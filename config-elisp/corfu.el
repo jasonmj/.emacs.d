@@ -1,0 +1,48 @@
+(use-package corfu
+  :ensure t
+  :init
+  (setq corfu-auto-prefix 3
+	corfu-auto-delay 0.05
+	corfu-auto t
+	corfu-cycle t
+	corfu-quit-no-match 'separator
+	corfu-preselect 'first
+	corfu-scroll-margin 5)
+  (corfu-indexed-mode 1)
+  (setq corfu-indexed-start 1)
+
+  ;; Customize corfu--affixate to exclude space after index
+  (cl-defmethod corfu--affixate :around (cands &context (corfu-indexed-mode (eql t)))
+    (setq cands (cdr (cl-call-next-method cands)))
+    (let* ((space #(" " 0 1 (face (:height 0.5 :inherit corfu-indexed))))
+           (width (if (length> cands (- 10 corfu-indexed-start)) 2 1))
+           (fmt (concat space
+			(propertize (format "%%%ds" width)
+                                    'face 'corfu-indexed)
+			space))
+           (align
+            (propertize (make-string width ?\s)
+			'display
+			`(space :align-to (+ left ,(1+ width))))))
+      (cl-loop for cand in cands for index from corfu-indexed-start do
+	       (setf (cadr cand)
+		     (concat
+		      (propertize " " 'display (format fmt index))
+		      (cadr cand))))
+      (cons t cands)))
+
+  ;; Insert indexed candidate without needing to press enter
+  (defun corfu-indexed-insert (i)
+    (setq corfu--index (- i 1))
+    (call-interactively #'corfu-insert))
+  (loopy-iter
+   (with (map corfu-map))
+   (numbering i :from 1 :to 9)
+   (define-key map (kbd (format "s-%d" i)) `(lambda () (interactive) (corfu-indexed-insert ,i))))
+  (global-corfu-mode))
+
+;; Customize Emacs for Corfu usage
+(use-package emacs
+  :init
+  (setq completion-cycle-threshold 3)
+  (setq tab-always-indent 'complete))

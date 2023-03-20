@@ -1,0 +1,97 @@
+#+TITLE: Defaults
+#+PROPERTY: header-args      :tangle "../config-elisp/defaults.el"
+* Auto Revert Buffers
+#+BEGIN_SRC emacs-lisp
+(setq global-auto-revert-mode t)
+#+END_SRC
+* Bury Compilation Buffers If Successful
+#+BEGIN_SRC emacs-lisp
+(use-package bury-successful-compilation :ensure t)
+#+END_SRC
+* Default Browser Settings
+#+BEGIN_SRC emacs-lisp
+(setq browse-url-browser-function 'browse-url-generic
+      browse-url-generic-program "firefox")
+#+END_SRC
+* Delete by Moving to Trash
+#+BEGIN_SRC emacs-lisp
+(setq delete-by-moving-to-trash t)
+#+END_SRC
+* Disable Ido Mode
+#+BEGIN_SRC emacs-lisp
+(ido-mode -1)
+#+END_SRC
+* Garbage Collect When Emacs Loses Focus
+#+BEGIN_SRC emacs-lisp
+(add-hook 'focus-out-hook 'garbage-collect)
+#+END_SRC
+* Newline at end of file
+#+BEGIN_SRC emacs-lisp
+(setq mode-require-final-newline t)
+(setq-default require-final-newline t)
+#+END_SRC
+* Narrow to Region
+#+begin_src emacs-lisp
+(put 'narrow-to-region 'disabled nil)
+#+end_src
+* Preserve Screen Position on Scroll
+#+BEGIN_SRC emacs-lisp
+(setq scroll-preserve-screen-position 'always)
+#+END_SRC
+* Replace Selected Text
+#+BEGIN_SRC emacs-lisp
+(delete-selection-mode 1)
+#+END_SRC
+* Save Backup Files to ~/.emacs-backups
+#+BEGIN_SRC emacs-lisp
+(setq backup-directory-alist '(("." . "~/.emacs.d/backups")))
+#+END_SRC
+* Save Kill Ring
+#+BEGIN_SRC emacs-lisp
+(use-package savekill :ensure t)
+(setq kill-ring-max 500)
+#+END_SRC
+* Save Place
+#+BEGIN_SRC emacs-lisp
+(save-place-mode 1)
+#+END_SRC
+* Set Minibuffer History Length
+#+BEGIN_SRC emacs-lisp
+(setq-default history-length 1000)
+(savehist-mode t)
+#+END_SRC
+* Turn Off Lockfiles
+#+BEGIN_SRC emacs-lisp
+(setq create-lockfiles nil)
+#+END_SRC
+* Turn Off Native Comp Warnings
+#+BEGIN_SRC emacs-lisp
+(setq warning-minimum-level :error)
+(setq native-comp-async-report-warnings-errors 'silent)
+#+END_SRC
+* Recent File Mode
+#+BEGIN_SRC emacs-lisp
+(setq recentf-exclude '("~$" "/tmp" "/sudo:"))
+(setq recentf-max-saved-items 300)
+(add-hook 'find-file-hook 'recentf-save-list)
+(recentf-mode 1)
+#+END_SRC
+* Secrets with GnuPG and Easy PG
+#+BEGIN_SRC emacs-lisp
+(setq epg-gpg-program "gpg2")
+(setq auth-sources '((:source "~/.authinfo.gpg")))
+#+END_SRC
+* Tramp
+#+BEGIN_SRC emacs-lisp
+(require 'tramp)
+(setq tramp-default-method "ssh")
+(setq tramp-inline-compress-start-size t)
+(setq tramp-copy-size-limit nil)
+(eval-after-load 'tramp '(setenv "SSH_AUTH_SOCK" "/run/user/1000/gnupg/S.gpg-agent.ssh"))
+#+END_SRC
+* Use Package Chords
+#+BEGIN_SRC emacs-lisp
+(use-package use-package-chords
+  :ensure t
+  :hook (after-init . key-chord-mode))
+#+END_SRC

@@ -1,0 +1,10 @@
+#+TITLE: Orderless
+#+PROPERTY: header-args      :tangle "../config-elisp/orderless.el"
+#+BEGIN_SRC emacs-lisp
+(use-package orderless
+  :ensure t
+  :init
+  (setq completion-styles '(orderless basic)
+        completion-category-defaults nil
+        completion-category-overrides '((file (styles partial-completion)))))
+#+END_SRC

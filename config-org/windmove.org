@@ -1,0 +1,14 @@
+#+TITLE: Windmove
+#+PROPERTY: header-args      :tangle "../config-elisp/windmove.el"
+#+BEGIN_SRC emacs-lisp
+(use-package windmove :ensure t)
+(exwm-input-set-key (kbd "s-b") 'windmove-left)
+(exwm-input-set-key (kbd "s-f") 'windmove-right)
+(exwm-input-set-key (kbd "s-p") 'windmove-up)
+(exwm-input-set-key (kbd "s-n") 'windmove-down)
+(exwm-input-set-key (kbd "C-1") 'delete-other-windows)
+(exwm-input-set-key (kbd "C-2") (lambda () (interactive) (split-window-below)
+                                  (run-with-idle-timer 0.15 nil (lambda() (interactive) (windmove-down)))))
+(exwm-input-set-key (kbd "C-3") (lambda () (interactive) (split-window-right) (windmove-right)))
+(exwm-input-set-key (kbd "<C-escape>") 'delete-window)
+#+END_SRC

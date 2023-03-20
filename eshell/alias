@@ -1,0 +1,22 @@
+alias dcl30 docker logs -f --since 30m ${docker ps -qf "name=$1"}
+alias gitlog git log --all --decorate --oneline --graph
+alias dsa docker-stop-all
+alias ds dsa; dcu
+alias clear eshell/clear
+alias ll ls -la $*
+alias l exa -aT -L 1 --color=always $*
+alias cl cd $*; exa -aT -L 1 --color=always ${pwd}
+alias dcd cd /docker:${docker ps -qf "name=$1"}:~/
+alias dps docker ps $*
+alias dce docker-compose exec $*
+alias dcu docker-compose up -d $*
+alias dcb docker-compose build $*
+alias dce docker-compose exec $*
+alias dcs docker-compose stop $*
+alias dcrs docker-compose restart $*
+alias dcl docker-compose logs -f $*
+alias dcr docker-compose run $*
+alias strip-colors sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g"
+alias scratch strip-colors >> #<buffer *scratch*>
+alias sudo eshell/sudo $*
+alias shadow-cljs /home/jasonmj/.npm-packages/bin/shadow-cljs

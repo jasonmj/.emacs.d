@@ -1,0 +1,9 @@
+#+TITLE: Battery Notifier
+#+PROPERTY: header-args      :tangle "../config-elisp/battery-notifier.el"
+* Battery Notifier
+#+BEGIN_SRC emacs-lisp
+(use-package battery-notifier
+  :ensure t
+  :hook ((after-init . battery-notifier-mode)
+	 (battery-notifier-capacity-critical . (lambda () (call-process-shell-command "systemctl suspend")))))
+#+END_SRC
