@@ -238,13 +238,31 @@
          frame-x frame-y frame-width frame-height)
     (with-current-buffer (exwm--id->buffer id)
       (when exwm--floating-frame
-        ...)
+        (setq frame-width (frame-pixel-width exwm--floating-frame)
+              frame-height (+ (frame-pixel-height exwm--floating-frame)
+                              ;; Use `frame-outer-height' in the future.
+                              exwm-workspace--frame-y-offset))
+        (when exwm--floating-frame-position
+          (setq frame-x (elt exwm--floating-frame-position 0)
+                frame-y (elt exwm--floating-frame-position 1)
+                x (+ x frame-x (- exwm-layout--floating-hidden-position))
+                y (+ y frame-y (- exwm-layout--floating-hidden-position)))
+          (setq exwm--floating-frame-position nil))
+        (exwm--set-geometry (frame-parameter exwm--floating-frame
+                                             'exwm-container)
+                            frame-x frame-y frame-width frame-height))
       (when (exwm-layout--fullscreen-p)
-        ...)
-;; edited here
-      (when (and (bound-and-true-p tab-line-mode) (not exwm--floating-frame))
-	(setq y (+ y (frame-char-height))))
-;; edited here
+        (with-slots ((x* x)
+                     (y* y)
+                     (width* width)
+                     (height* height))
+            (exwm-workspace--get-geometry exwm--frame)
+          (setq x x*
+                y y*
+                width width*
+                height height*)))
+      (when (bound-and-true-p tab-line-mode)
+	 (setq y (+ y (frame-char-height))))
       (exwm--set-geometry id x y width height)
       (xcb:+request exwm--connection (make-instance 'xcb:MapWindow :window id))
       (exwm-layout--set-state id xcb:icccm:WM_STATE:NormalState)
