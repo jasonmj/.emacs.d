@@ -32,7 +32,8 @@
 	       (setf (cadr cand)
 		     (concat
 		      (propertize " " 'display (format fmt index))
-		      (cadr cand))))
+		      (cadr cand)
+		      align)))
       (cons t cands)))
 
   ;; Insert indexed candidate without needing to press enter
@@ -52,14 +53,16 @@
   (setq tab-always-indent 'complete))
 #+END_SRC
 * Kind Icon
-#+begin_src 
+#+begin_src emacs-lisp
 (use-package kind-icon
   :ensure t
   :after corfu
   :custom
+  (kind-icon-use-icons t)
   (kind-icon)
   (kind-icon-default-face 'corfu-default)
   :config
-  (setq kind-icon-default-style '(:padding 0 :stroke 0 :margin 0 :radius 0 :height 1.0 :scale 0.6))
+  (setq kind-icon-default-style '(:padding 0 :stroke 0 :margin 0 :radius 0 :height 1.0 :scale 0.6)
+	kind-icon-extra-space t)
   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 #+end_src
