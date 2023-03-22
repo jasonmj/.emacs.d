@@ -7,11 +7,12 @@
   (interactive)
   (setq inhibit-compacting-font-caches t)
   (setq doom-modeline-height 32)
+  (setq doom-modeline-icon nil)
   (setq doom-modeline-bar-width 6)
   (setq-default mode-line '((t (:background "#3c3836" :foreground "#d5c4a1" :box nil :height 135))))
   (setq-default mode-line-inactive '((t (:background "#3c3836" :foreground "#a89984" :box nil :height 135))))
-  (set-face-attribute 'mode-line nil :family "Iosevka" :height 135)
-  (set-face-attribute 'mode-line-inactive nil :family "Iosevka" :height 135)
+  (set-face-attribute 'mode-line nil :family "Iosevka")
+  (set-face-attribute 'mode-line-inactive nil :family "Iosevka")
   (setq-local mode-line-format '("%e"
                            (:eval
                             (doom-modeline-format--my-simple-line))))
@@ -37,15 +38,6 @@
   (exwm-input-set-key (kbd "<XF86AudioPause>") 'toggle-doom-modeline)
   :init
   (my-doom-modeline-init))
-
-(defun doom-modeline-checker-icon (icon unicode text face)
-  "Displays the checker ICON with FACE.
-
-UNICODE and TEXT are fallbacks.
-Uses `all-the-icons-material' to fetch the icon."
-  (if (string-equal icon "block") (setq icon "do_not_disturb_alt"))
-  (doom-modeline-icon 'material icon unicode text
-                      :face face :height 1.1 :v-adjust -0.225))
 
 (doom-modeline-def-segment exwm-workspace
   (propertize (concat " [" (number-to-string exwm-workspace-current-index) "]") 'face '(:weight bold)))
