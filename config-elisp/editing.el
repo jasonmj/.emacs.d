@@ -27,13 +27,24 @@
 (use-package emacs
   :hook ((c-mode . display-line-numbers-mode)
 	 (sh-mode . display-line-numbers-mode)
+	 (emacs-lisp-mode . display-line-numbers-mode)
 	 (nix-mode . display-line-numbers-mode)
 	 (elixir-ts-mode . display-line-numbers-mode)))
 
+(defun duplicate-line ()
+  (interactive)
+  (move-beginning-of-line 1)
+  (kill-line 1)
+  (yank)
+  (yank)
+  (previous-line)
+  (backward-word))
+(global-set-key (kbd "C-c d") 'duplicate-line)
+
 (electric-pair-mode 1)
 
-(use-package expand-region
-  :ensure t
+(load-file "~/.emacs.d/elisp/expreg.el")
+(use-package expreg
   :bind (("s-<tab>" . er/expand-region)
 	 ("S-TAB" . er/expand-region)))
 
@@ -101,6 +112,7 @@ arg lines up."
 
 (use-package emacs
   :hook ((c-mode . subword-mode)
+	 (emacs-lisp-mode . subword-mode)
 	 (sh-mode . subword-mode)
 	 (nix-mode . subword-mode)
 	 (elixir-ts-mode . subword-mode)))
