@@ -24,7 +24,7 @@
 #+END_SRC
 * Expand Region
 #+BEGIN_SRC emacs-lisp
-(define-key org-mode-map (kbd "S-TAB") 'my/expand-region)
+(define-key org-mode-map (kbd "S-TAB") 'expreg-expand)
 #+END_SRC
 * Hungry Delete
 #+BEGIN_SRC emacs-lisp

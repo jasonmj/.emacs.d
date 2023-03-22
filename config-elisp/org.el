@@ -12,7 +12,7 @@
   (define-key org-mode-map (kbd "M-N") 'drag-stuff-down))
 (add-hook 'org-mode-hook 'org-move-lines)
 
-(define-key org-mode-map (kbd "S-TAB") 'my/expand-region)
+(define-key org-mode-map (kbd "S-TAB") 'expreg-expand)
 
 (add-hook 'org-mode-hook (lambda () (interactive) (hungry-delete-mode)))
 
