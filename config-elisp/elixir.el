@@ -25,11 +25,14 @@
   (add-to-list 'auto-mode-alist '("\\.ex\\'" . elixir-ts-mode))
   (add-to-list 'auto-mode-alist '("\\.exs\\'" . elixir-ts-mode)))
 
-(require 'eglot)
-(setq eglot-extend-to-xref t)
-(dolist (mode '(elixir-ts-mode))
-  (add-to-list 'eglot-server-programs `(,mode . ("/home/jasonmj/git/elixir-lsp/elixir-ls-1.14-25.1/language_server.sh"))))
-(add-hook 'elixir-ts-mode-hook 'eglot-ensure)
+(use-package eglot
+  :config
+  (setq eglot-extend-to-xref t)
+  (dolist (mode '(elixir-ts-mode))
+    (add-to-list 'eglot-server-programs `(,mode . ("/home/jasonmj/git/elixir-lsp/elixir-ls-1.14-25.1/language_server.sh"))))
+  (setq read-process-output-max (* 1024 1024))
+  (push :documentHighlightProvider eglot-ignored-server-capabilities)
+  (add-hook 'elixir-ts-mode-hook #'eglot-ensure))
 
 (use-package polymode
   :ensure t
