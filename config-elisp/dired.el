@@ -33,6 +33,14 @@
   :hook
   (dired-mode . all-the-icons-dired-mode))
 
+(defun dired-open-file ()
+  "In dired, open the file named on this line."
+  (interactive)
+  (let* ((file (dired-get-filename nil t)))
+    (call-process "xdg-open" nil 0 nil file)))
+(defun setup-dired-open-file () (define-key dired-mode-map (kbd "S-<return>") 'dired-open-file))
+(add-hook 'dired-mode-hook #'setup-dired-open-file)
+
 (defun dired-recent-dirs ()
   "Present a list of recently used directories and open the selected one in dired"
   (interactive)
@@ -72,15 +80,6 @@
 (defun hide-details-mode-hook ()
   (dired-hide-details-mode))
 (add-hook 'dired-mode-hook #'hide-details-mode-hook)
-
-(use-package openwith
-  :ensure t
-  :config
-  (setq openwith-associations '(
-                              ("\\.desktop\\'" "dex" (file))
-                              ("\\.csv\\'" "libreoffice" (file))
-                              ("\\.xlsx\\'" "libreoffice" (file)))))
-(add-hook 'dired-mode-hook 'openwith-mode)
 
 (setq dired-auto-revert-buffer t)
 (add-hook 'dired-mode-hook 'auto-revert-mode)
