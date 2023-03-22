@@ -59,6 +59,8 @@
 #+BEGIN_SRC emacs-lisp
 (setq-default history-length 1000)
 (savehist-mode t)
+(add-to-list 'savehist-additional-variables 'mark-ring)
+(add-to-list 'savehist-additional-variables 'global-mark-ring)
 #+END_SRC
 * Turn Off Lockfiles
 #+BEGIN_SRC emacs-lisp

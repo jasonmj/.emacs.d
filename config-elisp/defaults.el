@@ -29,6 +29,8 @@
 
 (setq-default history-length 1000)
 (savehist-mode t)
+(add-to-list 'savehist-additional-variables 'mark-ring)
+(add-to-list 'savehist-additional-variables 'global-mark-ring)
 
 (setq create-lockfiles nil)
 
