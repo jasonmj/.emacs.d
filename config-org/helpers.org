@@ -9,6 +9,12 @@
   (setq alert-fade-time 10
         alert-default-style 'notifications))
 #+END_SRC
+* App Launcher
+#+begin_src emacs-lisp
+(use-package app-launcher
+  :straight '(app-launcher :host github :repo "SebastienWae/app-launcher")
+  :bind (("C-s-SPC" . app-launcher-run-app)))
+#+end_src
 * Better Quit
 #+begin_src emacs-lisp
 (key-seq-define-global "gf" 'keyboard-escape-quit)

@@ -5,6 +5,10 @@
   (setq alert-fade-time 10
         alert-default-style 'notifications))
 
+(use-package app-launcher
+  :straight '(app-launcher :host github :repo "SebastienWae/app-launcher")
+  :bind (("C-s-SPC" . app-launcher-run-app)))
+
 (key-seq-define-global "gf" 'keyboard-escape-quit)
 
 (global-set-key (kbd "C-s-e") 'eval-region)
