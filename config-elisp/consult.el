@@ -85,7 +85,7 @@
 				"\\*elixir-ls" "Flymake log" "Shell command output" "direnv" "\\*scratch"
                                 "\\*Messages" "\\*Warning" "*magit-" "magit-" "*vterm" "vterm" "^:" "*Occur"
                                 "*straight-" "*elfeed-log" "*trace of SMTP session" "\\*Compile-Log"
-                                "*format-all-error" "*Async-" "COMMIT_EDITMSG"
+                                "*format-all-error" "*Async-" "COMMIT_EDITMSG" "shell: "
                                 "*lsp-" "*EGLOT" "*pyls")))
 
 (defun consult-line-at-point ()
