@@ -24,12 +24,7 @@
 	 (if (eq outline--cycle-buffer-state 'show-all) (setq outline--cycle-buffer-state 'top-level))
 	 (outline-cycle-buffer)))
 
-(use-package emacs
-  :hook ((c-mode . display-line-numbers-mode)
-	 (sh-mode . display-line-numbers-mode)
-	 (emacs-lisp-mode . display-line-numbers-mode)
-	 (nix-mode . display-line-numbers-mode)
-	 (elixir-ts-mode . display-line-numbers-mode)))
+(use-package emacs :hook ((prog-mode . display-line-numbers-mode)))
 
 (defun duplicate-line ()
   (interactive)
@@ -52,10 +47,7 @@
 
 (use-package hungry-delete
   :ensure t
-  :hook ((c-mode . hungry-delete-mode)
-	 (elixir-mode . hungry-delete-mode)
-	 (emacs-lisp-mode . hungry-delete-mode)
-	 (sh-mode . hungry-delete-mode)))
+  :hook ((prog-mode . hungry-delete-mode)))
 
 (use-package iedit :ensure t :bind (("C-c ;" . iedit-mode)))
 
@@ -110,12 +102,7 @@ arg lines up."
   :ensure t
   :hook (prog-mode . rainbow-delimiters-mode))
 
-(use-package emacs
-  :hook ((c-mode . subword-mode)
-	 (emacs-lisp-mode . subword-mode)
-	 (sh-mode . subword-mode)
-	 (nix-mode . subword-mode)
-	 (elixir-ts-mode . subword-mode)))
+(use-package emacs :hook ((prog-mode . subword-mode)))
 
 (use-package sudo-edit :ensure t)
 
