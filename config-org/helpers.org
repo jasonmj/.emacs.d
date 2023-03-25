@@ -45,6 +45,13 @@
       (let ((file (tramp-file-name-localname (tramp-dissect-file-name file))))
 	(replace-regexp-in-string (concat "\\`" dir) "" file))))
 #+END_SRC
+* Grip GitHub Markdown Previews
+#+begin_src emacs-lisp
+(use-package grip-mode
+  :ensure t
+  :config (setq grip-preview-use-webkit nil
+		grip-github-password (auth-source-pick-first-password :host "api.github.com" :user "jasonmj^grip")))
+#+end_src
 * Highlight Current Line
 #+BEGIN_SRC emacs-lisp
 (global-hl-line-mode +1)

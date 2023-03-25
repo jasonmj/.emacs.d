@@ -33,6 +33,11 @@
       (let ((file (tramp-file-name-localname (tramp-dissect-file-name file))))
 	(replace-regexp-in-string (concat "\\`" dir) "" file))))
 
+(use-package grip-mode
+  :ensure t
+  :config (setq grip-preview-use-webkit nil
+		grip-github-password (auth-source-pick-first-password :host "api.github.com" :user "jasonmj^grip")))
+
 (global-hl-line-mode +1)
 
 (mouse-avoidance-mode 'banish)
