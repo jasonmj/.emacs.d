@@ -21,7 +21,6 @@
   (setq-local global-hi-lock-mode nil)
   (setq-local global-hl-line-mode nil))
 (add-hook 'vterm-mode-hook 'vterm-startup)
-(exwm-input-set-key (kbd "M-s-t") 'multi-vterm)
 
 (use-package vterm-toggle
   :ensure t
