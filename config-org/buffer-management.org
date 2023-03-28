@@ -11,6 +11,8 @@
   (defun my/bufler-workspace-focus-buffer (&optional buffer)
     (run-with-idle-timer 0.001 nil (lambda () (interactive) (bufler-workspace-focus-buffer (current-buffer)))))
   (add-hook 'exwm-update-title-hook 'my/bufler-workspace-focus-buffer)
+  (add-hook 'exwm-manage-finish-hook 'my/bufler-workspace-focus-buffer)
+  (add-hook 'exwm-workspace-switch-hook 'my/bufler-workspace-focus-buffer)
   (add-hook 'kill-buffer-hook 'my/bufler-workspace-focus-buffer)
   (add-to-list 'window-selection-change-functions 'my/bufler-workspace-focus-buffer))
 #+END_SRC
