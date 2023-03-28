@@ -195,7 +195,9 @@
 
 (add-hook 'exwm-manage-finish-hook
     (lambda () (use-local-map (copy-keymap (current-local-map)))
+                (local-set-key (kbd "M-y") (lookup-key global-map (kbd "M-y")))
                 (local-set-key (kbd "C-SPC") (lookup-key global-map (kbd "C-SPC")))
+                (local-set-key (kbd "C-s-SPC") (lookup-key global-map (kbd "C-s-SPC")))
                 (local-set-key (kbd "C-<tab>") (lookup-key global-map (kbd "C-<tab>")))
                 (local-set-key (kbd "C-S-<iso-lefttab>") (lookup-key global-map (kbd "C-S-<iso-lefttab>")))
                 (local-set-key (kbd "M-<tab>") (lookup-key global-map (kbd "M-<tab>")))
