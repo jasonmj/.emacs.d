@@ -1,0 +1,10 @@
+#+TITLE: Eglot
+#+PROPERTY: header-args      :tangle "../config-elisp/eglot.el"
+* Eglot
+#+BEGIN_SRC emacs-lisp
+(use-package eglot
+  :config
+  (setq eglot-extend-to-xref t)
+  (setq read-process-output-max (* 1024 1024))
+  (push :documentHighlightProvider eglot-ignored-server-capabilities))
+#+END_SRC
