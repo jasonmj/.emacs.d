@@ -1,7 +1,7 @@
 (use-package corfu
   :ensure t
   :init
-  (setq corfu-auto-prefix 3
+  (setq corfu-auto-prefix 2
 	corfu-auto-delay 0.05
 	corfu-auto t
 	corfu-cycle t
@@ -9,6 +9,8 @@
 	corfu-preselect 'first
 	corfu-scroll-margin 5)
   (corfu-indexed-mode 1)
+  (corfu-history-mode 1)
+  (add-to-list 'savehist-additional-variables 'corfu-history)
   (setq corfu-indexed-start 1)
 
   ;; Customize corfu--affixate to exclude space after index
@@ -31,6 +33,13 @@
 		      (cadr cand)
 		      align)))
       (cons t cands)))
+
+  ;; Completion in the minibuffer
+  (defun corfu-move-to-minibuffer ()
+    (interactive)
+    (let ((completion-extra-properties corfu--extra)
+          completion-cycle-threshold completion-cycling)
+      (apply #'consult-completion-in-region completion-in-region--data)))
 
   ;; Insert indexed candidate without needing to press enter
   (defun corfu-indexed-insert (i)
