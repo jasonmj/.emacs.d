@@ -16,17 +16,6 @@
 (define-key shell-mode-map (kbd "C-c C-l") 'counsel-shell-history)
 (add-hook 'shell-mode-hook (lambda () (compilation-shell-minor-mode 1 )))
 
-;; (use-package shell-pop
-;;   :bind (("C-|" . shell-pop))
-;;   :ensure t
-;;   :config
-;;   (setq shell-pop-shell-type (quote ("shell" "*shell*" (lambda nil (shell shell-pop-term-shell)))))
-;;   (setq shell-pop-term-shell "/run/current-system/sw/bin/bash")
-;;   ;; need to do this manually or not picked up by `shell-pop'
-;;   (shell-pop--set-shell-type 'shell-pop-shell-type shell-pop-shell-type)
-;;   :init
-;;   (define-key shell-mode-map (kbd "<tab>") 'completion-at-point))
-
 (defun clean-compilation-filename (filename)
   (string-trim
          (string-remove-prefix "** (CompileError) "
