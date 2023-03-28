@@ -29,11 +29,7 @@
 
 (use-package eglot
   :config
-  (setq eglot-extend-to-xref t)
-  (dolist (mode '(elixir-ts-mode))
-    (add-to-list 'eglot-server-programs `(,mode . ("/home/jasonmj/git/elixir-lsp/elixir-ls-1.14-25.1/language_server.sh"))))
-  (setq read-process-output-max (* 1024 1024))
-  (push :documentHighlightProvider eglot-ignored-server-capabilities)
+  (add-to-list 'eglot-server-programs '(elixir-ts-mode . ("/home/jasonmj/git/elixir-lsp/elixir-ls-1.14-25.1/language_server.sh")))
   (add-hook 'elixir-ts-mode-hook #'eglot-ensure))
 
 (use-package polymode
@@ -47,7 +43,7 @@
     :head-mode 'host
     :tail-mode 'host)
   (define-innermode poly-elixir-ts-template-innermode
-    :mode 'web-mode
+    :mode 'heex-ts-mode
     :head-matcher "~\\(L\\|E\\|\\H\\)\"\"\""
     :tail-matcher "\"\"\""
     :head-mode 'host
@@ -59,12 +55,6 @@
   (define-innermode poly-heex-ts-doc-innermode
     :mode 'markdown-mode
     :head-matcher "@\\(module\\)?doc *\"\"\""
-    :tail-matcher "\"\"\""
-    :head-mode 'host
-    :tail-mode 'host)
-  (define-innermode poly-heex-ts-template-innermode
-    :mode 'web-mode
-    :head-matcher "~\\(L\\|E\\|\\H\\)\"\"\""
     :tail-matcher "\"\"\""
     :head-mode 'host
     :tail-mode 'host)
