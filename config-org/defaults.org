@@ -81,7 +81,9 @@
 * Secrets with GnuPG and Easy PG
 #+BEGIN_SRC emacs-lisp
 (setq epg-gpg-program "gpg2")
+(setq epa-pinentry-mode 'loopback)
 (setq auth-sources '((:source "~/.authinfo.gpg")))
+(pinentry-start)
 #+END_SRC
 * Tramp
 #+BEGIN_SRC emacs-lisp

@@ -43,7 +43,9 @@
 (recentf-mode 1)
 
 (setq epg-gpg-program "gpg2")
+(setq epa-pinentry-mode 'loopback)
 (setq auth-sources '((:source "~/.authinfo.gpg")))
+(pinentry-start)
 
 (require 'tramp)
 (setq tramp-default-method "ssh")
