@@ -57,6 +57,14 @@
   (setq completion-cycle-threshold 3)
   (setq tab-always-indent 'complete))
 
+(use-package dabbrev
+  ;; Swap M-/ and C-M-/
+  :bind (("M-/" . dabbrev-completion)
+         ("C-M-/" . dabbrev-expand))
+  ;; Other useful Dabbrev configurations.
+  :custom
+  (dabbrev-ignored-buffer-regexps '("\\.\\(?:pdf\\|jpe?g\\|png\\)\\'")))
+
 (use-package kind-icon
   :ensure t
   :after corfu

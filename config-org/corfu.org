@@ -61,6 +61,16 @@
   (setq completion-cycle-threshold 3)
   (setq tab-always-indent 'complete))
 #+END_SRC
+* Dabbrev
+#+begin_src emacs-lisp
+(use-package dabbrev
+  ;; Swap M-/ and C-M-/
+  :bind (("M-/" . dabbrev-completion)
+         ("C-M-/" . dabbrev-expand))
+  ;; Other useful Dabbrev configurations.
+  :custom
+  (dabbrev-ignored-buffer-regexps '("\\.\\(?:pdf\\|jpe?g\\|png\\)\\'")))
+#+end_src
 * Kind Icon
 #+begin_src emacs-lisp
 (use-package kind-icon
