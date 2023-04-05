@@ -59,6 +59,7 @@
   :config
   ;; Find File
   (key-seq-define-global "xf" 'find-file)
+  (global-set-key (kbd "C-x f") 'find-file)
   (global-set-key (kbd "M-SPC") 'project-find-file)
   
   ;; Switch buffer
@@ -84,8 +85,8 @@
   ;; Buffer filtering
   (setq consult-buffer-filter '("^ " "\\` " "\\*Echo Area" "\\*Minibuf" "\\*Quail Completions"
 				"\\*elixir-ls" "Flymake log" "Shell command output" "direnv" "\\*scratch"
-                                "\\*Messages" "\\*Warning" "*magit-" "magit-" "*vterm" "vterm" "^:" "*Occur"
-                                "*straight-" "*elfeed-log" "*trace of SMTP session" "\\*Compile-Log"
+                                "\\*Messages" "\\*Warning" "*magit-" "magit-process" "*vterm" "vterm" "^:" "*Occur"
+                                "*straight-" "*elfeed-log" "*trace of SMTP session" "\\*Compile-Log" "\\*blamer"
                                 "*format-all-error" "*Async-" "COMMIT_EDITMSG" "shell: "
                                 "*lsp-" "*EGLOT" "*pyls")))
 
