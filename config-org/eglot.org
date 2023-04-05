@@ -1,5 +1,14 @@
 #+TITLE: Eglot
 #+PROPERTY: header-args      :tangle "../config-elisp/eglot.el"
+* Eldoc
+#+begin_src emacs-lisp
+  (use-package eldoc-box
+    :ensure t
+    :custom
+    (eldoc-box-offset '(16 16 40))
+    (eldoc-idle-delay 1.0)
+    :hook (eglot-managed-mode . eldoc-box-hover-mode))
+#+end_src
 * Eglot
 #+BEGIN_SRC emacs-lisp
 (use-package eglot
