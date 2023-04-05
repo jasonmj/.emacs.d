@@ -1,3 +1,17 @@
+(use-package cape
+  :ensure t
+  :bind (("C-c q" . completion-at-point))
+  :init
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  (add-to-list 'completion-at-point-functions #'cape-file)
+  (add-to-list 'completion-at-point-functions #'cape-keyword)
+  (add-to-list 'completion-at-point-functions #'cape-tex)
+  ;;(add-to-list 'completion-at-point-functions #'cape-abbrev)
+  (add-to-list 'completion-at-point-functions #'cape-ispell)
+  ;;(add-to-list 'completion-at-point-functions #'cape-dict)
+  (add-to-list 'completion-at-point-functions #'cape-symbol)
+  (add-to-list 'completion-at-point-functions #'cape-line))
+
 (use-package corfu
   :ensure t
   :init
@@ -5,11 +19,12 @@
 	corfu-auto-delay 0.05
 	corfu-auto t
 	corfu-cycle t
-	corfu-quit-no-match 'separator
+	corfu-quit-no-match t
 	corfu-preselect 'first
 	corfu-scroll-margin 5)
   (corfu-indexed-mode 1)
   (corfu-history-mode 1)
+  (savehist-mode t)
   (add-to-list 'savehist-additional-variables 'corfu-history)
   (setq corfu-indexed-start 1)
 
