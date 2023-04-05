@@ -2,7 +2,7 @@
   :ensure t
   :init
   (with-eval-after-load 'magit-mode
-    (define-key magit-mode-map (kbd "<C-tab>") 'centaur-tabs-forward-group))
+    (define-key magit-mode-map (kbd "<C-tab>") 'tab-line-switch-to-next-tab))
   :bind (("C-c g" . magit))
   :config
   (setq magit-commit-show-diff nil
