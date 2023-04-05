@@ -50,14 +50,16 @@
        (message "Got error: %S" error-thrown)
        (print error-thrown)))))
 
-(add-to-list 'load-path "~/.emacs.d/elisp/org-toggl")
-(setq toggl-auth-token (auth-source-pick-first-password :host "api.toggl.com" :user "jasonmj"))
-(setq org-toggl-inherit-toggl-properties t)
-(require 'org-toggl)
-(toggl-get-projects)
-(toggl-timer-watch)
-(org-toggl-integration-mode)
-(eval-after-load 'org #'(define-key org-mode-map (kbd "C-x t s") 'org-toggl-set-project))
-(eval-after-load 'org #'(define-key org-mode-map (kbd "C-c C-x TAB") 'org-toggl-clock-in))
-(exwm-input-set-key (kbd "C-c C-x C-o") 'toggl-stop-time-entry)
-(eval-after-load 'org #'(define-key org-mode-map (kbd "C-c C-x C-o") 'toggl-stop-time-entry))
+(use-package org-toggl
+  :straight (:type git :host github :repo "jasonmj/org-toggl")
+  :custom
+  (toggl-auth-token (auth-source-pick-first-password :host "api.toggl.com" :user "jasonmj"))
+  (org-toggl-inherit-toggl-properties t)
+  :hook ((after-init . toggl-get-projects)
+	 (after-init . toggl-timer-watch)
+	 (after-init . org-toggl-integration-mode))
+  :init
+  (eval-after-load 'org #'(define-key org-mode-map (kbd "C-x t s") 'org-toggl-set-project))
+  (eval-after-load 'org #'(define-key org-mode-map (kbd "C-c C-x TAB") 'org-toggl-clock-in))
+  (exwm-input-set-key (kbd "C-c C-x C-o") 'toggl-stop-time-entry)
+  (eval-after-load 'org #'(define-key org-mode-map (kbd "C-c C-x C-o") 'toggl-stop-time-entry)))
