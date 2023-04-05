@@ -9,7 +9,7 @@
   (concat "^[[:space:]]*\\("
 	  "@moduledoc\\|@behaviour\\|@callback\\|@type\\|@typedoc\\|@doc\\|@spec\\|@impl"
 	  "\\|def\\(\\|p\\|callback\\|delegate\\|impl\\|overridable\\|exception\\|struct\\|guard\\|guardp\\|record\\|recordp\\|macro\\|macrop\\|macrocallback\\|protocol\\)"
-	  "\\|describe\\|test\\|setup\\|let\\|it\\|context\\|before"
+	  "\\|describe\\|test\\|setup\\|let\\|it\\|context\\|before\\|schema"
 	  "\\|use\\|alias\\|import\\|require"
 	  "\\)\\([[:space:]]\\|(\\)"))
 (defun my/elixir-format ()
@@ -34,6 +34,7 @@
 
 (use-package polymode
   :ensure t
+  :custom (polymode-mode-map nil)
   :config
   (define-hostmode poly-elixir-ts-hostmode :mode 'elixir-ts-mode)
   (define-innermode poly-elixir-ts-doc-innermode
