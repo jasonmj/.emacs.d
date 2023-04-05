@@ -9,16 +9,36 @@
   :straight '(app-launcher :host github :repo "SebastienWae/app-launcher")
   :bind (("C-s-SPC" . app-launcher-run-app)))
 
+(use-package blamer
+  :ensure t
+  :bind (("M-I" . blamer-show-posframe-commit-info))
+  :defer 20
+  :custom
+  (blamer-type 'posframe-popup)
+  (blamer-idle-time 0.3)
+  (blamer-show-avatar-p nil)
+  (blamer-min-offset 70)
+  (blamer-posframe-configurations '(:alpha 92 :left-fringe 0 :right-fringe 0 :y-pixel-offset 20 :x-pixel-offset -20 :internal-border-width 20 :lines-truncate t :accept-focus nil))
+  :custom-face
+  (blamer-pretty-border-face ((t nil)))
+  (blamer-face ((t :foreground "#7a88cf"
+		   :height 140
+		   :italic t)))
+  :config
+  (global-blamer-mode 1))
+
 (key-seq-define-global "gf" 'keyboard-escape-quit)
+
+(use-package codemetrics
+  :straight (codemetrics :type git :host github :repo "jcs-elpa/codemetrics"))
+
+(use-package devdocs :ensure t)
 
 (global-set-key (kbd "C-s-e") 'eval-region)
 
 (use-package git-gutter
   :ensure t
-  :hook ((c-mode . git-gutter-mode)
-	 (sh-mode . git-gutter-mode)
-	 (emacs-lisp-mode . git-gutter-mode)
-	 (elixir-mode . git-gutter-mode)))
+  :hook ((prog-mode . git-gutter-mode)))
 (with-eval-after-load 'git-gutter
   (defun git-gutter+-remote-default-directory (dir file)
     (let* ((vec (tramp-dissect-file-name file))
@@ -36,6 +56,7 @@
 (use-package grip-mode
   :ensure t
   :config (setq grip-preview-use-webkit nil
+		grip-github-user "jasonmj"
 		grip-github-password (auth-source-pick-first-password :host "api.github.com" :user "jasonmj^grip")))
 
 (global-hl-line-mode +1)
@@ -68,3 +89,8 @@
           (add-to-list 'tramp-remote-path "~/.asdf/shims/"))
 
 (use-package which-key :ensure t :hook (after-init . which-key-mode))
+
+(use-package writeroom-mode
+  :ensure t
+  :hook ((devdocs-mode . writeroom-mode))
+  :config (setq writeroom-width 100))
