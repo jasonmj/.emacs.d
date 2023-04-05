@@ -38,7 +38,7 @@
 
 (electric-pair-mode 1)
 
-(load-file "~/.emacs.d/elisp/expreg.el")
+(load-file "/home/jasonmj/.emacs.d/elisp/expreg.el")
 (use-package expreg
   :bind (("s-<tab>" . expreg-expand)
 	 ("S-TAB" . expreg-expand)))
