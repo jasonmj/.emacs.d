@@ -18,14 +18,14 @@
 
 (defun clean-compilation-filename (filename)
   (string-trim
-         (string-remove-prefix "** (CompileError) "
-                               (replace-regexp-in-string "\([^\"]+?\)" ""
-                                                         (string-trim filename)))))
+       (replace-regexp-in-string "\\(\*\* \\)" ""
+			     (replace-regexp-in-string "\([^\"]+?\)" ""
+						       (string-trim filename)))))
 (defun compilation-find-file-fixer (orig-fun marker filename &rest args)
   (message (clean-compilation-filename filename))
   (apply orig-fun marker
-         (clean-compilation-filename filename)
-         args))
+	 (clean-compilation-filename filename)
+	 args))
 (advice-add 'compilation-find-file :around #'compilation-find-file-fixer)
 
 (use-package bash-completion
