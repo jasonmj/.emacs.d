@@ -20,40 +20,7 @@
 
 (exwm-input-set-key (kbd "s-d") (lambda()(interactive)(dired "~/downloads")))
 
-(defun forward-node ()
-  (interactive)
-  (let ((initial-pos (point)))
-    (expreg-expand)
-    (let ((new-pos (cdr (car (region-bounds)))))
-      (if (eq initial-pos new-pos)
-	  (progn (goto-char new-pos) (forward-char 1))
-	(goto-char new-pos))))
-    (deactivate-mark))
-(global-set-key (kbd "C-s-f") 'forward-node)
-
-(defun backward-node ()
-  (interactive)
-  (let ((initial-pos (point)))
-    (expreg-expand)
-    (let ((new-pos (car (car (region-bounds)))))
-      (if (eq initial-pos new-pos)
-	  (progn (backward-char 1) (backward-node))
-	(goto-char new-pos))))
-  (deactivate-mark))
-(global-set-key (kbd "C-s-b") 'backward-node)
-
-(defun up-node ()
-  (interactive)
-  (let ((initial-pos (point)))
-    (expreg-expand)
-    (let ((new-pos (car (car (region-bounds)))))
-      (if (eq initial-pos new-pos)
-	  (up-node)
-	(goto-char new-pos))))
-  (deactivate-mark))
-(global-set-key (kbd "C-s-p") 'up-node)
-
-(global-set-key (kbd "C-s-n") 'down-list)
+(use-package golden-ratio :ensure t :config (golden-ratio-mode 1))
 
 (defun kill-ring-clear () (interactive) (setq kill-ring nil))
 
@@ -127,14 +94,49 @@ point reaches the beginning or end of the buffer, stop there."
 
 (global-set-key (kbd "s-a") 'mark-whole-buffer)
 
+(defun forward-node ()
+  (interactive)
+  (let ((initial-pos (point)))
+    (expreg-expand)
+    (let ((new-pos (cdr (car (region-bounds)))))
+      (if (eq initial-pos new-pos)
+	  (progn (goto-char new-pos) (forward-char 1))
+	(goto-char new-pos))))
+    (deactivate-mark))
+(global-set-key (kbd "C-s-f") 'forward-node)
+
+(defun backward-node ()
+  (interactive)
+  (let ((initial-pos (point)))
+    (expreg-expand)
+    (let ((new-pos (car (car (region-bounds)))))
+      (if (eq initial-pos new-pos)
+	  (progn (backward-char 1) (backward-node))
+	(goto-char new-pos))))
+  (deactivate-mark))
+(global-set-key (kbd "C-s-b") 'backward-node)
+
+(defun up-node ()
+  (interactive)
+  (let ((initial-pos (point)))
+    (expreg-expand)
+    (let ((new-pos (car (car (region-bounds)))))
+      (if (eq initial-pos new-pos)
+	  (up-node)
+	(goto-char new-pos))))
+  (deactivate-mark))
+(global-set-key (kbd "C-s-p") 'up-node)
+
+(global-set-key (kbd "C-s-n") 'down-list)
+
 (winner-mode 1)
 (exwm-input-set-key (kbd "s-z") 'winner-undo)
 (exwm-input-set-key (kbd "s-Z") 'winner-redo)
 
-(use-package zoom
-  :ensure t
-  :commands zoom-mode
-  :preface
-  (setq zoom-size '(0.618 . 0.618))
-  :init
-  (zoom-mode))
+;; (use-package zoom
+;;   :ensure t
+;;   :commands zoom-mode
+;;   :preface
+;;   (setq zoom-size '(0.618 . 0.618))
+;;   :init
+;;   (zoom-mode))

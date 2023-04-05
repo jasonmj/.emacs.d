@@ -32,43 +32,10 @@
 #+BEGIN_SRC emacs-lisp
 (exwm-input-set-key (kbd "s-d") (lambda()(interactive)(dired "~/downloads")))
 #+END_SRC
-* Smart Movement
-#+BEGIN_SRC emacs-lisp
-(defun forward-node ()
-  (interactive)
-  (let ((initial-pos (point)))
-    (expreg-expand)
-    (let ((new-pos (cdr (car (region-bounds)))))
-      (if (eq initial-pos new-pos)
-	  (progn (goto-char new-pos) (forward-char 1))
-	(goto-char new-pos))))
-    (deactivate-mark))
-(global-set-key (kbd "C-s-f") 'forward-node)
-
-(defun backward-node ()
-  (interactive)
-  (let ((initial-pos (point)))
-    (expreg-expand)
-    (let ((new-pos (car (car (region-bounds)))))
-      (if (eq initial-pos new-pos)
-	  (progn (backward-char 1) (backward-node))
-	(goto-char new-pos))))
-  (deactivate-mark))
-(global-set-key (kbd "C-s-b") 'backward-node)
-
-(defun up-node ()
-  (interactive)
-  (let ((initial-pos (point)))
-    (expreg-expand)
-    (let ((new-pos (car (car (region-bounds)))))
-      (if (eq initial-pos new-pos)
-	  (up-node)
-	(goto-char new-pos))))
-  (deactivate-mark))
-(global-set-key (kbd "C-s-p") 'up-node)
-
-(global-set-key (kbd "C-s-n") 'down-list)
-#+END_SRC
+* Golden Ratio
+#+begin_src emacs-lisp
+(use-package golden-ratio :ensure t :config (golden-ratio-mode 1))
+#+end_src
 * Kill Ring Clear
 #+BEGIN_SRC emacs-lisp
 (defun kill-ring-clear () (interactive) (setq kill-ring nil))
@@ -163,6 +130,43 @@ point reaches the beginning or end of the buffer, stop there."
 #+BEGIN_SRC emacs-lisp
 (global-set-key (kbd "s-a") 'mark-whole-buffer)
 #+END_SRC
+* Smart Movement
+#+BEGIN_SRC emacs-lisp
+(defun forward-node ()
+  (interactive)
+  (let ((initial-pos (point)))
+    (expreg-expand)
+    (let ((new-pos (cdr (car (region-bounds)))))
+      (if (eq initial-pos new-pos)
+	  (progn (goto-char new-pos) (forward-char 1))
+	(goto-char new-pos))))
+    (deactivate-mark))
+(global-set-key (kbd "C-s-f") 'forward-node)
+
+(defun backward-node ()
+  (interactive)
+  (let ((initial-pos (point)))
+    (expreg-expand)
+    (let ((new-pos (car (car (region-bounds)))))
+      (if (eq initial-pos new-pos)
+	  (progn (backward-char 1) (backward-node))
+	(goto-char new-pos))))
+  (deactivate-mark))
+(global-set-key (kbd "C-s-b") 'backward-node)
+
+(defun up-node ()
+  (interactive)
+  (let ((initial-pos (point)))
+    (expreg-expand)
+    (let ((new-pos (car (car (region-bounds)))))
+      (if (eq initial-pos new-pos)
+	  (up-node)
+	(goto-char new-pos))))
+  (deactivate-mark))
+(global-set-key (kbd "C-s-p") 'up-node)
+
+(global-set-key (kbd "C-s-n") 'down-list)
+#+END_SRC
 * Winner Undo
 #+BEGIN_SRC emacs-lisp
 (winner-mode 1)
@@ -171,11 +175,11 @@ point reaches the beginning or end of the buffer, stop there."
 #+END_SRC
 * Zoom
 #+BEGIN_SRC emacs-lisp
-(use-package zoom
-  :ensure t
-  :commands zoom-mode
-  :preface
-  (setq zoom-size '(0.618 . 0.618))
-  :init
-  (zoom-mode))
+;; (use-package zoom
+;;   :ensure t
+;;   :commands zoom-mode
+;;   :preface
+;;   (setq zoom-size '(0.618 . 0.618))
+;;   :init
+;;   (zoom-mode))
 #+END_SRC
