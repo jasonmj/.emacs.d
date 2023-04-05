@@ -60,11 +60,18 @@
              mouse-face tab-line-highlight))))
   (setq tab-line-new-button-show nil
 	tab-line-switch-cycling t
+	tab-line-close-tab-function 'kill-buffer
 	tab-line-tab-name-function 'tab-line-tab-name-truncated-buffer
 	tab-line-tab-name-truncated-max 25
 	tab-line-separator ""
 	tab-line-close-button-show nil
 	tab-line-tab-name-format-function 'my/tab-line-tab-name-format-default)
   (key-seq-define-global "jk" 'tab-line-switch-to-next-tab)
-  (key-seq-define-global "fd" 'tab-line-switch-to-prev-tab))
+  (key-seq-define-global "fd" 'tab-line-switch-to-prev-tab)
+  (defun my/tab-line-close-tab ()
+  (interactive)
+  (tab-line-switch-to-prev-tab)
+  (tab-line-switch-to-next-tab)
+  (my/kill-this-buffer))
+  (key-seq-define-global "gw" 'my/tab-line-close-tab))
 #+END_SRC
