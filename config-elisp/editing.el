@@ -40,8 +40,8 @@
 
 (load-file "~/.emacs.d/elisp/expreg.el")
 (use-package expreg
-  :bind (("s-<tab>" . er/expand-region)
-	 ("S-TAB" . er/expand-region)))
+  :bind (("s-<tab>" . expreg-expand)
+	 ("S-TAB" . expreg-expand)))
 
 (show-paren-mode 1)
 
@@ -94,9 +94,14 @@ arg lines up."
 (global-set-key (kbd "M-n") 'move-text-down)
 
 (use-package multiple-cursors
+  :defer
   :ensure t
-  :init (setq mc/always-run-for-all t)
-  :bind (("M-/" . mc/mark-next-like-this)))
+  :bind (("M-/" . mc/mark-next-like-this))
+  :init
+  (add-hook 'multiple-cursors-mode-hook
+            (defun my/work-around-multiple-cursors-issue ()
+              (load "multiple-cursors-core.el")
+              (remove-hook 'multiple-cursors-mode #'my/work-around-multiple-cursors-issue))))
 
 (use-package rainbow-delimiters
   :ensure t
@@ -123,13 +128,13 @@ arg lines up."
 (global-set-key (kbd "M-u") 'upcase-char)
 (global-set-key (kbd "M-l") 'downcase-dwim)
 
-(use-package yasnippet
-  :ensure t
-  :diminish yas-minor-mode
-  :config
-  (yas-reload-all)
-  :custom (yas-keymap-disable-hook
-           (lambda () (and (frame-live-p corfu--frame)
-                           (frame-visible-p corfu--frame))))
-  :hook ((elixir-ts-mode . yas-minor-mode)
-	 (after-init . yas-global-mode)))
+;; (use-package yasnippet
+;;   :ensure t
+;;   :diminish yas-minor-mode
+;;   :config
+;;   (yas-reload-all)
+;;   :custom (yas-keymap-disable-hook
+;;            (lambda () (and (frame-live-p corfu--frame)
+;;                            (frame-visible-p corfu--frame))))
+;;   :hook ((elixir-ts-mode . yas-minor-mode)
+;; 	 (after-init . yas-global-mode)))

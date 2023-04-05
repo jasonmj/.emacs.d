@@ -54,8 +54,8 @@
 #+begin_src emacs-lisp
 (load-file "~/.emacs.d/elisp/expreg.el")
 (use-package expreg
-  :bind (("s-<tab>" . er/expand-region)
-	 ("S-TAB" . er/expand-region)))
+  :bind (("s-<tab>" . expreg-expand)
+	 ("S-TAB" . expreg-expand)))
 #+end_src
 * Highlight Matching Parenthesis
 #+BEGIN_SRC emacs-lisp
@@ -120,9 +120,14 @@ arg lines up."
 * Multiple Cursors
 #+BEGIN_SRC emacs-lisp
 (use-package multiple-cursors
+  :defer
   :ensure t
-  :init (setq mc/always-run-for-all t)
-  :bind (("M-/" . mc/mark-next-like-this)))
+  :bind (("M-/" . mc/mark-next-like-this))
+  :init
+  (add-hook 'multiple-cursors-mode-hook
+            (defun my/work-around-multiple-cursors-issue ()
+              (load "multiple-cursors-core.el")
+              (remove-hook 'multiple-cursors-mode #'my/work-around-multiple-cursors-issue))))
 #+END_SRC
 * Rainbow Delimeters
 #+BEGIN_SRC emacs-lisp
@@ -163,14 +168,14 @@ arg lines up."
 #+END_SRC
 * Yasnippet
 #+begin_src emacs-lisp
-(use-package yasnippet
-  :ensure t
-  :diminish yas-minor-mode
-  :config
-  (yas-reload-all)
-  :custom (yas-keymap-disable-hook
-           (lambda () (and (frame-live-p corfu--frame)
-                           (frame-visible-p corfu--frame))))
-  :hook ((elixir-ts-mode . yas-minor-mode)
-	 (after-init . yas-global-mode)))
+;; (use-package yasnippet
+;;   :ensure t
+;;   :diminish yas-minor-mode
+;;   :config
+;;   (yas-reload-all)
+;;   :custom (yas-keymap-disable-hook
+;;            (lambda () (and (frame-live-p corfu--frame)
+;;                            (frame-visible-p corfu--frame))))
+;;   :hook ((elixir-ts-mode . yas-minor-mode)
+;; 	 (after-init . yas-global-mode)))
 #+end_src
