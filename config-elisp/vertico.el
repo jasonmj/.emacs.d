@@ -40,7 +40,7 @@
   :config
   (setq vertico-posframe-border-width 20
 	vertico-posframe-hide-minibuffer t
-	vertico-posframe-min-width 75
+	vertico-posframe-min-width 80
 	vertico-posframe-height nil
 	vertico-posframe-min-height 10
 	vertico-posframe-width 110

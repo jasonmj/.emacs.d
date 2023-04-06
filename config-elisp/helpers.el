@@ -18,7 +18,7 @@
   (blamer-idle-time 0.3)
   (blamer-show-avatar-p nil)
   (blamer-min-offset 70)
-  (blamer-posframe-configurations '(:alpha 92 :left-fringe 0 :right-fringe 0 :y-pixel-offset 20 :x-pixel-offset -20 :internal-border-width 20 :lines-truncate t :accept-focus nil))
+  (blamer-posframe-configurations '(:left-fringe 0 :right-fringe 0 :y-pixel-offset 20 :x-pixel-offset -20 :internal-border-width 20 :lines-truncate t :accept-focus nil))
   :custom-face
   (blamer-pretty-border-face ((t nil)))
   (blamer-face ((t :foreground "#7a88cf"
