@@ -1,10 +1,3 @@
-(use-package dap-mode
-  :ensure t
-  :config
-  (require 'dap-elixir)
-  (dap-ui-mode)
-  (dap-mode))
-
 (defvar elixir-outline-regexp
   (concat "^[[:space:]]*\\("
 	  "@moduledoc\\|@behaviour\\|@callback\\|@type\\|@typedoc\\|@doc\\|@spec\\|@impl"
@@ -20,7 +13,8 @@
       (elixir-format)))
   (revert-buffer t t))
 (defun setup-elixir ()
-  (add-hook 'after-save-hook 'my/elixir-format nil 'make-it-local)
+  (define-key elixir-ts-mode-map (kbd "C-S-s") (lambda () (interactive) (save-buffer) (my/elixir-format)))
+  ;;(add-hook 'after-save-hook 'my/elixir-format nil 'make-it-local)
   (setq-local outline-regexp elixir-outline-regexp))
 (use-package elixir-mode :ensure t)
 (use-package elixir-ts-mode
