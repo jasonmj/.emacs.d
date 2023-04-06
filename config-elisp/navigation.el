@@ -20,8 +20,6 @@
 
 (exwm-input-set-key (kbd "s-d") (lambda()(interactive)(dired "~/downloads")))
 
-(use-package golden-ratio :ensure t :config (golden-ratio-mode 1))
-
 (defun kill-ring-clear () (interactive) (setq kill-ring nil))
 
 (global-set-key (kbd "C-k") 'kill-whole-line)
@@ -133,10 +131,14 @@ point reaches the beginning or end of the buffer, stop there."
 (exwm-input-set-key (kbd "s-z") 'winner-undo)
 (exwm-input-set-key (kbd "s-Z") 'winner-redo)
 
-;; (use-package zoom
-;;   :ensure t
-;;   :commands zoom-mode
-;;   :preface
-;;   (setq zoom-size '(0.618 . 0.618))
-;;   :init
-;;   (zoom-mode))
+(use-package zoom
+  :ensure t
+  :commands zoom-mode
+  :preface
+  (setq zoom-size '(0.618 . 0.618))
+  :init
+  :init
+  (add-hook 'zoom-mode-hook
+	    (defun my/work-around-zoom-issue ()
+	      (load "zoom.el")
+	      (remove-hook 'zoo-mode #'my/work-around-zoom-issue))))
