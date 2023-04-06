@@ -99,6 +99,7 @@ searched. If there is no symbol, empty search box is started."
   (interactive)
   (consult-line (selection-or-thing-at-point)))
 (key-seq-define-global "vf" 'consult-line-at-point)
+(key-seq-define-global "vd" 'consult-line-at-point)
 
 (defun consult-ripgrep-at-point ()
   (interactive)
