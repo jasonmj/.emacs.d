@@ -1,5 +1,6 @@
 (use-package polymode
   :ensure t
+  :custom (poly-mode-map nil)
   :config
   (define-hostmode poly-markdown-hostmode :mode 'markdown-mode)
   (define-innermode poly-markdown-shell-innermode
