@@ -19,6 +19,11 @@
 (use-package elixir-mode :ensure t)
 (use-package elixir-ts-mode
   :ensure t
+  :config
+  (add-to-list 'auto-mode-alist '("\\.leex\\'" . heex-ts-mode))
+  (add-to-list 'auto-mode-alist '("\\.heex\\'" . heex-ts-mode))
+  (add-to-list 'auto-mode-alist '("\\.ex\\'" . elixir-ts-mode))
+  (add-to-list 'auto-mode-alist '("\\.exs\\'" . elixir-ts-mode))
   :hook (elixir-ts-mode . setup-elixir))
 
 (use-package eglot

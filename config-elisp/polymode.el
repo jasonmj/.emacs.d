@@ -44,8 +44,4 @@
   (define-polymode poly-heex-ts-mode
     :hostmode 'poly-heex-ts-hostmode
     :innermodes '(poly-heex-ts-doc-innermode poly-heex-ts-template-innermode))
-  (add-to-list 'auto-mode-alist '("\\.leex\\'" . poly-heex-ts-mode))
-  (add-to-list 'auto-mode-alist '("\\.heex\\'" . poly-heex-ts-mode))
-  (add-to-list 'auto-mode-alist '("\\.ex\\'" . poly-elixir-ts-mode))
-  (add-to-list 'auto-mode-alist '("\\.exs\\'" . poly-elixir-ts-mode))
   (add-to-list 'auto-mode-alist '("\\.md\\'" . poly-markdown-mode)))
