@@ -24,7 +24,7 @@
       focus-follows-mouse nil)
 (use-package exwm :ensure t)
 (require 'exwm-config)
-(exwm-config-default)
+(exwm-config-example)
 (exwm-enable)
 
 ;;; Straight
