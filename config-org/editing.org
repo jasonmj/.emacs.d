@@ -141,6 +141,14 @@ arg lines up."
   :ensure t
   :hook (prog-mode . rainbow-delimiters-mode))
 #+END_SRC
+* Spell Fu
+#+begin_src emacs-lisp
+  (use-package spell-fu
+    :ensure t
+    :hook ((prog-mode . spell-fu-mode)
+	   (org-mode . spell-fu-mode)
+	   (markdown-mode . spell-fu-mode)))
+#+end_src
 * Subword Mode
 #+begin_src emacs-lisp
 (use-package emacs :hook ((prog-mode . subword-mode)))

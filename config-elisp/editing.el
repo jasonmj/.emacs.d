@@ -111,6 +111,12 @@ arg lines up."
   :ensure t
   :hook (prog-mode . rainbow-delimiters-mode))
 
+(use-package spell-fu
+  :ensure t
+  :hook ((prog-mode . spell-fu-mode)
+	 (org-mode . spell-fu-mode)
+	 (markdown-mode . spell-fu-mode)))
+
 (use-package emacs :hook ((prog-mode . subword-mode)))
 
 (use-package sudo-edit :ensure t)
