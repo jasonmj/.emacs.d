@@ -108,6 +108,8 @@
 
 (use-package which-key :ensure t :hook (after-init . which-key-mode))
 
+(use-package which-key-posframe :ensure t :init (which-key-posframe-mode 1))
+
 (use-package writeroom-mode
   :ensure t
   :hook ((devdocs-mode . writeroom-mode))
