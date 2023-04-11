@@ -1,3 +1,7 @@
+(use-package aggressive-indent
+  :ensure t
+  :hook ((prog-mode . aggressive-indent-mode)))
+
 (global-set-key (kbd "<backtab>") 'un-indent-by-removing-2-spaces)
 (defun un-indent-by-removing-2-spaces ()
   (interactive)

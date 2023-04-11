@@ -1,5 +1,11 @@
 #+TITLE: Editing
 #+PROPERTY: header-args      :tangle "../config-elisp/editing.el"
+* Aggressive Indent Mode
+#+begin_src emacs-lisp
+  (use-package aggressive-indent
+    :ensure t
+    :hook ((prog-mode . aggressive-indent-mode)))
+#+end_src
 * Backtab
 #+BEGIN_SRC emacs-lisp
 (global-set-key (kbd "<backtab>") 'un-indent-by-removing-2-spaces)
