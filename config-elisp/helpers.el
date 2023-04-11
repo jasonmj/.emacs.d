@@ -15,13 +15,13 @@
   :defer 20
   :custom
   (blamer-type 'posframe-popup)
-  (blamer-idle-time 0.3)
   (blamer-show-avatar-p nil)
+  (blamer-idle-time 2)
   (blamer-min-offset 70)
-  (blamer-posframe-configurations '(:left-fringe 0 :right-fringe 0 :y-pixel-offset 20 :x-pixel-offset -20 :internal-border-width 20 :lines-truncate t :accept-focus nil))
+  (blamer-posframe-configurations `(:left-fringe 0 :right-fringe 0 :y-pixel-offset 20 :x-pixel-offset -20 :border-width 10 :border-color ,(face-attribute 'default :background) :lines-truncate t :accept-focus nil))
   :custom-face
-  (blamer-pretty-border-face ((t nil)))
   (blamer-face ((t :foreground "#7a88cf"
+		   :background "unspecified"
 		   :height 140
 		   :italic t)))
   :config
