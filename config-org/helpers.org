@@ -79,6 +79,15 @@
 		grip-github-user "jasonmj"
 		grip-github-password (auth-source-pick-first-password :host "api.github.com" :user "jasonmj^grip")))
 #+end_src
+* Fold This
+#+begin_src emacs-lisp
+  (use-package fold-this
+    :ensure t
+    :config
+    (defun expand-and-fold-this () (interactive) (expreg-expand) (fold-this (car (car (region-bounds))) (cdr (car (region-bounds)))))
+    :bind (:map shell-mode-map
+           ("C-<return>" . expand-and-fold-this)))
+#+end_src
 * Highlight Current Line
 #+BEGIN_SRC emacs-lisp
 (global-hl-line-mode +1)

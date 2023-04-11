@@ -59,6 +59,12 @@
 		grip-github-user "jasonmj"
 		grip-github-password (auth-source-pick-first-password :host "api.github.com" :user "jasonmj^grip")))
 
+(use-package fold-this
+  :ensure t
+  :config
+  (defun expand-and-fold-this () (interactive) (expreg-expand) (fold-this (car (car (region-bounds))) (cdr (car (region-bounds)))))
+  :bind (:map shell-mode-map
+         ("C-<return>" . expand-and-fold-this)))
 (global-hl-line-mode +1)
 
 (mouse-avoidance-mode 'banish)
