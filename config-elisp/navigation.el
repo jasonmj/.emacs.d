@@ -88,6 +88,17 @@ point reaches the beginning or end of the buffer, stop there."
 (key-seq-define-global "o0" 'pop-to-mark-command)
 (key-seq-define-global "O)" 'pop-global-mark)
 
+(use-package popper
+  :ensure t
+  :bind (("C-\\"   . popper-cycle))
+  :custom
+  (popper-mode-line nil)
+  (popper-window-height nil)
+  (popper-reference-buffers '("^shell:" "^Aweshell:"))
+  :config
+  (popper-mode +1)
+  (popper-echo-mode +1))
+
 (exwm-input-set-key (kbd "C-x x") 'scratch-buffer)
 
 (global-set-key (kbd "s-a") 'mark-whole-buffer)

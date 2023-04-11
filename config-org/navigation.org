@@ -118,6 +118,19 @@ point reaches the beginning or end of the buffer, stop there."
 (key-seq-define-global "o0" 'pop-to-mark-command)
 (key-seq-define-global "O)" 'pop-global-mark)
 #+END_SRC
+* Popper
+#+begin_src emacs-lisp
+  (use-package popper
+    :ensure t
+    :bind (("C-\\"   . popper-cycle))
+    :custom
+    (popper-mode-line nil)
+    (popper-window-height nil)
+    (popper-reference-buffers '("^shell:" "^Aweshell:"))
+    :config
+    (popper-mode +1)
+    (popper-echo-mode +1))
+#+end_src
 * Scratch
 #+BEGIN_SRC emacs-lisp
 (exwm-input-set-key (kbd "C-x x") 'scratch-buffer)
