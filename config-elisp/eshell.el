@@ -12,10 +12,7 @@
 (setq eshell-history-size 10000)
 (add-hook 'completion-at-point-functions 'pcomplete-completions-at-point nil t)
 
-(add-hook 'eshell-mode-hook (lambda () (interactive) (auto-highlight-symbol-mode -1)))
-
 (defun custom-eshell-init()
-  (auto-highlight-symbol-mode 1)
   (setq buffer-face-mode-face '(:height 150))
   (buffer-face-mode)
   (define-key eshell-mode-map (kbd "C-l") 'eshell-clear)
