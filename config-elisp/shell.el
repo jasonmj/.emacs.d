@@ -18,7 +18,7 @@
 
 (defun clean-compilation-filename (filename)
   (string-trim
-       (replace-regexp-in-string "\\(\*\* \\)" ""
+       (replace-regexp-in-string "\\(\*\* \\|┃\\)" ""
 			     (replace-regexp-in-string "\([^\"]+?\)" ""
 						       (string-trim filename)))))
 (defun compilation-find-file-fixer (orig-fun marker filename &rest args)
