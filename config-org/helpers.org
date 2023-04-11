@@ -142,6 +142,12 @@
 #+begin_src emacs-lisp
   (use-package transient-posframe :ensure t :hook (magit-status-mode . transient-posframe-mode))
 #+end_src
+* Wgrep
+#+begin_src emacs-lisp
+  (use-package wgrep
+    :ensure t
+    :custom (wgrep-auto-save-buffer t))
+#+end_src
 * Which Key
 #+begin_src emacs-lisp
 (use-package which-key :ensure t :hook (after-init . which-key-mode))
