@@ -147,9 +147,11 @@ point reaches the beginning or end of the buffer, stop there."
   :commands zoom-mode
   :preface
   (setq zoom-size '(0.618 . 0.618))
-  :init
-  :init
-  (add-hook 'zoom-mode-hook
-	    (defun my/work-around-zoom-issue ()
-	      (load "zoom.el")
-	      (remove-hook 'zoo-mode #'my/work-around-zoom-issue))))
+  :config
+  (defun my/work-around-zoom-issue ()
+    (message "reloading zoom-mode")
+    (load "zoom.el")
+    (remove-hook 'zoom-mode-hook #'my/work-around-zoom-issue))
+  :hook
+  ((zoom-mode . my/work-around-zoom-issue)
+   (after-init . zoom-mode)))
