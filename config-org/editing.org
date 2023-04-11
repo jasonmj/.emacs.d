@@ -180,5 +180,9 @@ arg lines up."
 (global-set-key (kbd "M-u") 'upcase-char)
 (global-set-key (kbd "M-l") 'downcase-dwim)
 #+END_SRC
+* Whitespace Cleanup Mode
 #+begin_src emacs-lisp
+  (use-package whitespace-cleanup-mode
+    :ensure t
+    :hook ((prog-mode . whitespace-cleanup-mode)))
 #+end_src

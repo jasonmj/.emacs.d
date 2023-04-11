@@ -138,3 +138,6 @@ arg lines up."
 (global-set-key (kbd "M-u") 'upcase-char)
 (global-set-key (kbd "M-l") 'downcase-dwim)
 
+(use-package whitespace-cleanup-mode
+  :ensure t
+  :hook ((prog-mode . whitespace-cleanup-mode)))
