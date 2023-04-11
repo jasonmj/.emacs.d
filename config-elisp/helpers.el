@@ -100,6 +100,8 @@
   :config (put 'tramp-remote-path '(tramp-own-remote-path) nil)
           (add-to-list 'tramp-remote-path "~/.asdf/shims/"))
 
+(use-package transient-posframe :ensure t :hook (magit-status-mode . transient-posframe-mode))
+
 (use-package which-key :ensure t :hook (after-init . which-key-mode))
 
 (use-package writeroom-mode

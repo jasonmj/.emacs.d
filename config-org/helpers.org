@@ -138,6 +138,10 @@
   :config (put 'tramp-remote-path '(tramp-own-remote-path) nil)
           (add-to-list 'tramp-remote-path "~/.asdf/shims/"))
 #+end_src
+* Transient Posframe
+#+begin_src emacs-lisp
+  (use-package transient-posframe :ensure t :hook (magit-status-mode . transient-posframe-mode))
+#+end_src
 * Which Key
 #+begin_src emacs-lisp
 (use-package which-key :ensure t :hook (after-init . which-key-mode))
