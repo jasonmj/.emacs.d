@@ -8,8 +8,6 @@
   (call-process-shell-command "nvidia-settings --assign CurrentMetaMode=\"nvidia-auto-select +0+0 { ForceFullCompositionPipeline = On }\""))
 
 (setup-input-devices)
-;;(call-process-shell-command "dunst" nil 0)
-(call-process-shell-command "deadd-notification-center" nil 0)
 (call-process-shell-command "xsetroot -cursor_name left_ptr")
 
 (use-package loopy :ensure t :config (require 'loopy-iter))
