@@ -138,13 +138,3 @@ arg lines up."
 (global-set-key (kbd "M-u") 'upcase-char)
 (global-set-key (kbd "M-l") 'downcase-dwim)
 
-;; (use-package yasnippet
-;;   :ensure t
-;;   :diminish yas-minor-mode
-;;   :config
-;;   (yas-reload-all)
-;;   :custom (yas-keymap-disable-hook
-;;            (lambda () (and (frame-live-p corfu--frame)
-;;                            (frame-visible-p corfu--frame))))
-;;   :hook ((elixir-ts-mode . yas-minor-mode)
-;; 	 (after-init . yas-global-mode)))
