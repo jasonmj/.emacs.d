@@ -65,6 +65,12 @@
   (defun expand-and-fold-this () (interactive) (expreg-expand) (fold-this (car (car (region-bounds))) (cdr (car (region-bounds)))))
   :bind (:map shell-mode-map
          ("C-<return>" . expand-and-fold-this)))
+
+(use-package helpful
+  :ensure t
+  :bind (("C-h f" . helpful-function)
+         ("C-h v" . helpful-variable)))
+
 (global-hl-line-mode +1)
 
 (mouse-avoidance-mode 'banish)

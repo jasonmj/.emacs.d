@@ -88,6 +88,13 @@
     :bind (:map shell-mode-map
            ("C-<return>" . expand-and-fold-this)))
 #+end_src
+* Helpful
+#+begin_src emacs-lisp
+  (use-package helpful
+    :ensure t
+    :bind (("C-h f" . helpful-function)
+           ("C-h v" . helpful-variable)))
+#+end_src
 * Highlight Current Line
 #+BEGIN_SRC emacs-lisp
 (global-hl-line-mode +1)
