@@ -53,7 +53,7 @@
 	vertico-posframe-min-height 10
 	vertico-posframe-width 110
 	vertico-posframe-poshandler #'posframe-poshandler-window-top-center-offset
-	vertico-posframe-parameters '((alpha . 92)
+	vertico-posframe-parameters '((alpha . 90)
 				      (parent-frame . nil)
 				      (cursor-type . 'bar)
 				      (left-fringe . 0)

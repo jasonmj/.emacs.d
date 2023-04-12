@@ -124,7 +124,7 @@ point reaches the beginning or end of the buffer, stop there."
     :ensure t
     :bind (("C-\\"   . popper-cycle))
     :custom
-    (popper-mode-line nil)
+    (popper-mode-line t)
     (popper-window-height nil)
     (popper-reference-buffers '("^shell:" "^Aweshell:"))
     :config

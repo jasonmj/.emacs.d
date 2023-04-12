@@ -25,12 +25,13 @@
 		  (when (posframe-workable-p)
 		    (posframe-show name
 				   :accept-focus nil
-				   :alpha 92
 				   :poshandler '(lambda (_info) '(-6 . 38))
+				   :max-width 45
+				   :border-width 1
+				   :left-fringe 5
+				   :right-fringe 5
+				   :border-color (face-attribute 'default :foreground)
+				   :timeout 5
 				   :refposhandler 'posframe-refposhandler-exwm
-				   :parent-frame nil
-				   :override-parameters '((internal-border-width . 15)
-							  (internal-border-color . (face-attribute 'default :background))))
-		    (run-with-idle-timer 3 nil 'posframe-delete-all)))
-	  (kill-buffer)))))
+				   :override-parameters '((alpha-background . 85)))))))))
   (add-hook 'ednc-notification-presentation-functions #'show-posframe-in-buffer))
