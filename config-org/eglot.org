@@ -1,19 +1,35 @@
 #+TITLE: Eglot
 #+PROPERTY: header-args      :tangle "../config-elisp/eglot.el"
-* Eldoc
+* Eldoc Box
+Display a childframe doc for eglot and anything that uses eldoc.
+
+https://github.com/casouri/eldoc-box
 #+begin_src emacs-lisp
   (use-package eldoc-box
     :ensure t
+    :config
+    (custom-set-faces `(eldoc-box-body ((t (:background ,(face-attribute 'default :background) :foreground ,(face-attribute 'default :foreground))))))
+    (custom-set-faces `(eldoc-box-border ((t (:background ,(face-attribute 'default :foreground))))))
     :custom
     (eldoc-box-offset '(16 16 40))
     (eldoc-idle-delay 2.0)
     :hook (eglot-managed-mode . eldoc-box-hover-mode))
 #+end_src
 * Eglot
-#+BEGIN_SRC emacs-lisp
-(use-package eglot
-  :config
-  (setq eglot-extend-to-xref t)
-  (setq read-process-output-max (* 1024 1024))
-  (push :documentHighlightProvider eglot-ignored-server-capabilities))
-#+END_SRC
+Eglot is the Emacs client for the Language Server Protocol (LSP). 
+
+https://joaotavora.github.io/eglot/
+#+begin_src emacs-lisp
+  (use-package eglot
+    :hook ((elixir-ts-mode . eglot-ensure)
+	   (c-mode . eglot-ensure)
+	   (python-mode . eglot-ensure))
+    :custom
+    (eglot-extend-to-xref t)
+    (read-process-output-max (* 1024 1024))
+    :config
+    (add-to-list 'eglot-server-programs '(python-mode . ("pyright-langserver" "--stdio")))
+    (add-to-list 'eglot-server-programs '(elixir-ts-mode . ("/home/jasonmj/git/elixir-lsp/elixir-ls-1.14-25.1/language_server.sh"
+							    "/home/jasonmj/git/mhanberg/credo-language-server/bin/credo-language-server")))
+    (push :documentHighlightProvider eglot-ignored-server-capabilities))
+#+end_src

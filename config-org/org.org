@@ -1,97 +1,66 @@
 #+TITLE: Org Mode
 #+PROPERTY: header-args      :tangle "../config-elisp/org.el"
-* Require Org Mode
-#+BEGIN_SRC emacs-lisp
-(use-package org
-  :config (setq org-startup-folded 'content))
-#+END_SRC
-* C-return to Fold
-#+BEGIN_SRC emacs-lisp
-(define-key org-mode-map (kbd "<C-return>") 'org-cycle)
-#+END_SRC
-* C-tab for other-window
-#+BEGIN_SRC emacs-lisp
-(define-key org-mode-map (kbd "<C-tab>") 'nil)
-#+END_SRC
-* Drag Stuff and org-metaup/down
-#+BEGIN_SRC emacs-lisp
-(defun org-move-lines()
-  (define-key org-mode-map (kbd "M-p") 'org-metaup)
-  (define-key org-mode-map (kbd "M-P") 'drag-stuff-up)
-  (define-key org-mode-map (kbd "M-n") 'org-metadown)
-  (define-key org-mode-map (kbd "M-N") 'drag-stuff-down))
-(add-hook 'org-mode-hook 'org-move-lines)
-#+END_SRC
-* Expand Region
-#+BEGIN_SRC emacs-lisp
-(define-key org-mode-map (kbd "S-TAB") 'expreg-expand)
-#+END_SRC
-* Hungry Delete
-#+BEGIN_SRC emacs-lisp
-(add-hook 'org-mode-hook (lambda () (interactive) (hungry-delete-mode)))
-#+END_SRC
-* Kill Line
-#+BEGIN_SRC emacs-lisp
-(define-key org-mode-map (kbd "C-k") (lambda ()
-               (interactive)
-               (org-beginning-of-line)
-               (org-kill-line)
-               (org-kill-line)))
-#+END_SRC
-* Line Wrap
-#+BEGIN_SRC emacs-lisp
-(add-hook 'org-mode-hook (lambda () (interactive) (setq-local truncate-lines -1)))
-#+END_SRC
-* M-return for New Bullet Item
-#+BEGIN_SRC emacs-lisp
-(define-key org-mode-map (kbd "M-RET") (lambda()
-                                              (interactive)
-                                              (org-beginning-of-line)
-                                              (org-meta-return)
-                                              (org-metadown)))
-#+END_SRC**
-* Open Line Below
-#+BEGIN_SRC emacs-lisp
-(define-key org-mode-map [(shift return)] 'crux-smart-open-line)
-#+END_SRC
+* Org Mode
+Outline-based notes management and organizer, alias "Carsten's outline-mode for keeping track of
+everything."
+
+Org mode develops organizational tasks around a NOTES file which contains information about projects
+as plain text.  Org mode is implemented on top of Outline mode, which is ideal to keep the content
+of large files well structured.
+#+begin_src emacs-lisp
+  (use-package org
+    :demand t
+    :bind (:map org-mode-map
+		("<C-return>" . org-cycle)
+		("C-k" . my/org-kill-line)
+		("<C-tab>" . nil)
+		("C-," . org-select-line-and-copy)
+		("C-s-p" . org-up-element)
+		("M-p" . org-metaup)
+		("M-P" . drag-stuff-up)
+		("M-n" . org-metadown)
+		("M-N" . drag-stuff-down)
+		("M-RET" . org-create-headline)
+		("S-TAB" . expreg-expand)
+		("<s-return>" . org-open-at-point)
+		("C-o" . (lambda () (interactive) (org-beginning-of-line) (org-open-line 1))))
+    :config
+    (defun my/org-kill-line ()
+      (interactive)
+      (insert-char 32 1)
+      (org-beginning-of-line)
+      (org-kill-line)
+      (delete-char 1))
+    (defun org-create-headline ()
+      (interactive)
+      (org-beginning-of-line)
+      (org-meta-return)
+      (org-metadown))
+    (defun org-select-line-and-copy ()
+      (interactive)
+      (org-beginning-of-line)
+      (set-mark-command nil)
+      (org-end-of-line)
+      (copy-keep-highlight (region-beginning) (region-end)))
+    :custom
+    (org-startup-folded t)
+    (org-todo-keyword-faces
+     '(("Waiting" . (:foreground "tomato1" :weight bold))
+       ("To Do" . (:foreground "dark khaki" :weight bold))
+       ("In Progress" . (:foreground "DodgerBlue2" :weight bold))
+       ("Done" . (:foreground "forest green" :weight bold))))
+    (org-todo-keywords
+     '((sequence "To Do" "In Progress" "Done" "Waiting")))
+    :init (setq-local truncate-lines -1))
+#+end_src
 * Org Mode Bullets
-#+BEGIN_SRC emacs-lisp
-(use-package org-bullets
-  :ensure t
-  :hook ((org-mode . org-bullets-mode))
-  :config (setq-default org-ellipsis " ▸"))
-#+END_SRC
-* Org Mode Status Settings
-#+BEGIN_SRC emacs-lisp
-(setq org-todo-keyword-faces
-      '(("Waiting" . (:foreground "tomato1" :weight bold))
-        ("To Do" . (:foreground "dark khaki" :weight bold))
-        ("In Progress" . (:foreground "DodgerBlue2" :weight bold))
-        ("Done" . (:foreground "forest green" :weight bold))))
-(setq org-todo-keywords
-        '((sequence "To Do" "In Progress" "Done" "Waiting")))
-#+END_SRC
-* Org Open at Point
-#+BEGIN_SRC emacs-lisp
-(define-key org-mode-map (kbd "<s-return>") 'org-open-at-point)
-#+END_SRC
-* Org Open Line
-#+BEGIN_SRC emacs-lisp
-(define-key org-mode-map (kbd "C-o") (lambda()
-                                       (interactive)
-                                       (org-beginning-of-line)
-                                       (org-open-line 1)))
-#+END_SRC
-* Org Up Element
-#+BEGIN_SRC emacs-lisp
-(define-key org-mode-map (kbd "C-s-p") 'org-up-element)
-#+END_SRC
-* Select Line and Copy
-#+BEGIN_SRC emacs-lisp
-(define-key org-mode-map (kbd "C-,") (lambda ()
-               (interactive)
-               (org-beginning-of-line)
-               (set-mark-command nil)
-               (org-end-of-line)
-               (copy-keep-highlight (region-beginning) (region-end))))
-#+END_SRC
+Display utf-8 bullets for org-mode headlines. 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
+https://github.com/sabof/org-bullets
+#+begin_src emacs-lisp
+  (use-package org-bullets
+    :ensure t
+    :after org
+    :hook (org-mode . org-bullets-mode)
+    :config (setq-default org-ellipsis " ▸"))
+#+end_src

@@ -1,101 +1,120 @@
 #+TITLE: Defaults
 #+PROPERTY: header-args      :tangle "../config-elisp/defaults.el"
 * Auto Revert Buffers
-#+BEGIN_SRC emacs-lisp
-(setq global-auto-revert-mode t)
-#+END_SRC
+Revert any buffer associated with a file when the file changes on disk.
+#+begin_src emacs-lisp
+  (setq global-auto-revert-mode t)
+#+end_src
 * Bury Compilation Buffers If Successful
-#+BEGIN_SRC emacs-lisp
-(use-package bury-successful-compilation :ensure t)
-#+END_SRC
+Automatically bury the *compilation* buffer when compilation succeeds.
+
+https://github.com/emacsattic/bury-successful-compilation
+#+begin_src emacs-lisp
+  (use-package bury-successful-compilation :ensure t)
+#+end_src
 * Default Browser Settings
-#+BEGIN_SRC emacs-lisp
-(setq browse-url-browser-function 'browse-url-generic
-      browse-url-generic-program "firefox")
-#+END_SRC
+Set the default browser to Firefox and use the default browser function for urls. 
+#+begin_src emacs-lisp
+  (setq browse-url-generic-program "firefox"
+	browse-url-browser-function 'browse-url-generic)
+#+end_src
 * Delete by Moving to Trash
-#+BEGIN_SRC emacs-lisp
-(setq delete-by-moving-to-trash t)
-#+END_SRC
+Set file deletion commands to use the function `move-file-to-trash` instead of deleting files outright.
+#+begin_src emacs-lisp
+  (setq delete-by-moving-to-trash t)
+#+end_src
 * Disable Ido Mode
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (ido-mode -1)
-#+END_SRC
+#+end_src
 * Garbage Collect When Emacs Loses Focus
-#+BEGIN_SRC emacs-lisp
-(add-hook 'focus-out-hook 'garbage-collect)
-#+END_SRC
+#+begin_src emacs-lisp
+  (add-hook 'focus-out-hook 'garbage-collect)
+#+end_src
 * Newline at end of file
-#+BEGIN_SRC emacs-lisp
-(setq mode-require-final-newline t)
-(setq-default require-final-newline t)
-#+END_SRC
+Require a newline at the end of every file.
+#+begin_src emacs-lisp
+  (setq mode-require-final-newline t)
+  (setq-default require-final-newline t)
+#+end_src
 * Narrow to Region
+Allow the use of narrow to region.
 #+begin_src emacs-lisp
 (put 'narrow-to-region 'disabled nil)
 #+end_src
 * Preserve Screen Position on Scroll
-#+BEGIN_SRC emacs-lisp
-(setq scroll-preserve-screen-position 'always)
-#+END_SRC
+Ensure the point keeps its screen position if the scroll command moves it vertically out of the window.
+#+begin_src emacs-lisp
+  (setq scroll-preserve-screen-position 'always)
+#+end_src
 * Replace Selected Text
-#+BEGIN_SRC emacs-lisp
-(delete-selection-mode 1)
-#+END_SRC
+Ensure that typed text replaces the selection if the selection is active.
+#+begin_src emacs-lisp
+  (delete-selection-mode 1)
+#+end_src
 * Save Backup Files to ~/.emacs-backups
-#+BEGIN_SRC emacs-lisp
-(setq backup-directory-alist '(("." . "~/.emacs.d/backups")))
-#+END_SRC
+Set the alist of file name patterns and backup directory names to include `~/.emacs.d/backups/`.
+#+begin_src emacs-lisp
+  (setq backup-directory-alist '(("." . "~/.emacs.d/backups")))
+#+end_src
 * Save Kill Ring
-#+BEGIN_SRC emacs-lisp
-(use-package savekill :ensure t)
-(setq kill-ring-max 500)
-#+END_SRC
+Save kill ring to disk every time `kill-ring' is updated.
+
+https://www.emacswiki.org/emacs/savekill.el
+#+begin_src emacs-lisp
+  (use-package savekill
+    :ensure t
+    :custom (kill-ring-max 500))
+#+end_src
 * Save Place
-#+BEGIN_SRC emacs-lisp
-(save-place-mode 1)
-#+END_SRC
-* Set Minibuffer History Length
-#+BEGIN_SRC emacs-lisp
-(setq-default history-length 1000)
-(savehist-mode t)
-(add-to-list 'savehist-additional-variables 'mark-ring)
-(add-to-list 'savehist-additional-variables 'global-mark-ring)
-#+END_SRC
+When visiting a file, point returns to the last place it was when previously visited.
+#+begin_src emacs-lisp
+  (save-place-mode 1)
+#+end_src
+* Save History for Minibuffer and Mark Ring
+#+begin_src emacs-lisp
+  (setq-default history-length 1000)
+  (savehist-mode t)
+  (add-to-list 'savehist-additional-variables 'mark-ring)
+  (add-to-list 'savehist-additional-variables 'global-mark-ring)
+#+end_src
+* Set Fill Column
+#+begin_src emacs-lisp
+  (setq-default fill-column 100)
+#+end_src
 * Turn Off Lockfiles
-#+BEGIN_SRC emacs-lisp
-(setq create-lockfiles nil)
-#+END_SRC
+Disable the use of lockfiles.
+#+begin_src emacs-lisp
+  (setq-default create-lockfiles nil)
+#+end_src
 * Turn Off Native Comp Warnings
-#+BEGIN_SRC emacs-lisp
-(setq warning-minimum-level :error)
-(setq native-comp-async-report-warnings-errors 'silent)
-#+END_SRC
+Disable warnings about native compilation issues.
+#+begin_src emacs-lisp
+  (setq warning-minimum-level :error)
+  (setq native-comp-async-report-warnings-errors 'silent)
+#+end_src
 * Recent File Mode
-#+BEGIN_SRC emacs-lisp
-(setq recentf-exclude '("~$" "/tmp" "/sudo:"))
-(setq recentf-max-saved-items 300)
-(add-hook 'find-file-hook 'recentf-save-list)
-(recentf-mode 1)
-#+END_SRC
+Setup recent file mode to include 300 items and exclude irrelevant directories. 
+#+begin_src emacs-lisp
+  (setq recentf-exclude '("~$" "/tmp" "/sudo:"))
+  (setq recentf-max-saved-items 300)
+  (add-hook 'find-file-hook 'recentf-save-list)
+  (recentf-mode 1)
+#+end_src
 * Secrets with GnuPG and Easy PG
-#+BEGIN_SRC emacs-lisp
-(setq epg-gpg-program "gpg2")
-(setq epa-pinentry-mode 'loopback)
-(setq auth-sources '((:source "~/.authinfo.gpg")))
-(pinentry-start)
-#+END_SRC
+Configure GPG and Pinentry for managing secrets. Use `~/.authinfo.gpg` for storage.
+#+begin_src emacs-lisp
+  (setq epg-gpg-program "gpg2")
+  (setq epa-pinentry-mode 'loopback)
+  (setq auth-sources '((:source "~/.authinfo.gpg")))
+  (pinentry-start)
+#+end_src
 * Tramp
-#+BEGIN_SRC emacs-lisp
-(require 'tramp)
-(setq tramp-default-method "ssh")
-(setq tramp-inline-compress-start-size t)
-(setq tramp-copy-size-limit nil)
-(eval-after-load 'tramp '(setenv "SSH_AUTH_SOCK" "/run/user/1000/gnupg/S.gpg-agent.ssh"))
-#+END_SRC
-* Use Package Chords
-#+BEGIN_SRC emacs-lisp
-(use-package use-package-chords
-  :ensure t
-  :hook (after-init . key-chord-mode))
-#+END_SRC
+Configure tramp to use smart defaults for remote connections. 
+#+begin_src emacs-lisp
+  (require 'tramp)
+  (setq tramp-default-method "ssh")
+  (setq tramp-inline-compress-start-size t)
+  (setq tramp-copy-size-limit nil)
+  (eval-after-load 'tramp '(setenv "SSH_AUTH_SOCK" "/run/user/1000/gnupg/S.gpg-agent.ssh"))
+#+end_src

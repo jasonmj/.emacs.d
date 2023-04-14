@@ -1,32 +1,41 @@
 #+TITLE: Magit
 #+PROPERTY: header-args      :tangle "../config-elisp/magit.el"
 * Magit
-#+BEGIN_SRC emacs-lisp
-(use-package magit
-  :ensure t
-  :init
-  (with-eval-after-load 'magit-mode
-    (define-key magit-mode-map (kbd "<C-tab>") 'tab-line-switch-to-next-tab))
-  :bind (("C-c g" . magit))
-  :config
-  (setq magit-commit-show-diff nil
-	magit-refresh-status-buffer nil
-	magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1
-	magit-save-repository-buffers nil
-	magit-revert-buffers 1)
-  (key-chord-define-global "mg" 'magit))
-#+END_SRC
+Magit is a complete text-based user interface to Git.
+
+https://magit.vc
+#+begin_src emacs-lisp
+  (use-package magit
+    :ensure t
+    :bind (("C-c g" . magit)
+	   :map magit-mode-map
+	   ("<C-tab>" . tab-line-switch-to-next-tab))
+    :chords ("mg" . magit)
+    :custom
+    (magit-commit-show-diff nil)
+    (magit-refresh-status-buffer nil)
+    (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1)
+    (magit-save-repository-buffers nil)
+    (magit-revert-buffers 1))
+#+end_src
 * Magit Pretty Graph
-#+BEGIN_SRC emacs-lisp
-(use-package magit-pretty-graph
-  :straight (magit-pretty-graph :type git :host github :repo "georgek/magit-pretty-graph")
-  :config
-  (key-seq-define-global "pg" (lambda () (interactive) (magit-pg-repo (project-root (project-current t)))))
-  (setq magit-pg-command "git --no-pager log --branches --remotes --topo-order --decorate=full --pretty=format:\"%H%x00%P%x00%an%x00%ar%x00%s%x00%d\" -n 100"))
-#+END_SRC
+A prettier graph for magit drawn in Emacs.
+
+https://github.com/georgek/magit-pretty-graph
+#+begin_src emacs-lisp
+  (use-package magit-pretty-graph
+    :straight (magit-pretty-graph :type git :host github :repo "georgek/magit-pretty-graph")
+    :config
+    (key-seq-define-global "pg" (lambda () (interactive) (magit-pg-repo (project-root (project-current t)))))
+    :custom
+    (magit-pg-command "git --no-pager log --branches --remotes --topo-order --decorate=full --pretty=format:\"%H%x00%P%x00%an%x00%ar%x00%s%x00%d\" -n 100"))
+#+end_src
 * Magit Delta
-#+BEGIN_SRC emacs-lisp
-(use-package magit-delta
-  :ensure t
-  :hook (magit-mode . magit-delta-mode))
-#+END_SRC
+Use delta (https://github.com/dandavison/delta) when viewing diffs in Magit.
+
+https://github.com/dandavison/magit-delta
+#+begin_src emacs-lisp
+  (use-package magit-delta
+    :ensure t
+    :hook (magit-mode . magit-delta-mode))
+#+end_src

@@ -1,94 +1,108 @@
 #+TITLE: Helpers
 #+PROPERTY: header-args      :tangle "../config-elisp/helpers.el"
-* Alert Config
-#+BEGIN_SRC emacs-lisp
-(use-package alert
-  :ensure t
-  :commands (alert)
-  :init
-  (setq alert-fade-time 10
-        alert-default-style 'notifications))
-#+END_SRC
 * App Launcher
+Launch application from Emacs.
+
+https://github.com/SebastienWae/app-launcher
 #+begin_src emacs-lisp
 (use-package app-launcher
   :straight '(app-launcher :host github :repo "SebastienWae/app-launcher")
   :bind (("C-s-SPC" . app-launcher-run-app)))
 #+end_src
 * Blamer
+A git blame plugin for emacs inspired by VS Code's GitLens plugin.
+
+https://github.com/Artawower/blamer.el
 #+begin_src emacs-lisp
   (use-package blamer
     :ensure t
     :bind (("M-I" . blamer-show-posframe-commit-info))
     :defer 20
     :custom
-    (blamer-type 'posframe-popup)
+    (blamer-type 'both)
     (blamer-show-avatar-p nil)
     (blamer-idle-time 2)
     (blamer-min-offset 70)
-    (blamer-posframe-configurations `(:left-fringe 0 :right-fringe 0 :y-pixel-offset 20 :x-pixel-offset -20 :border-width 10 :border-color ,(face-attribute 'default :background) :lines-truncate t :accept-focus nil))
+    (blamer-posframe-configurations `(:left-fringe 20 :right-fringe 20 :y-pixel-offset 20 :x-pixel-offset -20 :border-width 1 :border-color ,(face-attribute 'default :foreground) :lines-truncate t :accept-focus nil))
     :custom-face
     (blamer-face ((t :foreground "#7a88cf"
 		     :background "unspecified"
-		     :height 140
 		     :italic t)))
     :config
+    (with-current-buffer (get-buffer-create blamer--buffer-name) (face-remap-add-relative 'fringe :background (face-attribute 'default :background) :foreground (face-attribute 'default :background)))
     (global-blamer-mode 1))
 #+end_src
-* Better Quit
+* Copy File Name
+Copy the current buffer file name to the clipboard.
 #+begin_src emacs-lisp
-(key-seq-define-global "gf" 'keyboard-escape-quit)
-#+end_src
-* Codemetrics
-#+begin_src emacs-lisp
-  (use-package codemetrics
-    :straight (codemetrics :type git :host github :repo "jcs-elpa/codemetrics"))
+  (defun copy-file-name ()
+      "Copy the current buffer file name to the clipboard."
+      (interactive)
+      (let ((filename (if (equal major-mode 'dired-mode)
+			  default-directory
+			(buffer-file-name))))
+	(if filename
+	    (progn
+	      (kill-new filename)
+	      (message "Copied '%s'" filename))
+	  (warn "Current buffer is not attached to a file!"))))
 #+end_src
 * DevDocs
+Emacs viewer for DevDocs.
+
+https://github.com/astoff/devdocs.el
 #+begin_src emacs-lisp
-(use-package devdocs :ensure t)
+  (use-package devdocs :ensure t)
 #+end_src
 * Eval Region
-#+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "C-s-e") 'eval-region)
-#+END_SRC
-* Git Gutter
-#+BEGIN_SRC emacs-lisp
-(use-package git-gutter
-  :ensure t
-  :hook ((prog-mode . git-gutter-mode)))
-(with-eval-after-load 'git-gutter
-  (defun git-gutter+-remote-default-directory (dir file)
-    (let* ((vec (tramp-dissect-file-name file))
-           (method (tramp-file-name-method vec))
-           (user (tramp-file-name-user vec))
-           (domain (tramp-file-name-domain vec))
-           (host (tramp-file-name-host vec))
-           (port (tramp-file-name-port vec)))
-      (tramp-make-tramp-file-name method user domain host port dir)))
-
-    (defun git-gutter-remote-file-path (dir file)
-      (let ((file (tramp-file-name-localname (tramp-dissect-file-name file))))
-	(replace-regexp-in-string (concat "\\`" dir) "" file))))
-#+END_SRC
-* Grip GitHub Markdown Previews
 #+begin_src emacs-lisp
-(use-package grip-mode
-  :ensure t
-  :config (setq grip-preview-use-webkit nil
-		grip-github-user "jasonmj"
-		grip-github-password (auth-source-pick-first-password :host "api.github.com" :user "jasonmj^grip")))
+  (global-set-key (kbd "C-s-e") 'eval-region)
+#+end_src
+* Git Gutter
+Emacs port of GitGutter which is Sublime Text Plugin.
+
+https://github.com/emacsorphanage/git-gutter
+#+begin_src emacs-lisp
+  (use-package git-gutter
+    :ensure t
+    :hook ((prog-mode . git-gutter-mode)))
+#+end_src
+* Grip GitHub Markdown Previews
+Instant Github-flavored Markdown/Org preview using grip.
+
+https://github.com/seagle0128/grip-mode
+#+begin_src emacs-lisp
+  (use-package grip-mode
+    :ensure t
+    :defer t
+    :custom
+    (grip-preview-use-webkit nil)
+    (grip-github-user "jasonmj")
+    (grip-github-password (auth-source-pick-first-password
+			   :host "api.github.com"
+			   :user "jasonmj^grip")))
 #+end_src
 * Fold This
+Fold the active region in Emacs.
+
+https://github.com/magnars/fold-this.el
 #+begin_src emacs-lisp
   (use-package fold-this
     :ensure t
     :config
-    (defun expand-and-fold-this () (interactive) (expreg-expand) (fold-this (car (car (region-bounds))) (cdr (car (region-bounds)))))
+    (defun expand-and-fold-this ()
+      (interactive)
+      (expreg-expand)
+      (fold-this
+       (car (car (region-bounds)))
+       (cdr (car (region-bounds)))))
     :bind (:map shell-mode-map
-           ("C-<return>" . expand-and-fold-this)))
+	   ("C-<return>" . expand-and-fold-this)))
 #+end_src
 * Helpful
+A better Emacs *help* buffer.
+
+https://github.com/Wilfred/helpful
 #+begin_src emacs-lisp
   (use-package helpful
     :ensure t
@@ -96,70 +110,94 @@
            ("C-h v" . helpful-variable)))
 #+end_src
 * Highlight Current Line
-#+BEGIN_SRC emacs-lisp
-(global-hl-line-mode +1)
-#+END_SRC
-* Mouse Avoidance Mode
-#+BEGIN_SRC emacs-lisp
-(mouse-avoidance-mode 'banish)
-(setq mouse-avoidance-banish-position '((frame-or-window . frame)
-                                        (side . right)
-                                        (side-pos . 0)
-                                        (top-or-bottom . top)
-                                        (top-or-bottom-pos . 0)))
-#+END_SRC
-* Olivetti Mode
-#+BEGIN_SRC emacs-lisp
-(add-hook 'olivetti-mode (lambda () (display-line-numbers-mode -1)))
-#+END_SRC
-* Pinentry
-#+BEGIN_SRC emacs-lisp
-(use-package pinentry :ensure t :config (pinentry-start))
-#+END_SRC
-* Short Answer Yes/No
-#+BEGIN_SRC emacs-lisp
-(defalias 'yes-or-no-p 'y-or-n-p)
-#+END_SRC
-* Suspend
-#+BEGIN_SRC emacs-lisp
-(defun suspend()
-  (interactive)
-  (shell-command "systemctl suspend"))
-(defun suspend-lock()
-  (interactive)
-  (shell-command "systemctl suspend")
-  (shell-command "slock"))
-(exwm-input-set-key (kbd "C-x >") 'suspend-lock)
-(exwm-input-set-key (kbd "C-x .") 'suspend)
-#+END_SRC
-* Tramp
+Highlights the line about the current buffer's point in all live windows.
 #+begin_src emacs-lisp
-(use-package tramp
-  :config (put 'tramp-remote-path '(tramp-own-remote-path) nil)
-          (add-to-list 'tramp-remote-path "~/.asdf/shims/"))
+  (global-hl-line-mode +1)
+#+end_src
+* Keyboard Escape Quit
+This command can exit an interactive command such as query-replace, can clear out a prefix argument or a region, can get out of the minibuffer or other recursive edit, cancel the use of the current buffer (for special-purpose buffers), or go back to just one window (by deleting all but the selected window).
+#+begin_src emacs-lisp
+  (key-seq-define-global "gf" 'keyboard-escape-quit)
+#+end_src
+* Mouse Avoidance Mode
+With mouse avoidance mode set to banish, the behavior will move the mouse to the upper-right corner on any keypress.
+#+begin_src emacs-lisp
+  (mouse-avoidance-mode 'banish)
+  (setq mouse-avoidance-banish-position '((frame-or-window . frame)
+					  (side . right)
+					  (side-pos . 0)
+					  (top-or-bottom . top)
+					  (top-or-bottom-pos . 0)))
+#+end_src
+* Pinentry
+A pinentry for gpg that uses emacsclient to prompt for the passphrase. 
+
+https://github.com/ecraven/pinentry-emacs
+#+begin_src emacs-lisp
+  (use-package pinentry
+    :ensure t
+    :hook (after-init . pinentry-start))
+#+end_src
+* Short Answer Yes/No
+#+begin_src emacs-lisp
+  (defalias 'yes-or-no-p 'y-or-n-p)
+#+end_src
+* Tramp
+The file name handler implementation for ssh-alike remote connections.
+#+begin_src emacs-lisp
+  (use-package tramp
+    :config (put 'tramp-remote-path '(tramp-own-remote-path) nil)
+	    (add-to-list 'tramp-remote-path "~/.asdf/shims/"))
 #+end_src
 * Transient Posframe
+This package is a transient extension, which use posframe to show transient popups.
+
+https://github.com/yanghaoxie/transient-posframe
 #+begin_src emacs-lisp
-  (use-package transient-posframe :ensure t :hook (magit-status-mode . transient-posframe-mode))
+  (use-package transient-posframe
+    :ensure t
+    :hook (magit-status-mode . transient-posframe-mode))
 #+end_src
 * Wgrep
+Writable grep buffer and apply the changes to files.
+
+https://github.com/mhayashi1120/Emacs-wgrep
 #+begin_src emacs-lisp
   (use-package wgrep
     :ensure t
     :custom (wgrep-auto-save-buffer t))
 #+end_src
 * Which Key
+Emacs package that displays available keybindings in popup.
+
+https://github.com/justbur/emacs-which-key
 #+begin_src emacs-lisp
-(use-package which-key :ensure t :hook (after-init . which-key-mode))
+  (use-package which-key
+    :ensure t
+    :custom (which-key-idle-delay 0.25)
+    :hook (after-init . which-key-mode))
 #+end_src
 * Which Key Posframe
+Let emacs-which-key use posframe to show its popup. 
+
+https://github.com/yanghaoxie/which-key-posframe
 #+begin_src emacs-lisp
-  (use-package which-key-posframe :ensure t :init (which-key-posframe-mode 1))
+  (use-package which-key-posframe
+    :ensure t
+    :config (custom-set-faces '(which-key-posframe-border ((t nil))))
+    :custom
+    (which-key-posframe-border-width  20)
+    (which-key-posframe-poshandler 'posframe-poshandler-window-top-center-offset)
+    (which-key-posframe-parameters `((alpha . 90)))
+    :hook (after-init . which-key-posframe-mode))
 #+end_src
 * Writeroom
+A minor mode for Emacs that implements a distraction-free writing mode.
+
+https://github.com/joostkremers/writeroom-mode
 #+begin_src emacs-lisp
   (use-package writeroom-mode
     :ensure t
     :hook ((devdocs-mode . writeroom-mode))
-    :config (setq writeroom-width 100))
+    :custom (writeroom-width 100))
 #+end_src

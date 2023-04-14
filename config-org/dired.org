@@ -1,133 +1,156 @@
 #+TITLE: Dired
 #+PROPERTY: header-args      :tangle "../config-elisp/dired.el"
-* Dired Base Config
-#+BEGIN_SRC emacs-lisp
-(setq dired-listing-switches "-l -A -h -v --group-directories-first")
-(defun dired-navigation-keys ()
-  (define-key dired-mode-map "[" (lambda nil (interactive) (dired-single-buffer
-"..")))
-  (define-key dired-mode-map "]" 'dired-single-buffer))
-(add-hook 'dired-mode-hook #'dired-navigation-keys)
-(global-set-key (kbd "C-x d") 'dired-x-find-file)
-(global-set-key (kbd "C-x C-d") 'dired-x-find-file)
-(key-seq-define-global "xd" 'dired-x-find-file)
-#+END_SRC
-* Dired All the Icons Mode
-#+BEGIN_SRC emacs-lisp
-(use-package all-the-icons-dired
-  :ensure t
-  :config
-  (defun all-the-icons-dired--refresh ()
-    "Display the icons of files in a dired buffer."
-    (all-the-icons-dired--remove-all-overlays)
-    (unless (file-remote-p default-directory)
-      (save-excursion
-        (goto-char (point-min))
-        (while (not (eobp))
-          (when (dired-move-to-filename nil)
-            (let ((file (dired-get-filename 'relative 'noerror)))
-              (when file
-                (let ((icon (if (file-directory-p file)
-                                (all-the-icons-icon-for-dir file
-                                                            :face 'all-the-icons-dired-dir-face
-                                                            :v-adjust all-the-icons-dired-v-adjust)
-                              (all-the-icons-icon-for-file file :v-adjust all-the-icons-dired-v-adjust))))
-                  (if (member file '("." ".."))
-                      (all-the-icons-dired--add-overlay (point) "  \t")
-                    (all-the-icons-dired--add-overlay (point) (concat icon "\t")))))))
-          (forward-line 1)))))
-  :hook
-  (dired-mode . all-the-icons-dired-mode))
-#+END_SRC
-* Dired Open File
+* Dired
+A major mode for directory browsing and editing.
 #+begin_src emacs-lisp
-(defun dired-open-file ()
-  "In dired, open the file named on this line."
-  (interactive)
-  (let* ((file (dired-get-filename nil t)))
-    (call-process "xdg-open" nil 0 nil file)))
-(defun setup-dired-open-file () (define-key dired-mode-map (kbd "S-<return>") 'dired-open-file))
-(add-hook 'dired-mode-hook #'setup-dired-open-file)
+  (use-package dired
+    :bind (("s-d" . (lambda () (interactive) (dired "~/downloads")))
+	   :map dired-mode-map
+	   ("C-c C-p" . wdired-change-to-wdired-mode))
+    :custom
+    (dired-recursive-deletes 'always)
+    (dired-recursive-copies 'always)
+    (dired-listing-switches "-l -A -h -v --group-directories-first")
+    (dired-dwim-target t)
+    (dired-auto-revert-buffer t)
+    :hook ((dired-mode . auto-revert-mode)
+	   (dired-mode . dired-hide-details-mode)))
+#+end_src
+* Dired All the Icons Mode
+Adds dired support to all-the-icons.
+
+https://github.com/jtbm37/all-the-icons-dired
+#+begin_src emacs-lisp
+  (use-package all-the-icons-dired
+    :ensure t
+    :config
+    (defun all-the-icons-dired--refresh ()
+      "Display the icons of files in a dired buffer."
+      (all-the-icons-dired--remove-all-overlays)
+      (unless (file-remote-p default-directory)
+	(save-excursion
+	  (goto-char (point-min))
+	  (while (not (eobp))
+	    (when (dired-move-to-filename nil)
+	      (let ((file (dired-get-filename 'relative 'noerror)))
+		(when file
+		  (let ((icon (if (file-directory-p file)
+				  (all-the-icons-icon-for-dir file
+							      :face 'all-the-icons-dired-dir-face
+							      :v-adjust all-the-icons-dired-v-adjust)
+				(all-the-icons-icon-for-file file :v-adjust all-the-icons-dired-v-adjust))))
+		    (if (member file '("." ".."))
+			(all-the-icons-dired--add-overlay (point) "  \t")
+		      (all-the-icons-dired--add-overlay (point) (concat icon "\t")))))))
+	    (forward-line 1)))))
+    :hook
+    (dired-mode . all-the-icons-dired-mode))
+#+end_src
+* Dired Open File
+Open files from dired with xdg-open. 
+#+begin_src emacs-lisp
+  (defun dired-open-file ()
+    "In dired, open the file named on this line."
+    (interactive)
+    (let* ((file (dired-get-filename nil t)))
+      (call-process "xdg-open" nil 0 nil file)))
+  (defun setup-dired-open-file () (define-key dired-mode-map (kbd "S-<return>") 'dired-open-file))
+  (add-hook 'dired-mode-hook #'setup-dired-open-file)
 #+end_src
 * Dired Recent Directories
+Present a list of recently used directories and open the selected one in dired.
 #+begin_src emacs-lisp
-(defun dired-recent-dirs ()
-  "Present a list of recently used directories and open the selected one in dired"
-  (interactive)
-  (let ((recent-dirs
-         (delete-dups
-          (mapcar (lambda (file)
-                    (if (file-directory-p file) file (file-name-directory file)))
-                  recentf-list))))
+  (defun dired-recent-dirs ()
+    "Present a list of recently used directories and open the selected one in dired"
+    (interactive)
+    (let ((recent-dirs
+	   (delete-dups
+	    (mapcar (lambda (file)
+		      (if (file-directory-p file) file (file-name-directory file)))
+		    recentf-list))))
 
-    (let ((dir (completing-read "Recent directory: " recent-dirs)))
-      (dired dir))))
-(exwm-input-set-key (kbd "C-x d") 'dired-recent-dirs)
+      (let ((dir (completing-read "Recent directory: " recent-dirs)))
+	(dired dir))))
+  (exwm-input-set-key (kbd "C-x d") 'dired-recent-dirs)
+#+end_src
+* Dired-x
+Extra Dired functionality.
+#+begin_src emacs-lisp
+  (use-package dired-x
+    :bind (("C-x C-d" . dired-x-find-file))
+    :after dired
+    :demand t
+    :config
+    (key-seq-define-global "xd" 'dired-x-find-file)
+    ;;(require 'dired-x)
+    (setq-default dired-omit-files-p t)
+    (setq dired-omit-files (concat dired-omit-files "^\\.?#\\|^\\.$\\|^\\.\\.$")))
 #+end_src
 * Direnv
-#+BEGIN_SRC emacs-lisp
-(use-package direnv :ensure t :hook (after-init . direnv-mode))
-#+END_SRC
+Direnv integration for Emacs.
+
+https://github.com/wbolster/emacs-direnv
+#+begin_src emacs-lisp
+  (use-package direnv
+    :ensure t
+    :hook (after-init . direnv-mode))
+#+end_src
+* Dired Single
+Provides a way to reuse the current dired buffer to visit another directory (rather than creating a new buffer for the new directory).
+
+https://codeberg.org/amano.kenji/dired-single
+#+begin_src emacs-lisp
+  (use-package dired-single
+    :ensure t
+    :after dired
+    :bind (:map dired-mode-map
+		("^" . (lambda nil (interactive) (dired-single-buffer "..")))
+		("[" . (lambda nil (interactive) (dired-single-buffer "..")))
+		("]" . dired-single-buffer)
+		([return] . dired-single-buffer)
+		([mouse-1] . dired-single-buffer-mouse))
+    :init (set (make-local-variable 'mouse-1-click-follows-link) nil))
+#+end_src
 * Dotfile Visibility
-#+BEGIN_SRC emacs-lisp
-(use-package dired-hide-dotfiles :ensure t)
-(defun dired-toggle-dotfiles()
-  (dired-hide-dotfiles-mode)
-  (revert-buffer)
-  (define-key dired-mode-map "." 'dired-hide-dotfiles-mode))
-(add-hook 'dired-mode-hook #'dired-toggle-dotfiles)
-(require 'dired-x)
-(setq-default dired-omit-files-p t) ; Buffer-local variable
-(setq dired-omit-files (concat dired-omit-files "^\\.?#\\|^\\.$\\|^\\.\\.$"))
-#+END_SRC
+Hide dotfiles in dired. 
+
+https://github.com/mattiasb/dired-hide-dotfiles
+#+begin_src emacs-lisp
+  (use-package dired-hide-dotfiles
+    :ensure t
+    :config
+    (defun dired-toggle-dotfiles()
+      (dired-hide-dotfiles-mode)
+      (revert-buffer)
+      (define-key dired-mode-map "." 'dired-hide-dotfiles-mode))
+    :hook (dired-mode . dired-toggle-dotfiles))
+#+end_src
 * Enable Tabbed Subtree Navigation
-#+BEGIN_SRC emacs-lisp
-(use-package dired-subtree
-  :ensure t
-  :after dired
-  :config
-  (bind-key "<tab>" (lambda()(interactive)(dired-subtree-toggle)(revert-buffer)) dired-mode-map)
-  (bind-key "<backtab>" #'dired-subtree-cycle dired-mode-map))
-#+END_SRC
+Insert sub-directories in a tree-like fashion.
+
+https://github.com/Fuco1/dired-hacks/blob/master/dired-subtree.el
+#+begin_src emacs-lisp
+  (use-package dired-subtree
+    :ensure t
+    :after dired
+    :bind (:map dired-mode-map
+		("<tab>" . (lambda () (interactive) (dired-subtree-toggle) (revert-buffer)))
+		("<backtab>" . dired-subtree-cycle)))
+#+end_src
 * Handle Zip Files
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (eval-after-load "dired-aux"
-  '(add-to-list 'dired-compress-file-suffixes
-                '("\\.zip\\'" ".zip" "unzip")))
-#+END_SRC
-* Hide Details
-#+BEGIN_SRC emacs-lisp
-(defun hide-details-mode-hook ()
-  (dired-hide-details-mode))
-(add-hook 'dired-mode-hook #'hide-details-mode-hook)
-#+END_SRC
-* Reload dired after making changes
-#+BEGIN_SRC emacs-lisp
-(setq dired-auto-revert-buffer t)
-(add-hook 'dired-mode-hook 'auto-revert-mode)
-#+END_SRC
-* Set Default Target to Use Open Buffer
-#+BEGIN_SRC emacs-lisp
-(setq dired-dwim-target t)
-#+END_SRC
-* Use A Single Buffer for Dired
-#+BEGIN_SRC emacs-lisp
-(use-package dired-single :ensure t)
-(defun dired-single-init ()
-  (set (make-local-variable 'mouse-1-click-follows-link) nil)
-  (set (make-local-variable 'mouse-3-click-follows-link) nil)
-  (define-key dired-mode-map [return] 'dired-single-buffer)
-  (define-key dired-mode-map [mouse-1] 'dired-single-buffer-mouse)
-  (define-key dired-mode-map [down-mouse-3] 'crux-open-with)
-  (define-key dired-mode-map (kbd "<mouse-8>") (lambda nil (interactive) (dired-single-buffer "..")))
-  (define-key dired-mode-map "^" (lambda nil (interactive) (dired-single-buffer ".."))))
-(add-hook 'dired-mode-hook 'dired-single-init)
-#+END_SRC
-* Write Directory Changes Freestyle in wdired-mode
-#+BEGIN_SRC emacs-lisp
-(key-chord-define-global "wd" 'wdired-change-to-wdired-mode)
-#+END_SRC
+  '(add-to-list 'dired-compress-file-suffixes '("\\.zip\\'" ".zip" "unzip")))
+#+end_src
+* wdired
+A special mode that allows you to perform file operations by editing the Dired buffer directly.
+
+https://www.gnu.org/software/emacs/manual/html_node/emacs/Wdired.html
+#+begin_src emacs-lisp
+  (key-chord-define-global "wd" 'wdired-change-to-wdired-mode)
+#+end_src
 * Visit Home Directory
-#+BEGIN_SRC emacs-lisp
-(key-seq-define-global "1`" (lambda () (interactive) (dired "~/")))
-#+END_SRC
+Quick access to the home directory with a key sequence. 
+#+begin_src emacs-lisp
+  (key-seq-define-global "1`" (lambda () (interactive) (dired "~/")))
+#+end_src

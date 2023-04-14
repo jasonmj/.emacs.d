@@ -1,13 +1,8 @@
 #+TITLE: Editing
 #+PROPERTY: header-args      :tangle "../config-elisp/editing.el"
-* Aggressive Indent Mode
-#+begin_src emacs-lisp
-  (use-package aggressive-indent
-    :ensure t
-    :hook ((prog-mode . aggressive-indent-mode)))
-#+end_src
 * Backtab
-#+BEGIN_SRC emacs-lisp
+Unindent by 2 spaces with shift tab.
+#+begin_src emacs-lisp
 (global-set-key (kbd "<backtab>") 'un-indent-by-removing-2-spaces)
 (defun un-indent-by-removing-2-spaces ()
   (interactive)
@@ -19,170 +14,238 @@
         (untabify (match-beginning 0) (match-end 0)))
       (when (looking-at "^  ")
         (replace-match "")))))
-#+END_SRC
-* Code Folding
-#+BEGIN_SRC emacs-lisp
-(use-package outline
-  :hook ((elixir-ts-mode . outline-minor-mode))
-  :bind (("C-<return>" . outline-cycle)
-	 ("C-S-<return>" . my/outline-cycle-buffer))
-  :config (setq outline-blank-line t)
-  (set-display-table-slot
-   standard-display-table
-   'selective-display
-   (let ((face-offset (* (face-id 'shadow) (lsh 1 22))))
-     (vconcat (mapcar (lambda (c) (+ face-offset c)) " ▸"))))
-  (defun my/outline-cycle-buffer () (interactive)
-	 (if (eq outline--cycle-buffer-state 'show-all) (setq outline--cycle-buffer-state 'top-level))
-	 (outline-cycle-buffer)))
-#+END_SRC
-* Display Line Numbers
+#+end_src
+* Comment Line
+Comment or uncomment current line and leave point after it.
 #+begin_src emacs-lisp
-(use-package emacs :hook ((prog-mode . display-line-numbers-mode)))
+  (global-set-key (kbd "M-;") 'comment-line)
+#+end_src
+* Display Line Numbers
+Display line numbers in the buffer.
+#+begin_src emacs-lisp
+  (use-package emacs
+    :hook ((prog-mode . display-line-numbers-mode)))
+#+end_src
+* Drag Stuff
+#+begin_src emacs-lisp
+  (use-package drag-stuff
+    :ensure t
+    :bind (("M-p" . drag-stuff-up)
+	   ("M-n" . drag-stuff-down)))
 #+end_src
 * Duplicate Line
- #+BEGIN_SRC emacs-lisp
-(defun duplicate-line ()
-  (interactive)
-  (move-beginning-of-line 1)
-  (kill-line 1)
-  (yank)
-  (yank)
-  (previous-line)
-  (backward-word))
-(global-set-key (kbd "C-c d") 'duplicate-line)
- #+END_SRC
-* Electric Pairs
-#+BEGIN_SRC emacs-lisp
-(electric-pair-mode 1)
-#+END_SRC    
-* Expreg
+A simple elisp function to duplicate the current line.
 #+begin_src emacs-lisp
-(load-file "/home/jasonmj/.emacs.d/elisp/expreg.el")
-(use-package expreg
-  :bind (("s-<tab>" . expreg-expand)
-	 ("S-TAB" . expreg-expand)))
+  (defun duplicate-line ()
+    (interactive)
+    (move-beginning-of-line 1)
+    (kill-line 1)
+    (yank)
+    (yank)
+    (previous-line)
+    (backward-word))
+  (global-set-key (kbd "C-c d") 'duplicate-line)
+ #+end_src
+* Electric Pairs
+Electric Pair mode is a global minor mode.  When enabled, typing an open parenthesis automatically inserts the corresponding closing parenthesis, and vice versa.
+#+begin_src emacs-lisp
+  (electric-pair-mode 1)
+#+end_src    
+* Expreg
+Expand the current region based on a smart usage of regex. 
+
+https://github.com/casouri/lunarymacs/blob/master/site-lisp/expreg.el
+#+begin_src emacs-lisp
+  (load-file "/home/jasonmj/.emacs.d/elisp/expreg.el")
+  (use-package expreg
+    :bind (("s-<tab>" . expreg-expand)
+	   ("S-TAB" . expreg-expand)))
 #+end_src
 * Highlight Matching Parenthesis
-#+BEGIN_SRC emacs-lisp
-(show-paren-mode 1)
-#+END_SRC
+When enabled, any matching parenthesis is highlighted in show-paren-style after show-paren-delay seconds of Emacs idle time.
+#+begin_src emacs-lisp
+  (show-paren-mode 1)
+#+end_src
 * Hungry Delete
-#+BEGIN_SRC emacs-lisp
-(use-package hungry-delete
-  :ensure t
-  :hook ((prog-mode . hungry-delete-mode)))
-#+END_SRC
+This package implements hungry deletion, meaning that deleting a whitespace character will delete all whitespace until the next non-whitespace character.
+
+https://github.com/nflath/hungry-delete
+#+begin_src emacs-lisp
+  (use-package hungry-delete
+    :ensure t
+    :hook ((org-mode . hungry-delete-mode)
+	   (prog-mode . hungry-delete-mode)))
+#+end_src
 * iEdit
-#+BEGIN_SRC emacs-lisp
-(use-package iedit :ensure t :bind (("C-c ;" . iedit-mode)))
-#+END_SRC
+Modify multiple occurrences simultaneously.
+
+https://github.com/victorhge/iedit
+#+begin_src emacs-lisp
+  (use-package iedit
+    :ensure t
+    :bind (("C-c ;" . iedit-mode)))
+#+end_src
 * Increment / Decrement Numbers
-#+BEGIN_SRC emacs-lisp
-(use-package evil-numbers :ensure t)
-(global-set-key (kbd "M-s-p") 'evil-numbers/inc-at-pt)
-(global-set-key (kbd "<M-mouse-5>") 'evil-numbers/inc-at-pt)
-(global-set-key (kbd "M-s-n") 'evil-numbers/dec-at-pt)
-(global-set-key (kbd "<M-mouse-4>") 'evil-numbers/dec-at-pt)
-#+END_SRC
-* Move Text
-#+BEGIN_SRC emacs-lisp
-(defun move-text-internal (arg)
-  (cond
-   ((and mark-active transient-mark-mode)
-    (if (> (point) (mark))
-	(exchange-point-and-mark))
-    (let ((column (current-column))
-	  (text (delete-and-extract-region (point) (mark))))
-      (forward-line arg)
-      (move-to-column column t)
-      (set-mark (point))
-      (insert text)
-      (exchange-point-and-mark)
-      (setq deactivate-mark nil)))
-   (t
-    (beginning-of-line)
-    (when (or (> arg 0) (not (bobp)))
-      (forward-line)
-      (when (or (< arg 0) (not (eobp)))
-	(transpose-lines arg))
-      (forward-line -1)))))
+Increment / Decrement binary, octal, decimal and hex literals.
 
-(defun move-text-down (arg)
-  "Move region (transient-mark-mode active) or current line
-arg lines down."
-  (interactive "*p")
-  (move-text-internal arg))
+https://github.com/cofi/evil-numbers
+#+begin_src emacs-lisp
+  (use-package evil-numbers
+    :ensure t
+    :bind (("M-s-p" . evil-numbers/inc-at-pt)
+	   ("M-s-n" . evil-numbers/dec-at-pt)))
+#+end_src
+* Kill Ring Clear
+#+begin_src emacs-lisp
+(defun kill-ring-clear () (interactive) (setq kill-ring nil))
+#+end_src
+* Kill Whole Line
+A simple function to cleanly kill the whole line where the cursor is located. 
+#+begin_src emacs-lisp
+  (global-set-key (kbd "C-k") (lambda () (interactive) (insert-char 32 1) (kill-whole-line)))
+#+end_src
+* Kill Word Backwards No Copy
+#+begin_src emacs-lisp
+(defun backward-delete-word-no-copy (arg)
+  "Delete characters backward until encountering the beginning of a word.
+With argument, do this that many times.
+This command does not push text to `kill-ring'."
+  (interactive "p")
+  (delete-word-no-copy (- arg)))
+(global-set-key (kbd "<C-backspace>") 'backward-delete-word-no-copy)
+(global-set-key (kbd "<M-backspace>") 'backward-delete-word-no-copy)
+#+end_src
 
-(defun move-text-up (arg)
-  "Move region (transient-mark-mode active) or current line
-arg lines up."
-  (interactive "*p")
-  (move-text-internal (- arg)))
-
-(global-set-key (kbd "M-p") 'move-text-up)
-(global-set-key (kbd "M-n") 'move-text-down)
-#+END_SRC
+* Kill Word No Copy
+#+begin_src emacs-lisp
+(defun delete-word-no-copy (arg)
+  "Delete characters forward until encountering the end of a word.
+With argument, do this that many times.
+This command does not push text to `kill-ring'."
+  (interactive "p")
+  (delete-region
+   (point)
+   (progn
+     (forward-word arg)
+     (point))))
+(global-set-key (kbd "M-d") 'delete-word-no-copy)
+#+end_src
 * Multiple Cursors
-#+BEGIN_SRC emacs-lisp
-(use-package multiple-cursors
-  :defer
-  :ensure t
-  :bind (("M-/" . mc/mark-next-like-this))
-  :init
-  (add-hook 'multiple-cursors-mode-hook
-            (defun my/work-around-multiple-cursors-issue ()
-              (load "multiple-cursors-core.el")
-              (remove-hook 'multiple-cursors-mode #'my/work-around-multiple-cursors-issue))))
-#+END_SRC
+Multiple cursor editing for Emacs. 
+
+https://github.com/magnars/multiple-cursors.el
+#+begin_src emacs-lisp
+  (use-package multiple-cursors
+    :defer
+    :ensure t
+    :bind (("M-/" . mc/mark-next-like-this))
+    :config (defun my/work-around-multiple-cursors-issue ()
+		(load "multiple-cursors-core.el")
+		(remove-hook 'multiple-cursors-mode #'my/work-around-multiple-cursors-issue))
+    :hook ((multiple-cursors-mode . my/work-around-multiple-cursors-issue)))
+#+end_src
+* Open Line Below
+#+begin_src emacs-lisp
+(defun open-line-below ()
+  (interactive)
+  (move-end-of-line 1)
+  (newline))
+(global-set-key [(shift return)] 'open-line-below)
+#+end_src
+* Outline Minor Mode
+A minor mode for cycling outlines with selective display.
+#+begin_src emacs-lisp
+  (use-package outline
+    :hook ((elixir-ts-mode . outline-minor-mode))
+    :bind (("C-<return>" . outline-cycle)
+	   ("C-S-<return>" . my/outline-cycle-buffer))
+    :config (setq outline-blank-line t)
+    (set-display-table-slot
+     standard-display-table
+     'selective-display
+     (let ((face-offset (* (face-id 'shadow) (lsh 1 22))))
+       (vconcat (mapcar (lambda (c) (+ face-offset c)) " ⏵"))))
+    (defun my/outline-cycle-buffer () (interactive)
+	   (if (eq outline--cycle-buffer-state 'show-all) (setq outline--cycle-buffer-state 'top-level))
+	   (outline-cycle-buffer)))
+#+end_src
 * Rainbow Delimiters
-#+BEGIN_SRC emacs-lisp
-(use-package rainbow-delimiters
-  :ensure t
-  :hook (prog-mode . rainbow-delimiters-mode))
-#+END_SRC
+Highlights delimiters such as parentheses, brackets or braces according to their depth. Each successive level is highlighted in a different color. 
+
+https://github.com/Fanael/rainbow-delimiters
+#+begin_src emacs-lisp
+  (use-package rainbow-delimiters
+    :ensure t
+    :hook (prog-mode . rainbow-delimiters-mode))
+#+end_src
 * Spell Fu
+Fast highlighting of all on-screen misspelled words.
+
+https://codeberg.org/ideasman42/emacs-spell-fu/
 #+begin_src emacs-lisp
   (use-package spell-fu
     :ensure t
+    :custom (ispell-personal-dictionary "/home/jasonmj/.emacs.d/spell-fu/personal.txt")
     :hook ((prog-mode . spell-fu-mode)
 	   (org-mode . spell-fu-mode)
 	   (markdown-mode . spell-fu-mode)))
 #+end_src
 * Subword Mode
+A minor mode that changes the definition of a word so that word-based commands stop inside symbols with mixed uppercase and lowercase letters, e.g. "GtkWidget", "EmacsFrameClass", "NSGraphicsContext".
 #+begin_src emacs-lisp
-(use-package emacs :hook ((prog-mode . subword-mode)))
+  (use-package emacs
+    :hook ((prog-mode minibuffer-setup shell-mode) . subword-mode))
 #+end_src
 * Sudo Edit
-#+BEGIN_SRC emacs-lisp
-(use-package sudo-edit :ensure t)
-#+END_SRC
-* Symbol Overlay
+Allows to open files as another user, by default "root".
+
+https://github.com/nflath/sudo-edit/blob/master/sudo-edit.el
 #+begin_src emacs-lisp
-(use-package symbol-overlay
-  :ensure t
-  :bind (("M-i" . symbol-overlay-put))
-  :hook ((elixir-mode . symbol-overlay-mode)
-	 (emacs-lisp-mode . symbol-overlay-mode)))
+(use-package sudo-edit :ensure t)
+#+end_src
+* Symbol Overlay
+Highlight symbols with keymap-enabled overlays.
+
+https://github.com/wolray/symbol-overlay
+#+begin_src emacs-lisp
+  (use-package symbol-overlay
+    :ensure t
+    :bind (("M-i" . symbol-overlay-put))
+    :hook ((prog-mode . symbol-overlay-mode)))
+#+end_src
+* Undo Fu
+#+begin_src emacs-lisp
+  (use-package undo-fu
+    :ensure t
+    :bind (("C-z" . undo-fu-only-undo)
+	   ("C-S-z" . undo-fu-only-redo)))
+  (use-package undo-fu-session
+    :ensure t
+    :hook (after-init . global-undo-fu-session-mode)
+    :custom (undo-fu-session-incompatible-files '("/COMMIT_EDITMSG\\'" "/git-rebase-todo\\'")))
 #+end_src
 * Unfill Region
-#+BEGIN_SRC emacs-lisp
+Unfill the region, joining text paragraphs into a single logical line.  This is useful, e.g., for use with visual-line-mode.
+#+begin_src emacs-lisp
 (defun unfill-region (beg end)
   "Unfill the region, joining text paragraphs into a single
-    logical line.  This is useful, e.g., for use with
-    `visual-line-mode'."
+    logical line.  This is useful, e.g., for use with `visual-line-mode'."
   (interactive "*r")
   (let ((fill-column (point-max)))
     (fill-region beg end)))
-#+END_SRC
+#+end_src
 * Upper/Lowercase Chars
-#+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "M-u") 'upcase-char)
-(global-set-key (kbd "M-l") 'downcase-dwim)
-#+END_SRC
-* Whitespace Cleanup Mode
 #+begin_src emacs-lisp
-  (use-package whitespace-cleanup-mode
+  (use-package emacs
+    :bind (("M-u" . upcase-char)
+	   ("M-l" . downcase-dwim)))
+#+end_src
+* WS Butler Mode
+Unobtrusively trim extraneous white-space *ONLY* in lines edited. 
+
+https://github.com/lewang/ws-butler
+#+begin_src emacs-lisp
+  (use-package ws-butler
     :ensure t
-    :hook ((prog-mode . whitespace-cleanup-mode)))
+    :hook ((prog-mode . ws-butler-mode)))
 #+end_src

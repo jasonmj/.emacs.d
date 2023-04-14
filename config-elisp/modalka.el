@@ -1,4 +1,7 @@
-(use-package modalka :ensure t)
+(use-package modalka
+  :ensure t
+  :bind (:map modalka-mode-map
+	      ("<S-backspace>" . backward-delete-char-untabify)))
 
 (defun toggle-modalka ()
   (interactive)
@@ -169,7 +172,9 @@
   (modalka-define-kbd "+" "C-+")
   (modalka-define-kbd "=" "C-+")
   (define-key modalka-mode-map (kbd ",") (lambda () (interactive) (toggle-modalka) (insert-char 44 1)))
-  (define-key modalka-mode-map (kbd ".") 'repeat)
+  (define-key modalka-mode-map (kbd ".") 'xref-find-definitions)
+  (define-key modalka-mode-map (kbd "/") 'xref-find-references)
+  (modalka-define-kbd "\\" "C-\\")
   (modalka-define-kbd "<" "M-<")
   (modalka-define-kbd ">" "M->")
   (modalka-define-kbd "a" "C-a")

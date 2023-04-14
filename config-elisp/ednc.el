@@ -3,6 +3,7 @@
   :init (ednc-mode)
   :config
   (require 'notifications)
+
   (defun posframe-refposhandler-exwm (&optional frame)
     "EXWM posframe refposhandler."
     (cond
@@ -11,6 +12,41 @@
 	    (posframe-refposhandler-xwininfo frame))
 	  (cons 0 0)))
      (t nil)))
+  (defun customize-ednc-view ()
+    (face-remap-add-relative 'fringe :background (face-attribute 'default :background) :foreground (face-attribute 'default :background))
+    (setq-local word-wrap t)
+    (setq-local header-line-format ""))
+
+  (defun ednc-format-notification (notification &optional expand-flag)
+    "Return propertized description of NOTIFICATION.
+
+       If EXPAND-FLAG is nil, make details invisible by default."
+    (let* ((hints (ednc-notification-hints notification))
+	   (urgency (or (ednc--get-hint hints "urgency") 1))
+	   (inherit (if (<= urgency 0) 'shadow (when (>= urgency 2) 'bold))))
+      (format (propertize "\n%s [%s: %s]%s \n" 'face (list :inherit inherit)
+			  'ednc-notification notification)
+	      (alist-get 'icon (ednc-notification-amendments notification) "")
+	      (ednc-notification-app-name notification)
+	      (ednc--format-summary notification)
+	      (propertize (concat "\n" (ednc-notification-body notification) "\n")
+			  'invisible (not expand-flag)))))
+
+  (defun ednc-format-notification (notification &optional expand-flag)
+    "Return propertized description of NOTIFICATION.
+
+	 If EXPAND-FLAG is nil, make details invisible by default."
+    (let* ((hints (ednc-notification-hints notification))
+	   (urgency (or (ednc--get-hint hints "urgency") 1))
+	   (inherit (if (<= urgency 0) 'shadow (when (>= urgency 2) 'bold))))
+      (format (propertize "\n%s [%s: %s]%s \n" 'face (list :inherit inherit)
+			  'ednc-notification notification)
+	      (alist-get 'icon (ednc-notification-amendments notification) "")
+	      (ednc-notification-app-name notification)
+	      (ednc--format-summary notification)
+	      (propertize (concat "\n" (ednc-notification-body notification) "\n")
+			  'invisible (not expand-flag)))))
+
   (defun show-posframe-in-buffer (old new)
     ;; Creates a small floating frame with the EDNC notification.
     ;; Test with notification function below:
@@ -28,10 +64,12 @@
 				   :poshandler '(lambda (_info) '(-6 . 38))
 				   :max-width 45
 				   :border-width 1
-				   :left-fringe 5
-				   :right-fringe 5
-				   :border-color (face-attribute 'default :foreground)
+				   :header-line-height 10
+				   :left-fringe 30
+				   :right-fringe 30
+				   :border-color (if (eq (ednc--get-hint (ednc-notification-hints new) "urgency") 1) "red" (face-attribute 'default :foreground))
 				   :timeout 5
 				   :refposhandler 'posframe-refposhandler-exwm
 				   :override-parameters '((alpha-background . 85)))))))))
-  (add-hook 'ednc-notification-presentation-functions #'show-posframe-in-buffer))
+  (add-hook 'ednc-notification-presentation-functions #'show-posframe-in-buffer)
+  :hook ((ednc-view-mode . customize-ednc-view)))

@@ -1,9 +1,0 @@
-#+TITLE: Python
-#+PROPERTY: header-args      :tangle "../config-elisp/python.el"
-* Eglot
-#+BEGIN_SRC emacs-lisp
-(use-package eglot
-  :config
-  (add-to-list 'eglot-server-programs '(python-mode . ("pyright-langserver" "--stdio")))
-  (add-hook 'python-mode-hook #'eglot-ensure))
-#+END_SRC

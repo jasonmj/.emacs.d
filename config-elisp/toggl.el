@@ -1,5 +1,7 @@
 (use-package request :ensure t)
+
 (setq toggl--headers '(("Authorization" . (auth-source-pick-first-password :host "www.toggl.com" :user "jasonmj"))))
+
 (defun toggl-stop-timer()
   (interactive)
   (request
@@ -10,8 +12,8 @@
     (cl-function
      (lambda (&key data &allow-other-keys)
        (let ((tid (cdr (pop (cdr (pop data))))))
-         (setq toggl-last-timer tid)
-         (toggl--stop-timer tid))))
+	 (setq toggl-last-timer tid)
+	 (toggl--stop-timer tid))))
     :error
     (cl-function
      (lambda (&rest args &key error-thrown &allow-other-keys)
@@ -52,14 +54,16 @@
 
 (use-package org-toggl
   :straight (:type git :host github :repo "jasonmj/org-toggl")
+  :ensure t
+  :demand t
+  :after org
+  :bind (("C-c C-x C-o" . toggl-stop-time-entry)
+	 :map org-mode-map
+	      ("C-x t s" . org-toggl-set-project)
+	      ("C-c C-x TAB" . org-toggl-clock-in))
   :custom
   (toggl-auth-token (auth-source-pick-first-password :host "api.toggl.com" :user "jasonmj"))
   (org-toggl-inherit-toggl-properties t)
   :hook ((after-init . toggl-get-projects)
 	 (after-init . toggl-timer-watch)
-	 (after-init . org-toggl-integration-mode))
-  :init
-  (eval-after-load 'org #'(define-key org-mode-map (kbd "C-x t s") 'org-toggl-set-project))
-  (eval-after-load 'org #'(define-key org-mode-map (kbd "C-c C-x TAB") 'org-toggl-clock-in))
-  (exwm-input-set-key (kbd "C-c C-x C-o") 'toggl-stop-time-entry)
-  (eval-after-load 'org #'(define-key org-mode-map (kbd "C-c C-x C-o") 'toggl-stop-time-entry)))
+	 (after-init . org-toggl-integration-mode)))

@@ -1,124 +1,82 @@
 #+TITLE: Navigtion
 #+PROPERTY: header-args      :tangle "../config-elisp/navigation.el"
 * Avy
-#+BEGIN_SRC emacs-lisp
-(use-package avy :ensure t
-  :bind (("C-c j" . avy-goto-word-org-subword-1))
-  :config
-  (key-chord-define-global "jj" 'avy-goto-word-or-subword-1)
-  (key-chord-define-global "JJ" 'avy-goto-char-in-line))
-#+END_SRC
+Jump to things in Emacs tree-style.
+
+https://github.com/abo-abo/avy
+#+begin_src emacs-lisp
+  (use-package avy
+    :ensure t
+    :demand t
+    :bind (("C-c j" . avy-goto-word-org-subword-1))
+    :config
+    (key-chord-define-global "jj" 'avy-goto-word-or-subword-1)
+    (key-chord-define-global "JJ" 'avy-goto-char-in-line))
+#+end_src
 * Centered Cursor Mode
-#+BEGIN_SRC emacs-lisp
-(use-package centered-cursor-mode
-  :ensure t
-  :config
-  (global-set-key (kbd "s--") 'centered-cursor-mode)
-  (global-centered-cursor-mode t))
-#+END_SRC
-* Comment Line
-#+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "M-;") 'comment-line)
-#+END_SRC
+An emacs minor mode for smooth scrolling.
+
+https://github.com/andre-r/centered-cursor-mode.el
+#+begin_src emacs-lisp
+  (use-package centered-cursor-mode
+    :ensure t
+    :bind ("s--" . centered-cursor-mode)
+    :init (global-centered-cursor-mode))
+#+end_src
 * Copy and Keep Highlight
-#+BEGIN_SRC emacs-lisp
-(defun copy-keep-highlight (beg end)
-  (interactive "r")
-  (prog1 (clipboard-kill-ring-save beg end)
-    (setq deactivate-mark nil)))
- (global-set-key (kbd "M-w") 'copy-keep-highlight)
-#+END_SRC
-* Dired Open Downloads
-#+BEGIN_SRC emacs-lisp
-(exwm-input-set-key (kbd "s-d") (lambda()(interactive)(dired "~/downloads")))
-#+END_SRC
-* Kill Ring Clear
-#+BEGIN_SRC emacs-lisp
-(defun kill-ring-clear () (interactive) (setq kill-ring nil))
-#+END_SRC
-* Kill Whole Line
-#+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "C-k") 'kill-whole-line)
-#+END_SRC
-* Kill Word No Copy
-#+BEGIN_SRC emacs-lisp
-(defun delete-word-no-copy (arg)
-  "Delete characters forward until encountering the end of a word.
-With argument, do this that many times.
-This command does not push text to `kill-ring'."
-  (interactive "p")
-  (delete-region
-   (point)
-   (progn
-     (forward-word arg)
-     (point))))
-(global-set-key (kbd "M-d") 'delete-word-no-copy)
-#+END_SRC
-* Kill Word Backwards No Copy
-#+BEGIN_SRC emacs-lisp
-(defun backward-delete-word-no-copy (arg)
-  "Delete characters backward until encountering the beginning of a word.
-With argument, do this that many times.
-This command does not push text to `kill-ring'."
-  (interactive "p")
-  (delete-word-no-copy (- arg)))
-(global-set-key (kbd "<C-backspace>") 'backward-delete-word-no-copy)
-(global-set-key (kbd "<M-backspace>") 'backward-delete-word-no-copy)
-#+END_SRC
+Copy the currently selected region and keep it selected. 
+#+begin_src emacs-lisp
+  (defun copy-keep-highlight (beg end)
+    (interactive "r")
+    (prog1 (clipboard-kill-ring-save beg end)
+      (setq deactivate-mark nil)))
+   (global-set-key (kbd "M-w") 'copy-keep-highlight)
+#+end_src
 * Move to Beginning of Line
-#+BEGIN_SRC emacs-lisp
-(defun smarter-move-beginning-of-line (arg)
-  "Move point back to indentation of beginning of line.
+Move point back to indentation of beginning of line.
+#+begin_src emacs-lisp
+  (defun smarter-move-beginning-of-line (arg)
+    "Move point back to indentation of beginning of line.
 
-Move point to the first non-whitespace character on this line.
-If point is already there, move to the beginning of the line.
-Effectively toggle between the first non-whitespace character and
-the beginning of the line.
+     Move point to the first non-whitespace character on this line.
+     If point is already there, move to the beginning of the line.
+     Effectively toggle between the first non-whitespace character and
+     the beginning of the line.
 
-If ARG is not nil or 1, move forward ARG - 1 lines first.  If
-point reaches the beginning or end of the buffer, stop there."
-  (interactive "^p")
-  (setq arg (or arg 1))
+     If ARG is not nil or 1, move forward ARG - 1 lines first.  If
+     point reaches the beginning or end of the buffer, stop there."
+    (interactive "^p")
+    (setq arg (or arg 1))
 
-  ;; Move lines first
-  (when (/= arg 1)
-    (let ((line-move-visual nil))
-      (forward-line (1- arg))))
+    ;; Move lines first
+    (when (/= arg 1)
+      (let ((line-move-visual nil))
+	(forward-line (1- arg))))
 
-  (let ((orig-point (point)))
-    (back-to-indentation)
-    (when (= orig-point (point))
-      (move-beginning-of-line 1))))
+    (let ((orig-point (point)))
+      (back-to-indentation)
+      (when (= orig-point (point))
+	(move-beginning-of-line 1))))
 
-;; remap C-a to `smarter-move-beginning-of-line'
-(global-set-key [remap move-beginning-of-line]
-                'smarter-move-beginning-of-line)
-(global-set-key [remap org-beginning-of-line]
-                'smarter-move-beginning-of-line)
-#+END_SRC
-* Move to End of Line Minus One
-#+BEGIN_SRC emacs-lisp
-(defun end-of-line-minus-one () (interactive) (move-end-of-line 1) (left-char))
-(global-set-key (kbd "s-e") 'end-of-line-minus-one)
-#+END_SRC
-* Open Line Below
-#+BEGIN_SRC emacs-lisp
-(defun open-line-below ()
-  (interactive)
-  (move-end-of-line 1)
-  (newline))
-(global-set-key [(shift return)] 'open-line-below)
-#+END_SRC
+  ;; remap C-a to `smarter-move-beginning-of-line'
+  (global-set-key [remap move-beginning-of-line] 'smarter-move-beginning-of-line)
+  (eval-after-load 'org #'(define-key org-mode-map (kbd "C-a") 'smarter-move-beginning-of-line))
+#+end_src
 * Other Window
-#+BEGIN_SRC emacs-lisp
-(key-chord-define-global ".," 'other-window)
-#+END_SRC
+Select another window in cyclic ordering of windows.
+#+begin_src emacs-lisp
+  (key-chord-define-global ".," 'other-window)
+#+end_src
 * Pop to Mark
-#+BEGIN_SRC emacs-lisp
-(key-seq-define-global "o0" 'pop-to-mark-command)
-(key-seq-define-global "O)" 'pop-global-mark)
-#+END_SRC
+Jump to mark, and pop a new position for mark off the ring or the global mark ring. 
+#+begin_src emacs-lisp
+  (key-seq-define-global "o0" 'pop-to-mark-command)
+  (key-seq-define-global "O)" 'pop-global-mark)
+#+end_src
 * Popper
+Emacs minor-mode to summon and dismiss buffers easily. 
+
+https://github.com/karthink/popper
 #+begin_src emacs-lisp
   (use-package popper
     :ensure t
@@ -127,74 +85,99 @@ point reaches the beginning or end of the buffer, stop there."
     (popper-mode-line t)
     (popper-window-height nil)
     (popper-reference-buffers '("^shell:" "^Aweshell:"))
-    :config
+    :init
     (popper-mode +1)
     (popper-echo-mode +1))
 #+end_src
 * Scratch
-#+BEGIN_SRC emacs-lisp
-(exwm-input-set-key (kbd "C-x x") 'scratch-buffer)
-#+END_SRC
+Visit the scratch buffer using quick access key bindings.
+#+begin_src emacs-lisp
+  (exwm-input-set-key (kbd "C-x x") 'scratch-buffer)
+  (key-chord-define-global "xx" 'scratch-buffer)
+#+end_src
 * Select All
-#+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "s-a") 'mark-whole-buffer)
-#+END_SRC
+Put point at beginning and mark at end of buffer.
+#+begin_src emacs-lisp
+  (global-set-key (kbd "s-a") 'mark-whole-buffer)
+#+end_src
 * Smart Movement
-#+BEGIN_SRC emacs-lisp
-(defun forward-node ()
-  (interactive)
-  (let ((initial-pos (point)))
-    (expreg-expand)
-    (let ((new-pos (cdr (car (region-bounds)))))
-      (if (eq initial-pos new-pos)
-	  (progn (goto-char new-pos) (forward-char 1))
-	(goto-char new-pos))))
+Smart node movement based on expreg-expand.
+#+begin_src emacs-lisp
+  (defun forward-node ()
+    (interactive)
+    (let ((initial-pos (point)))
+      (expreg-expand)
+      (let ((new-pos (cdr (car (region-bounds)))))
+	(if (eq initial-pos new-pos)
+	    (progn (goto-char new-pos) (forward-char 1))
+	  (goto-char new-pos))))
+      (deactivate-mark))
+  (global-set-key (kbd "C-s-f") 'forward-node)
+
+  (defun backward-node ()
+    (interactive)
+    (let ((initial-pos (point)))
+      (expreg-expand)
+      (let ((new-pos (car (car (region-bounds)))))
+	(if (eq initial-pos new-pos)
+	    (progn (backward-char 1) (backward-node))
+	  (goto-char new-pos))))
     (deactivate-mark))
-(global-set-key (kbd "C-s-f") 'forward-node)
+  (global-set-key (kbd "C-s-b") 'backward-node)
 
-(defun backward-node ()
-  (interactive)
-  (let ((initial-pos (point)))
-    (expreg-expand)
-    (let ((new-pos (car (car (region-bounds)))))
-      (if (eq initial-pos new-pos)
-	  (progn (backward-char 1) (backward-node))
-	(goto-char new-pos))))
-  (deactivate-mark))
-(global-set-key (kbd "C-s-b") 'backward-node)
+  (defun up-node ()
+    (interactive)
+    (let ((initial-pos (point)))
+      (expreg-expand)
+      (let ((new-pos (car (car (region-bounds)))))
+	(if (eq initial-pos new-pos)
+	    (up-node)
+	  (goto-char new-pos))))
+    (deactivate-mark))
+  (global-set-key (kbd "C-s-p") 'up-node)
 
-(defun up-node ()
-  (interactive)
-  (let ((initial-pos (point)))
-    (expreg-expand)
-    (let ((new-pos (car (car (region-bounds)))))
-      (if (eq initial-pos new-pos)
-	  (up-node)
-	(goto-char new-pos))))
-  (deactivate-mark))
-(global-set-key (kbd "C-s-p") 'up-node)
+  (global-set-key (kbd "C-s-n") 'down-list)
+#+end_src
+* Windmove
+Defines a set of routines, windmove-{left,up,right, down}, for selection of windows in a frame geometrically.
+#+begin_src emacs-lisp
+  (use-package windmove :ensure t)
+  (exwm-input-set-key (kbd "s-b") 'windmove-left)
+  (exwm-input-set-key (kbd "s-f") 'windmove-right)
+  (exwm-input-set-key (kbd "s-p") 'windmove-up)
+  (exwm-input-set-key (kbd "s-n") 'windmove-down)
+  (exwm-input-set-key (kbd "C-1") 'delete-other-windows)
+  (exwm-input-set-key (kbd "C-2") (lambda () (interactive) (split-window-below)
+				    (run-with-idle-timer 0.15 nil (lambda() (interactive) (windmove-down)))))
+  (exwm-input-set-key (kbd "C-3") (lambda () (interactive) (split-window-right) (windmove-right)))
+  (exwm-input-set-key (kbd "<C-escape>") 'delete-window)
+#+end_src
 
-(global-set-key (kbd "C-s-n") 'down-list)
-#+END_SRC
 * Winner Undo
-#+BEGIN_SRC emacs-lisp
-(winner-mode 1)
-(exwm-input-set-key (kbd "s-z") 'winner-undo)
-(exwm-input-set-key (kbd "s-Z") 'winner-redo)
-#+END_SRC
+Winner mode is a global minor mode that records the changes in the window configuration (i.e. how
+the frames are partitioned into windows) so that the changes can be "undone" using the command
+winner-undo.
+#+begin_src emacs-lisp
+  (winner-mode 1)
+  (exwm-input-set-key (kbd "s-z") 'winner-undo)
+  (exwm-input-set-key (kbd "s-Z") 'winner-redo)
+#+end_src
 * Zoom
-#+BEGIN_SRC emacs-lisp
-(use-package zoom
-  :ensure t
-  :commands zoom-mode
-  :preface
-  (setq zoom-size '(0.618 . 0.618))
-  :config
-  (defun my/work-around-zoom-issue ()
-    (message "reloading zoom-mode")
-    (load "zoom.el")
-    (remove-hook 'zoom-mode-hook #'my/work-around-zoom-issue))
-  :hook
-  ((zoom-mode . my/work-around-zoom-issue)
-   (after-init . zoom-mode)))
-#+END_SRC
+Fixed and automatic balanced window layout for Emacs.
+
+https://github.com/cyrus-and/zoom
+#+begin_src emacs-lisp
+  (use-package zoom
+    :ensure t
+    :commands zoom-mode
+    :preface
+    (setq zoom-size '(0.618 . 0.618))
+    :config
+    (defun my/work-around-zoom-issue ()
+      (message "reloading zoom-mode")
+      (load "zoom.el")
+      (remove-hook 'zoom-mode-hook #'my/work-around-zoom-issue))
+    :hook
+    ((zoom-mode . my/work-around-zoom-issue)
+     (after-init . zoom-mode)))
+#+end_src

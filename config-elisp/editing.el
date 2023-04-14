@@ -1,7 +1,3 @@
-(use-package aggressive-indent
-  :ensure t
-  :hook ((prog-mode . aggressive-indent-mode)))
-
 (global-set-key (kbd "<backtab>") 'un-indent-by-removing-2-spaces)
 (defun un-indent-by-removing-2-spaces ()
   (interactive)
@@ -14,21 +10,15 @@
       (when (looking-at "^  ")
         (replace-match "")))))
 
-(use-package outline
-  :hook ((elixir-ts-mode . outline-minor-mode))
-  :bind (("C-<return>" . outline-cycle)
-	 ("C-S-<return>" . my/outline-cycle-buffer))
-  :config (setq outline-blank-line t)
-  (set-display-table-slot
-   standard-display-table
-   'selective-display
-   (let ((face-offset (* (face-id 'shadow) (lsh 1 22))))
-     (vconcat (mapcar (lambda (c) (+ face-offset c)) " ▸"))))
-  (defun my/outline-cycle-buffer () (interactive)
-	 (if (eq outline--cycle-buffer-state 'show-all) (setq outline--cycle-buffer-state 'top-level))
-	 (outline-cycle-buffer)))
+(global-set-key (kbd "M-;") 'comment-line)
 
-(use-package emacs :hook ((prog-mode . display-line-numbers-mode)))
+(use-package emacs
+  :hook ((prog-mode . display-line-numbers-mode)))
+
+(use-package drag-stuff
+  :ensure t
+  :bind (("M-p" . drag-stuff-up)
+	 ("M-n" . drag-stuff-down)))
 
 (defun duplicate-line ()
   (interactive)
@@ -51,61 +41,71 @@
 
 (use-package hungry-delete
   :ensure t
-  :hook ((prog-mode . hungry-delete-mode)))
+  :hook ((org-mode . hungry-delete-mode)
+	 (prog-mode . hungry-delete-mode)))
 
-(use-package iedit :ensure t :bind (("C-c ;" . iedit-mode)))
+(use-package iedit
+  :ensure t
+  :bind (("C-c ;" . iedit-mode)))
 
-(use-package evil-numbers :ensure t)
-(global-set-key (kbd "M-s-p") 'evil-numbers/inc-at-pt)
-(global-set-key (kbd "<M-mouse-5>") 'evil-numbers/inc-at-pt)
-(global-set-key (kbd "M-s-n") 'evil-numbers/dec-at-pt)
-(global-set-key (kbd "<M-mouse-4>") 'evil-numbers/dec-at-pt)
+(use-package evil-numbers
+  :ensure t
+  :bind (("M-s-p" . evil-numbers/inc-at-pt)
+	 ("M-s-n" . evil-numbers/dec-at-pt)))
 
-(defun move-text-internal (arg)
-  (cond
-   ((and mark-active transient-mark-mode)
-    (if (> (point) (mark))
-	(exchange-point-and-mark))
-    (let ((column (current-column))
-	  (text (delete-and-extract-region (point) (mark))))
-      (forward-line arg)
-      (move-to-column column t)
-      (set-mark (point))
-      (insert text)
-      (exchange-point-and-mark)
-      (setq deactivate-mark nil)))
-   (t
-    (beginning-of-line)
-    (when (or (> arg 0) (not (bobp)))
-      (forward-line)
-      (when (or (< arg 0) (not (eobp)))
-	(transpose-lines arg))
-      (forward-line -1)))))
+(defun kill-ring-clear () (interactive) (setq kill-ring nil))
 
-(defun move-text-down (arg)
-  "Move region (transient-mark-mode active) or current line
-arg lines down."
-  (interactive "*p")
-  (move-text-internal arg))
+(global-set-key (kbd "C-k") (lambda () (interactive) (insert-char 32 1) (kill-whole-line)))
 
-(defun move-text-up (arg)
-  "Move region (transient-mark-mode active) or current line
-arg lines up."
-  (interactive "*p")
-  (move-text-internal (- arg)))
+(defun backward-delete-word-no-copy (arg)
+  "Delete characters backward until encountering the beginning of a word.
+With argument, do this that many times.
+This command does not push text to `kill-ring'."
+  (interactive "p")
+  (delete-word-no-copy (- arg)))
+(global-set-key (kbd "<C-backspace>") 'backward-delete-word-no-copy)
+(global-set-key (kbd "<M-backspace>") 'backward-delete-word-no-copy)
 
-(global-set-key (kbd "M-p") 'move-text-up)
-(global-set-key (kbd "M-n") 'move-text-down)
+(defun delete-word-no-copy (arg)
+  "Delete characters forward until encountering the end of a word.
+With argument, do this that many times.
+This command does not push text to `kill-ring'."
+  (interactive "p")
+  (delete-region
+   (point)
+   (progn
+     (forward-word arg)
+     (point))))
+(global-set-key (kbd "M-d") 'delete-word-no-copy)
 
 (use-package multiple-cursors
   :defer
   :ensure t
   :bind (("M-/" . mc/mark-next-like-this))
-  :init
-  (add-hook 'multiple-cursors-mode-hook
-            (defun my/work-around-multiple-cursors-issue ()
-              (load "multiple-cursors-core.el")
-              (remove-hook 'multiple-cursors-mode #'my/work-around-multiple-cursors-issue))))
+  :config (defun my/work-around-multiple-cursors-issue ()
+	      (load "multiple-cursors-core.el")
+	      (remove-hook 'multiple-cursors-mode #'my/work-around-multiple-cursors-issue))
+  :hook ((multiple-cursors-mode . my/work-around-multiple-cursors-issue)))
+
+(defun open-line-below ()
+  (interactive)
+  (move-end-of-line 1)
+  (newline))
+(global-set-key [(shift return)] 'open-line-below)
+
+(use-package outline
+  :hook ((elixir-ts-mode . outline-minor-mode))
+  :bind (("C-<return>" . outline-cycle)
+	 ("C-S-<return>" . my/outline-cycle-buffer))
+  :config (setq outline-blank-line t)
+  (set-display-table-slot
+   standard-display-table
+   'selective-display
+   (let ((face-offset (* (face-id 'shadow) (lsh 1 22))))
+     (vconcat (mapcar (lambda (c) (+ face-offset c)) " ⏵"))))
+  (defun my/outline-cycle-buffer () (interactive)
+	 (if (eq outline--cycle-buffer-state 'show-all) (setq outline--cycle-buffer-state 'top-level))
+	 (outline-cycle-buffer)))
 
 (use-package rainbow-delimiters
   :ensure t
@@ -113,31 +113,41 @@ arg lines up."
 
 (use-package spell-fu
   :ensure t
+  :custom (ispell-personal-dictionary "/home/jasonmj/.emacs.d/spell-fu/personal.txt")
   :hook ((prog-mode . spell-fu-mode)
 	 (org-mode . spell-fu-mode)
 	 (markdown-mode . spell-fu-mode)))
 
-(use-package emacs :hook ((prog-mode . subword-mode)))
+(use-package emacs
+  :hook ((prog-mode minibuffer-setup shell-mode) . subword-mode))
 
 (use-package sudo-edit :ensure t)
 
 (use-package symbol-overlay
   :ensure t
   :bind (("M-i" . symbol-overlay-put))
-  :hook ((elixir-mode . symbol-overlay-mode)
-	 (emacs-lisp-mode . symbol-overlay-mode)))
+  :hook ((prog-mode . symbol-overlay-mode)))
+
+(use-package undo-fu
+  :ensure t
+  :bind (("C-z" . undo-fu-only-undo)
+	 ("C-S-z" . undo-fu-only-redo)))
+(use-package undo-fu-session
+  :ensure t
+  :hook (after-init . global-undo-fu-session-mode)
+  :custom (undo-fu-session-incompatible-files '("/COMMIT_EDITMSG\\'" "/git-rebase-todo\\'")))
 
 (defun unfill-region (beg end)
   "Unfill the region, joining text paragraphs into a single
-    logical line.  This is useful, e.g., for use with
-    `visual-line-mode'."
+    logical line.  This is useful, e.g., for use with `visual-line-mode'."
   (interactive "*r")
   (let ((fill-column (point-max)))
     (fill-region beg end)))
 
-(global-set-key (kbd "M-u") 'upcase-char)
-(global-set-key (kbd "M-l") 'downcase-dwim)
+(use-package emacs
+  :bind (("M-u" . upcase-char)
+	 ("M-l" . downcase-dwim)))
 
-(use-package whitespace-cleanup-mode
+(use-package ws-butler
   :ensure t
-  :hook ((prog-mode . whitespace-cleanup-mode)))
+  :hook ((prog-mode . ws-butler-mode)))

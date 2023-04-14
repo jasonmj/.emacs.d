@@ -1,55 +1,66 @@
 #+TITLE: Appearance
 #+PROPERTY: header-args      :tangle "../config-elisp/appearance.el"
-* Circadian
-#+BEGIN_SRC emacs-lisp
-(use-package circadian
-  :ensure t
-  :config
-  (setq circadian-themes '(("7:00" . modus-operandi)
-                           ("17:30" . modus-vivendi)))
-  (circadian-setup))
-#+END_SRC
-* Default Font
-#+BEGIN_SRC emacs-lisp
-(set-face-attribute 'default nil :font "Iosevka 14")
-#+END_SRC
-* Default Cursor
-#+BEGIN_SRC emacs-lisp
-(blink-cursor-mode 1)
-(use-package bar-cursor :ensure t :hook ((after-init . bar-cursor-mode)))
-#+END_SRC
-* Display Time
-#+BEGIN_SRC emacs-lisp
-(setq display-time-default-load-average nil)
-(setq display-time-format "%I:%M%p")
-(display-time-mode t)
-#+END_SRC
-* Modern Fringes
-#+BEGIN_SRC emacs-lisp
-(use-package modern-fringes
-  :ensure t
-  :hook (after-init . modern-fringes-mode)
-  :config
-  (set-fringe-mode '(7 . 0)))
-#+END_SRC
-* Pretty Symbols
-#+BEGIN_SRC emacs-lisp
-(global-prettify-symbols-mode 1)
-(load-file "~/.emacs.d/elisp/pretty-fonts.el")
-(pretty-fonts-set-kwds
-  '((pretty-fonts-fira-font prog-mode-hook org-mode-hook)))
-#+END_SRC
-* Theme Switching
-#+BEGIN_SRC emacs-lisp
-(defun disable-all-themes ()
-  "disable all active themes."
-  (dolist (i custom-enabled-themes)
-    (disable-theme i)))
+* Bar Cursor
+Change Emacs cursor into a bar.
 
-(defadvice load-theme (before disable-themes-first activate)
-  (disable-all-themes))
-#+END_SRC
-* Truncate Lines
-#+BEGIN_SRC emacs-lisp
-(setq-default truncate-lines -1)
-#+END_SRC
+https://github.com/ajsquared/bar-cursor
+#+begin_src emacs-lisp
+  (use-package bar-cursor
+    :ensure t
+    :hook ((after-init . bar-cursor-mode)
+	   (after-init . blink-cursor-mode)))
+#+end_src
+* Circadian
+Theme-switching for Emacs based on daytime.
+
+https://github.com/GuidoSchmidt/circadian.el
+#+begin_src emacs-lisp
+  (use-package circadian
+    :ensure t
+    :custom
+    (circadian-themes '(("7:00"  . modus-operandi)
+			("17:30" . modus-vivendi)))
+    :hook (after-init . circadian-setup))
+#+end_src
+* Fira Code Ligatures
+Emacs minor mode for Fira Code ligatures using prettify-symbols.
+
+https://github.com/jming422/fira-code-mode
+#+begin_src emacs-lisp
+  (use-package fira-code-mode
+    :ensure t
+    :config (fira-code-mode-set-font)
+    :hook prog-mode)
+#+end_src
+* Font Face
+Set the default face font attribute. 
+#+begin_src emacs-lisp
+  (set-face-attribute 'default nil :font "Iosevka 14")
+#+end_src
+* Line Truncation
+Never truncate lines by default. 
+#+begin_src emacs-lisp
+  (setq-default truncate-lines -1)
+#+end_src
+* Modern Fringes
+Replaces the ugly looking default emacs fringe bitmaps and replaces them with better, modern looking ones.
+
+https://github.com/SpecialBomb/emacs-modern-fringes
+#+begin_src emacs-lisp
+  (use-package modern-fringes
+    :ensure t
+    :hook (after-init . modern-fringes-mode)
+    :config (set-fringe-mode '(7 . 0)))
+#+end_src
+* Prettify Symbols
+When Prettify Symbols mode and font-locking are enabled, symbols are prettified (displayed as composed characters) according to the rules in `prettify-symbols-alist' (which see), which are locally defined by major modes supporting prettifying.
+#+begin_src emacs-lisp
+  (global-prettify-symbols-mode t)
+#+end_src
+* Time
+Display time in the mode line as 12-hour clock with am/pm. 
+#+begin_src emacs-lisp
+  (setq display-time-default-load-average nil
+        display-time-format "%I:%M%p")
+  (display-time-mode t)
+#+end_src

@@ -1,9 +1,9 @@
 #+TITLE: Nix
 #+PROPERTY: header-args      :tangle "../config-elisp/nix.el"
 * Nix Mode
-#+BEGIN_SRC emacs-lisp
-(use-package nix-mode
-  :ensure t
-  :config
-  (add-to-list 'auto-mode-alist '("\\.nix\\'" . nix-mode)))
-#+END_SRC
+A major mode for editing .nix files. 
+#+begin_src emacs-lisp
+  (use-package nix-mode
+    :ensure t
+    :mode "\\.nix\\'")
+#+end_src

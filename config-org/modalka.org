@@ -1,11 +1,14 @@
 #+TITLE: Modalka
 #+PROPERTY: header-args      :tangle "../config-elisp/modalka.el"
 * Require Modalka
-#+BEGIN_SRC emacs-lisp
-(use-package modalka :ensure t)
-#+END_SRC
+#+begin_src emacs-lisp
+  (use-package modalka
+    :ensure t
+    :bind (:map modalka-mode-map
+		("<S-backspace>" . backward-delete-char-untabify)))
+#+end_src
 * Custom Toggle Function
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (defun toggle-modalka ()
   (interactive)
   (if (bound-and-true-p modalka-mode)
@@ -22,9 +25,9 @@
 (exwm-input-set-key (kbd "s-i") 'toggle-modalka)
 (exwm-input-set-key (kbd "<delete>") 'toggle-modalka)
 (exwm-input-set-key (kbd "<print>") 'toggle-modalka)
-#+END_SRC
+#+end_src
 * Update Mode Line Indication
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (defun update-modalka-mode-line()
   (if (bound-and-true-p modalka-mode)
       (progn
@@ -34,9 +37,9 @@
       (custom-set-faces '(doom-modeline-bar ((t (:background "DarkGoldenrod1")))))
       (setq doom-modeline-bar-width 6)))
   (exwm-layout--refresh))
-#+END_SRC
+#+end_src
 * Define EXWM Keys
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (defun modalka-exwm-click()
     (interactive)
     (toggle-modalka)
@@ -161,76 +164,78 @@
     (define-key modalka-mode-map (kbd "z") (lambda () (interactive) (exwm-input--fake-key ?\C-z)))
     (define-key modalka-mode-map (kbd "<XF86Display>") (lambda () (interactive) (exwm-input--fake-key 'f7)))
     (define-key modalka-mode-map (kbd "Z") (lambda () (interactive) (exwm-input--fake-key 'C-S-z))))
-#+END_SRC
+#+end_src
 * Define Emacs Keys
-#+BEGIN_SRC emacs-lisp
-(defun define-emacs-keys()
-  (define-key modalka-mode-map (kbd "0") (lambda () (interactive) (message "Workspace 0") (exwm-workspace-switch 0)))
-  (define-key modalka-mode-map (kbd "1") (lambda () (interactive) (message "Workspace 1") (exwm-workspace-switch 1)))
-  (define-key modalka-mode-map (kbd "2") (lambda () (interactive) (message "Workspace 2") (exwm-workspace-switch 2)))
-  (define-key modalka-mode-map (kbd "3") (lambda () (interactive) (message "Workspace 3") (exwm-workspace-switch 3)))
-  (define-key modalka-mode-map (kbd "4") (lambda () (interactive) (message "Workspace 4") (exwm-workspace-switch 4)))
-  (define-key modalka-mode-map (kbd "5") (lambda () (interactive) (message "Workspace 5") (exwm-workspace-switch 5)))
-  (define-key modalka-mode-map (kbd "6") (lambda () (interactive) (message "Workspace 6") (exwm-workspace-switch 6)))
-  (define-key modalka-mode-map (kbd "7") (lambda () (interactive) (message "Workspace 7") (exwm-workspace-switch 7)))
-  (define-key modalka-mode-map (kbd "8") (lambda () (interactive) (message "Workspace 8") (exwm-workspace-switch 8)))
-  (define-key modalka-mode-map (kbd "9") (lambda () (interactive) (message "Workspace 9") (exwm-workspace-switch 9)))
-  (modalka-define-kbd "`" "C-`")
-  (modalka-define-kbd "~" "M-[")
-  (modalka-define-kbd "-" "C--")
-  (modalka-define-kbd "+" "C-+")
-  (modalka-define-kbd "=" "C-+")
-  (define-key modalka-mode-map (kbd ",") (lambda () (interactive) (toggle-modalka) (insert-char 44 1)))
-  (define-key modalka-mode-map (kbd ".") 'repeat)
-  (modalka-define-kbd "<" "M-<")
-  (modalka-define-kbd ">" "M->")
-  (modalka-define-kbd "a" "C-a")
-  (modalka-define-kbd "A" "C-S-a")
-  (modalka-define-kbd "b" "C-b")
-  (modalka-define-kbd "B" "M-b")
-  (modalka-define-kbd "c" "M-w")
-  (modalka-define-kbd "d" "C-d")
-  (modalka-define-kbd "D" "M-d")
-  (modalka-define-kbd "e" "C-e")
-  (modalka-define-kbd "E" "C-S-e")
-  (modalka-define-kbd "f" "C-f")
-  (modalka-define-kbd "F" "M-f")
-  (modalka-define-kbd "g" "C-g")
-  (define-key modalka-mode-map (kbd "i") (lambda () (interactive) (toggle-modalka)))
-  (modalka-define-kbd "j" "C-c j")
-  (modalka-define-kbd "k" "C-k")
-  (modalka-define-kbd "l" "C-l")
-  (modalka-define-kbd "m" "C-m")
-  (modalka-define-kbd "M" "<S-return>")
-  (modalka-define-kbd "n" "C-n")
-  (define-key modalka-mode-map (kbd "N") (lambda () (interactive) (if (or (not mark-active)  (null (mark))  (= (point) (mark))) (set-mark-command nil)) (next-line)))
-  (modalka-define-kbd "o" "C-o")
-  (modalka-define-kbd "p" "C-p")
-  (define-key modalka-mode-map (kbd "P") (lambda () (interactive) (if (or (not mark-active)  (null (mark))  (= (point) (mark))) (set-mark-command nil)) (previous-line)))
-  (modalka-define-kbd "s" "C-s")
-  (modalka-define-kbd "S" "M-s")
-  (modalka-define-kbd "u" "S-TAB")
-  (modalka-define-kbd "v" "C-v")
-  (modalka-define-kbd "V" "M-v")
-  (modalka-define-kbd "w" "M-w")
-  (modalka-define-kbd "y" "C-y")
-  (modalka-define-kbd "Y" "M-y")
-  (modalka-define-kbd "z" "C-+")
-  (modalka-define-kbd "Z" "C--")
-  (modalka-define-kbd "<backspace>" "<C-backspace>")
-  (define-key modalka-mode-map (kbd "SPC") (lambda () (interactive) (toggle-modalka) (insert-char 32 1)))
-  (modalka-define-kbd "<escape>" "C-.")
-  (modalka-define-kbd "<backtab>" "<C-S-return>")
-  (modalka-define-kbd "<tab>" "<C-return>")
-  (modalka-define-kbd "<right>" "C-f")
-  (modalka-define-kbd "<left>" "C-b")
-  (modalka-define-kbd "<down>" "C-n")
-  (modalka-define-kbd "<up>" "C-p")
-  (modalka-define-kbd "<return>" "RET")
-  (define-key modalka-mode-map (kbd "C-w") nil))
-#+END_SRC
+#+begin_src emacs-lisp
+  (defun define-emacs-keys()
+    (define-key modalka-mode-map (kbd "0") (lambda () (interactive) (message "Workspace 0") (exwm-workspace-switch 0)))
+    (define-key modalka-mode-map (kbd "1") (lambda () (interactive) (message "Workspace 1") (exwm-workspace-switch 1)))
+    (define-key modalka-mode-map (kbd "2") (lambda () (interactive) (message "Workspace 2") (exwm-workspace-switch 2)))
+    (define-key modalka-mode-map (kbd "3") (lambda () (interactive) (message "Workspace 3") (exwm-workspace-switch 3)))
+    (define-key modalka-mode-map (kbd "4") (lambda () (interactive) (message "Workspace 4") (exwm-workspace-switch 4)))
+    (define-key modalka-mode-map (kbd "5") (lambda () (interactive) (message "Workspace 5") (exwm-workspace-switch 5)))
+    (define-key modalka-mode-map (kbd "6") (lambda () (interactive) (message "Workspace 6") (exwm-workspace-switch 6)))
+    (define-key modalka-mode-map (kbd "7") (lambda () (interactive) (message "Workspace 7") (exwm-workspace-switch 7)))
+    (define-key modalka-mode-map (kbd "8") (lambda () (interactive) (message "Workspace 8") (exwm-workspace-switch 8)))
+    (define-key modalka-mode-map (kbd "9") (lambda () (interactive) (message "Workspace 9") (exwm-workspace-switch 9)))
+    (modalka-define-kbd "`" "C-`")
+    (modalka-define-kbd "~" "M-[")
+    (modalka-define-kbd "-" "C--")
+    (modalka-define-kbd "+" "C-+")
+    (modalka-define-kbd "=" "C-+")
+    (define-key modalka-mode-map (kbd ",") (lambda () (interactive) (toggle-modalka) (insert-char 44 1)))
+    (define-key modalka-mode-map (kbd ".") 'xref-find-definitions)
+    (define-key modalka-mode-map (kbd "/") 'xref-find-references)
+    (modalka-define-kbd "\\" "C-\\")
+    (modalka-define-kbd "<" "M-<")
+    (modalka-define-kbd ">" "M->")
+    (modalka-define-kbd "a" "C-a")
+    (modalka-define-kbd "A" "C-S-a")
+    (modalka-define-kbd "b" "C-b")
+    (modalka-define-kbd "B" "M-b")
+    (modalka-define-kbd "c" "M-w")
+    (modalka-define-kbd "d" "C-d")
+    (modalka-define-kbd "D" "M-d")
+    (modalka-define-kbd "e" "C-e")
+    (modalka-define-kbd "E" "C-S-e")
+    (modalka-define-kbd "f" "C-f")
+    (modalka-define-kbd "F" "M-f")
+    (modalka-define-kbd "g" "C-g")
+    (define-key modalka-mode-map (kbd "i") (lambda () (interactive) (toggle-modalka)))
+    (modalka-define-kbd "j" "C-c j")
+    (modalka-define-kbd "k" "C-k")
+    (modalka-define-kbd "l" "C-l")
+    (modalka-define-kbd "m" "C-m")
+    (modalka-define-kbd "M" "<S-return>")
+    (modalka-define-kbd "n" "C-n")
+    (define-key modalka-mode-map (kbd "N") (lambda () (interactive) (if (or (not mark-active)  (null (mark))  (= (point) (mark))) (set-mark-command nil)) (next-line)))
+    (modalka-define-kbd "o" "C-o")
+    (modalka-define-kbd "p" "C-p")
+    (define-key modalka-mode-map (kbd "P") (lambda () (interactive) (if (or (not mark-active)  (null (mark))  (= (point) (mark))) (set-mark-command nil)) (previous-line)))
+    (modalka-define-kbd "s" "C-s")
+    (modalka-define-kbd "S" "M-s")
+    (modalka-define-kbd "u" "S-TAB")
+    (modalka-define-kbd "v" "C-v")
+    (modalka-define-kbd "V" "M-v")
+    (modalka-define-kbd "w" "M-w")
+    (modalka-define-kbd "y" "C-y")
+    (modalka-define-kbd "Y" "M-y")
+    (modalka-define-kbd "z" "C-+")
+    (modalka-define-kbd "Z" "C--")
+    (modalka-define-kbd "<backspace>" "<C-backspace>")
+    (define-key modalka-mode-map (kbd "SPC") (lambda () (interactive) (toggle-modalka) (insert-char 32 1)))
+    (modalka-define-kbd "<escape>" "C-.")
+    (modalka-define-kbd "<backtab>" "<C-S-return>")
+    (modalka-define-kbd "<tab>" "<C-return>")
+    (modalka-define-kbd "<right>" "C-f")
+    (modalka-define-kbd "<left>" "C-b")
+    (modalka-define-kbd "<down>" "C-n")
+    (modalka-define-kbd "<up>" "C-p")
+    (modalka-define-kbd "<return>" "RET")
+    (define-key modalka-mode-map (kbd "C-w") nil))
+#+end_src
 * Enable Modalka on Window Configuration Change
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (defun maybe-modalka-mode (&rest args)
   (if (not (or (eq major-mode 'exwm-mode)
                (eq major-mode 'epa-pinentry-mode)
@@ -260,9 +265,9 @@
 (add-hook 'change-major-mode-hook 'maybe-modalka-mode)
 (add-to-list 'window-selection-change-functions 'maybe-modalka-mode)
 (advice-add 'set-window-buffer :after 'maybe-modalka-mode)
-#+END_SRC
+#+end_src
 * Custom Modalka Init
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (defun custom-modalka-init ()
   (if (equal major-mode 'exwm-mode)
       (progn
@@ -273,8 +278,8 @@
       (setq exwm-input-line-mode-passthrough nil)
       (define-emacs-keys))))
 (add-hook 'modalka-mode-hook 'custom-modalka-init)
-#+END_SRC
+#+end_src
 * Set Box Cursor to Indicate Mode
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (setq modalka-cursor-type 'box)
-#+END_SRC
+#+end_src

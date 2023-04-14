@@ -1,16 +1,28 @@
 (use-package bufler
   :ensure t
-  :init (bufler-tabs-mode 1)
+  :custom
+  (bufler-filter-buffer-name-regexps '("\\*Compile-Log\\*"
+				       "\\*direnv\\*"
+				       "\\*Disabled Command\\*"
+				       "\\*Org [^z-a]+Output\\*"
+				       "\\*xref\\*"
+				       "\\*ednc-log\\*"
+				       "\\*straight-process\\*"
+				       "\\*blamer\\*"
+				       "\\*Messages\\*"
+				       "\\*Warnings\\*"))
   :config
   (key-seq-define-global "bf" 'bufler)
-  (setq bufler-filter-buffer-name-regexps '("\\*Compile-Log\\*" "\\*direnv\\*" "\\*Disabled Command\\*" "\\*Org [^z-a]+Output\\*" "\\*xref\\*" "\\*Messages\\*" "\\*Warnings\\*"))
   (defun my/bufler-workspace-focus-buffer (&optional buffer)
     (run-with-idle-timer 0.001 nil (lambda () (interactive) (bufler-workspace-focus-buffer (current-buffer)))))
-  (add-hook 'exwm-update-title-hook 'my/bufler-workspace-focus-buffer)
-  (add-hook 'exwm-manage-finish-hook 'my/bufler-workspace-focus-buffer)
-  (add-hook 'exwm-workspace-switch-hook 'my/bufler-workspace-focus-buffer)
-  (add-hook 'kill-buffer-hook 'my/bufler-workspace-focus-buffer)
-  (add-to-list 'window-selection-change-functions 'my/bufler-workspace-focus-buffer))
+  (add-to-list 'window-selection-change-functions 'my/bufler-workspace-focus-buffer)
+  (advice-add 'bufler-workspace-mode-lighter :override (lambda () ""))
+  (bufler-workspace-mode t)
+  (bufler-workspace-tabs-mode t)
+  :hook ((exwm-update-title . my/bufler-workspace-focus-buffer)
+	 (exwm-manage-finish . my/bufler-workspace-focus-buffer)
+	 (exwm-workspace-switch . my/bufler-workspace-focus-buffer)
+	 (kill-buffer .my/bufler-workspace-focus-buffer)))
 
 (key-seq-define-global "xb" 'list-buffers)
 

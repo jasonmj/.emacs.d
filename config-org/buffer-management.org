@@ -1,59 +1,79 @@
 #+TITLE: Buffer Management
 #+PROPERTY: header-args      :tangle "../config-elisp/buffer-management.el"
 * Bufler
-#+BEGIN_SRC emacs-lisp
-(use-package bufler
-  :ensure t
-  :init (bufler-tabs-mode 1)
-  :config
-  (key-seq-define-global "bf" 'bufler)
-  (setq bufler-filter-buffer-name-regexps '("\\*Compile-Log\\*" "\\*direnv\\*" "\\*Disabled Command\\*" "\\*Org [^z-a]+Output\\*" "\\*xref\\*" "\\*Messages\\*" "\\*Warnings\\*"))
-  (defun my/bufler-workspace-focus-buffer (&optional buffer)
-    (run-with-idle-timer 0.001 nil (lambda () (interactive) (bufler-workspace-focus-buffer (current-buffer)))))
-  (add-hook 'exwm-update-title-hook 'my/bufler-workspace-focus-buffer)
-  (add-hook 'exwm-manage-finish-hook 'my/bufler-workspace-focus-buffer)
-  (add-hook 'exwm-workspace-switch-hook 'my/bufler-workspace-focus-buffer)
-  (add-hook 'kill-buffer-hook 'my/bufler-workspace-focus-buffer)
-  (add-to-list 'window-selection-change-functions 'my/bufler-workspace-focus-buffer))
-#+END_SRC
+A butler for your buffers. Group buffers into workspaces with programmable rules, and easily switch to and manipulate them.
+
+https://github.com/alphapapa/bufler.el
+#+begin_src emacs-lisp
+  (use-package bufler
+    :ensure t
+    :custom
+    (bufler-filter-buffer-name-regexps '("\\*Compile-Log\\*"
+					 "\\*direnv\\*"
+					 "\\*Disabled Command\\*"
+					 "\\*Org [^z-a]+Output\\*"
+					 "\\*xref\\*"
+					 "\\*ednc-log\\*"
+					 "\\*straight-process\\*"
+					 "\\*blamer\\*"
+					 "\\*Messages\\*"
+					 "\\*Warnings\\*"))
+    :config
+    (key-seq-define-global "bf" 'bufler)
+    (defun my/bufler-workspace-focus-buffer (&optional buffer)
+      (run-with-idle-timer 0.001 nil (lambda () (interactive) (bufler-workspace-focus-buffer (current-buffer)))))
+    (add-to-list 'window-selection-change-functions 'my/bufler-workspace-focus-buffer)
+    (advice-add 'bufler-workspace-mode-lighter :override (lambda () ""))
+    (bufler-workspace-mode t)
+    (bufler-workspace-tabs-mode t)
+    :hook ((exwm-update-title . my/bufler-workspace-focus-buffer)
+	   (exwm-manage-finish . my/bufler-workspace-focus-buffer)
+	   (exwm-workspace-switch . my/bufler-workspace-focus-buffer)
+	   (kill-buffer .my/bufler-workspace-focus-buffer)))
+#+end_src
 * Buffer List
-#+BEGIN_SRC emacs-lisp
-(key-seq-define-global "xb" 'list-buffers)
-#+END_SRC
-* Close Window
-#+BEGIN_SRC emacs-lisp
-(defun my/kill-this-buffer (&optional arg)
-  (interactive "P")
-  (pcase arg
-    ('4 (call-interactively #'kill-buffer))
-    (_ (kill-buffer (current-buffer)))))
-(global-set-key (kbd "C-x k") 'my/kill-this-buffer)
-(key-seq-define-global "gw" 'my/kill-this-buffer)
-(key-seq-define-global "fw" (lambda () (interactive) (kill-buffer-and-window)))
-#+END_SRC
+Easy access to the built-in `list-buffers` display with a key sequence. 
+#+begin_src emacs-lisp
+  (key-seq-define-global "xb" 'list-buffers)
+#+end_src
+* Kill Buffer
+Efficiently kill buffers and windows. 
+#+begin_src emacs-lisp
+  (defun my/kill-this-buffer (&optional arg)
+    (interactive "P")
+    (pcase arg
+      ('4 (call-interactively #'kill-buffer))
+      (_ (kill-buffer (current-buffer)))))
+  (global-set-key (kbd "C-x k") 'my/kill-this-buffer)
+  (key-seq-define-global "gw" 'my/kill-this-buffer)
+  (key-seq-define-global "fw" (lambda () (interactive) (kill-buffer-and-window)))
+#+end_src
 * Revert Buffer
-#+BEGIN_SRC emacs-lisp
-(key-seq-define-global "xv" (lambda () (interactive) (revert-buffer t t)))
-#+END_SRC
+Easy access to `revert-buffer` with a key sequence.
+#+begin_src emacs-lisp
+  (key-seq-define-global "xv" (lambda () (interactive) (revert-buffer t t)))
+#+end_src
 * Save Buffer
-#+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "C-s") 'save-buffer)
-#+END_SRC
+Save buffers with the most common key binding "C-s".
+#+begin_src emacs-lisp
+  (global-set-key (kbd "C-s") 'save-buffer)
+#+end_src
 * Text Scale
-#+BEGIN_SRC emacs-lisp
-(defun centered-cursor-reset ()
-  (interactive)
-  (centered-cursor-mode -1)
-  (centered-cursor-mode 1))
-(defun my/text-scale-increase ()
-  (interactive)
-  (text-scale-increase 1)
-  (run-with-idle-timer 0.01 nil 'centered-cursor-reset))
-(defun my/text-scale-decrease ()
-  (interactive)
-  (text-scale-decrease 1)
-  (run-with-idle-timer 0.01 nil 'centered-cursor-reset))
-(global-set-key (kbd "C-=") 'my/text-scale-increase)
-(global-set-key (kbd "C-+") 'my/text-scale-increase)
-(global-set-key (kbd "C--") 'my/text-scale-decrease)
-#+END_SRC
+Increase and decrease text scale. Reset `centered-cursor-mode` afterwards.
+#+begin_src emacs-lisp
+  (defun centered-cursor-reset ()
+    (interactive)
+    (centered-cursor-mode -1)
+    (centered-cursor-mode 1))
+  (defun my/text-scale-increase ()
+    (interactive)
+    (text-scale-increase 1)
+    (run-with-idle-timer 0.01 nil 'centered-cursor-reset))
+  (defun my/text-scale-decrease ()
+    (interactive)
+    (text-scale-decrease 1)
+    (run-with-idle-timer 0.01 nil 'centered-cursor-reset))
+  (global-set-key (kbd "C-=") 'my/text-scale-increase)
+  (global-set-key (kbd "C-+") 'my/text-scale-increase)
+  (global-set-key (kbd "C--") 'my/text-scale-decrease)
+#+end_src

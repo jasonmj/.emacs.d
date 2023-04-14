@@ -2,8 +2,8 @@
 
 (use-package bury-successful-compilation :ensure t)
 
-(setq browse-url-browser-function 'browse-url-generic
-      browse-url-generic-program "firefox")
+(setq browse-url-generic-program "firefox"
+      browse-url-browser-function 'browse-url-generic)
 
 (setq delete-by-moving-to-trash t)
 
@@ -22,8 +22,9 @@
 
 (setq backup-directory-alist '(("." . "~/.emacs.d/backups")))
 
-(use-package savekill :ensure t)
-(setq kill-ring-max 500)
+(use-package savekill
+  :ensure t
+  :custom (kill-ring-max 500))
 
 (save-place-mode 1)
 
@@ -32,7 +33,9 @@
 (add-to-list 'savehist-additional-variables 'mark-ring)
 (add-to-list 'savehist-additional-variables 'global-mark-ring)
 
-(setq create-lockfiles nil)
+(setq-default fill-column 100)
+
+(setq-default create-lockfiles nil)
 
 (setq warning-minimum-level :error)
 (setq native-comp-async-report-warnings-errors 'silent)
@@ -52,7 +55,3 @@
 (setq tramp-inline-compress-start-size t)
 (setq tramp-copy-size-limit nil)
 (eval-after-load 'tramp '(setenv "SSH_AUTH_SOCK" "/run/user/1000/gnupg/S.gpg-agent.ssh"))
-
-(use-package use-package-chords
-  :ensure t
-  :hook (after-init . key-chord-mode))

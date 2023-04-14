@@ -1,13 +1,17 @@
 #+TITLE: Treesitter
 #+PROPERTY: header-args      :tangle "../config-elisp/treesitter.el"
 * Treesit
-#+BEGIN_SRC emacs-lisp
-(use-package treesit
-  :straight (:type built-in)
-  :config
-  (dolist (mode
-           '((bash-mode       . bash-ts-mode)
-             (c-mode          . c-ts-mode)
-             (elixir-mode     . elixir-ts-mode)))
-    (add-to-list 'major-mode-remap-alist mode)))
-#+END_SRC
+This file is the Lisp counterpart of treesit.c.  Together they provide tree-sitter integration for
+Emacs.  This file contains convenient functions that are more idiomatic and flexible than the
+exposed C API of tree-sitter.  It also contains frameworks for integrating tree-sitter with
+font-lock, indentation, activating and deactivating tree-sitter, debugging tree-sitter, etc.
+#+begin_src emacs-lisp
+  (use-package treesit
+    :straight (:type built-in)
+    :config
+    (dolist (mode
+	     '((bash-mode       . bash-ts-mode)
+	       (c-mode          . c-ts-mode)
+	       (elixir-mode     . elixir-ts-mode)))
+      (add-to-list 'major-mode-remap-alist mode)))
+#+end_src
