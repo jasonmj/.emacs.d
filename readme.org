@@ -1,0 +1,28 @@
+** Overview
+If you want to go all-in with Emacs, you've come to the right place.
+
+This is a literate Emacs configuration broken down into multiple org-mode files that get tangled in the `./config-elisp` directory before being loaded during init.
+*** Configuration Files
+***** [[./config-org/appearance.org][Appearance]]
+***** [[./config-org/buffer-management.org][Buffer Management]]
+***** [[./config-org/completion.org][Completion]]
+***** [[./config-org/defaults.org][Defaults]]
+***** [[./config-org/dired.org][Dired]]
+***** [[./config-org/doom-modeline.org][Doom Modeline]]
+***** [[./config-org/editing.org][Editing]]
+***** [[./config-org/ednc.org][EDNC]]
+***** [[./config-org/eglot.org][Eglot]]
+***** [[./config-org/elixir.org][Elixir]]
+***** [[./config-org/exwm.org][EXWM]]
+***** [[./config-org/hardware.org][Hardware]]
+***** [[./config-org/helpers.org][Helpers]]
+***** [[./config-org/magit.org][Magit]]
+***** [[./config-org/modalka.org][Modalka]]
+***** [[./config-org/navigation.org][Navigation]]
+***** [[./config-org/nix.org][Nix]]
+***** [[./config-org/org.org][Org]]
+***** [[./config-org/polymode.org][Polymode]]
+***** [[./config-org/shells.org][Shells]]
+***** [[./config-org/tabs.org][Tabs]]
+***** [[./config-org/toggl.org][Toggl]]
+***** [[./config-org/treesitter.org][Treesitter]]
