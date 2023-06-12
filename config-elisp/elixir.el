@@ -3,7 +3,7 @@
   :ensure t
   :bind (:map elixir-ts-mode-map
 	      ("C-S-s" . (lambda () (interactive) (save-buffer) (my/elixir-format)))
-	      ("M-RET" . (lambda () (interactive) (open-line-below) (insert "|> ") (indent-for-tab-command))))
+	      ("M-RET" . (lambda () (interactive) (newline) (insert "|> ") (indent-for-tab-command))))
   :config
   (defvar elixir-outline-regexp
     (concat "^[[:space:]]*\\("
@@ -12,6 +12,7 @@
 	    "\\|describe\\|test\\|setup\\|let\\|it\\|context\\|before\\|schema"
 	    "\\|use\\|alias\\|import\\|require"
 	    "\\)\\([[:space:]]\\|(\\)"))
+  (defvar html-outline-regexp "^[[:space:]]*<[^/>]+?\\(>\\|\n\\)")
   (defun my/elixir-format ()
     (interactive)
     (with-current-buffer (current-buffer)
@@ -19,7 +20,10 @@
 	  (call-process-shell-command (concat "cd " (project-root (project-current)) " && " "NIX_SKIP_SHELL_HOOK=true nix-shell --run \"mix format " (buffer-file-name) "\""))
 	(elixir-format)))
     (revert-buffer t t))
-  :hook (elixir-ts-mode . (lambda () (setq-local outline-regexp elixir-outline-regexp)))
+  :hook ((elixir-ts-mode . (lambda () (setq-local outline-regexp elixir-outline-regexp)))
+	 (heex-ts-mode . (lambda () (setq-local outline-regexp html-outline-regexp)))
+	 (heex-ts-mode . hungry-delete-mode)
+	 (heex-ts-mode . display-line-numbers-mode))
   :mode (("\\.ex\\'" . elixir-ts-mode)
 	 ("\\.exs\\'" . elixir-ts-mode)
 	 ("\\.heex\\'" . heex-ts-mode)

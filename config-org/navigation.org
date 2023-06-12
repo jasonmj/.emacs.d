@@ -1,4 +1,4 @@
-#+TITLE: Navigtion
+#+TITLE: Navigation
 #+PROPERTY: header-args      :tangle "../config-elisp/navigation.el"
 * Avy
 Jump to things in Emacs tree-style.
@@ -70,7 +70,7 @@ Select another window in cyclic ordering of windows.
 * Pop to Mark
 Jump to mark, and pop a new position for mark off the ring or the global mark ring. 
 #+begin_src emacs-lisp
-  (key-seq-define-global "o0" 'pop-to-mark-command)
+  ;;(key-seq-define-global "o0" 'pop-to-mark-command)
   (key-seq-define-global "O)" 'pop-global-mark)
 #+end_src
 * Popper
@@ -84,7 +84,7 @@ https://github.com/karthink/popper
     :custom
     (popper-mode-line t)
     (popper-window-height nil)
-    (popper-reference-buffers '("^shell:" "^Aweshell:"))
+    (popper-reference-buffers '("^Shell:" "^Aweshell:"))
     :init
     (popper-mode +1)
     (popper-echo-mode +1))
@@ -137,6 +137,15 @@ Smart node movement based on expreg-expand.
   (global-set-key (kbd "C-s-p") 'up-node)
 
   (global-set-key (kbd "C-s-n") 'down-list)
+#+end_src
+* Tabgo
+avy-like jumper for tab-bar and tab-line.
+
+https://github.com/isamert/tabgo.el
+#+begin_src emacs-lisp
+  (use-package tabgo
+    :ensure t
+    :bind ("C-S-SPC" . tabgo))
 #+end_src
 * Windmove
 Defines a set of routines, windmove-{left,up,right, down}, for selection of windows in a frame geometrically.

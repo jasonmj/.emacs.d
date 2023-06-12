@@ -1,15 +1,5 @@
 #+TITLE: Appearance
 #+PROPERTY: header-args      :tangle "../config-elisp/appearance.el"
-* Bar Cursor
-Change Emacs cursor into a bar.
-
-https://github.com/ajsquared/bar-cursor
-#+begin_src emacs-lisp
-  (use-package bar-cursor
-    :ensure t
-    :hook ((after-init . bar-cursor-mode)
-	   (after-init . blink-cursor-mode)))
-#+end_src
 * Circadian
 Theme-switching for Emacs based on daytime.
 
@@ -21,6 +11,22 @@ https://github.com/GuidoSchmidt/circadian.el
     (circadian-themes '(("7:00"  . modus-operandi)
 			("17:30" . modus-vivendi)))
     :hook (after-init . circadian-setup))
+#+end_src
+* Cursor
+Set the cursor to use a horizontal bar.
+#+begin_src emacs-lisp
+  (use-package emacs
+    :init (setq-default cursor-type 'hbar))
+#+end_src
+* Fancy Battery
+Display battery in Emacs Mode line.
+
+https://github.com/emacsorphanage/fancy-battery
+#+begin_src emacs-lisp
+  (use-package fancy-battery
+    :ensure t
+    :hook (after-init . fancy-battery-mode)
+    :config (setq fancy-battery-show-percentage t))
 #+end_src
 * Fira Code Ligatures
 Emacs minor mode for Fira Code ligatures using prettify-symbols.

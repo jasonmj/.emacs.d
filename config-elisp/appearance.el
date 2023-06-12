@@ -1,14 +1,17 @@
-(use-package bar-cursor
-  :ensure t
-  :hook ((after-init . bar-cursor-mode)
-	 (after-init . blink-cursor-mode)))
-
 (use-package circadian
   :ensure t
   :custom
   (circadian-themes '(("7:00"  . modus-operandi)
 		      ("17:30" . modus-vivendi)))
   :hook (after-init . circadian-setup))
+
+(use-package emacs
+  :init (setq-default cursor-type 'hbar))
+
+(use-package fancy-battery
+  :ensure t
+  :hook (after-init . fancy-battery-mode)
+  :config (setq fancy-battery-show-percentage t))
 
 (use-package fira-code-mode
   :ensure t

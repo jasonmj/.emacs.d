@@ -1,19 +1,24 @@
 (use-package cape
   :ensure t
-  :bind (("C-c q" . completion-at-point))
+  :bind (("C-c q" . completion-at-point)
+	 :map shell-mode-map
+	 ("C-r" . cape-history)
+	 ("C-S-r" . complete-tag))
   :init
   (add-to-list 'completion-at-point-functions #'comint-completion-at-point)
+  ;; (add-to-list 'completion-at-point-functions #'tags-completion-at-point-function)
   (add-to-list 'completion-at-point-functions #'cape-dabbrev)
   (add-to-list 'completion-at-point-functions #'cape-file)
   (add-to-list 'completion-at-point-functions #'cape-history)
   (add-to-list 'completion-at-point-functions #'cape-keyword)
   (add-to-list 'completion-at-point-functions #'cape-abbrev)
-  (add-to-list 'completion-at-point-functions #'cape-ispell)
+  ;; (add-to-list 'completion-at-point-functions #'cape-ispell)
   (add-to-list 'completion-at-point-functions #'cape-symbol))
 
 (use-package consult
   :ensure t
   :bind (("C-c h" . consult-history)
+	 ("C-c l" . consult-theme)
 	 ("C-;" . consult-recent-file)
 	 ("s-SPC" . consult-buffer)
 	 ("C-x B" . consult-bookmark)
@@ -25,17 +30,15 @@
 	 ("M-g k" . consult-global-mark)
 	 ("M-g i" . consult-imenu)
 	 ("M-g I" . consult-imenu-multi)
-	 ("M-s d" . consult-find)
-	 ("M-s D" . consult-locate)
+	 ;; ("M-s d" . consult-find)
+	 ;; ("M-s D" . consult-locate)
 	 ("s-s" . consult-ripgrep)
-	 ("M-s r" . consult-ripgrep)
-	 ("M-s l" . consult-line)
-	 ("M-s L" . consult-line-multi)
-	 ("M-s u" . consult-focus-lines)
+	 ;; ("M-s r" . consult-ripgrep)
+	 ("M-s" . consult-line)
+	 ;; ("M-s L" . consult-line-multi)
+	 ;; ("M-s u" . consult-focus-lines)
 	 ("C-x f" . find-file)
 	 ("M-SPC" . project-find-file)
-	 :map shell-mode-map
-	 ("C-r" . consult-history)
 	 :map minibuffer-local-map
 	 ("M-s" . consult-history)
 	 ("M-r" . consult-history))
@@ -47,13 +50,14 @@
   :custom
   (xref-show-xrefs-function #'consult-xref)
   (xref-show-definitions-function #'consult-xref)
+  (consult-line-start-from-top t)
   (consult-preview-key 'any)
   (consult-buffer-filter '("^ " "\\` " "\\*Echo Area" "\\*Minibuf" "\\*Quail Completions"
 			   "\\*elixir-ls" "Flymake log" "Shell command output" "direnv" "\\*scratch"
 			   "\\*Messages" "\\*Warning" "*magit-" "magit-process" "*vterm" "vterm" "^:"
 			   "*straight-" "*elfeed-log" "*trace of SMTP session" "\\*Compile-Log" "\\*blamer"
 			   "*format-all-error" "*Async-" "COMMIT_EDITMSG" "shell: " "\\*ednc-log" "TAGS"
-			   "*lsp-" "*EGLOT" "*pyls" "*vc" "*citre-ctags*"))
+			   "*lsp-" "*EGLOT" "*pyls" "*vc" "*citre-ctags*" "*flycheck-posframe-buffer*" "*xob*"))
 
   :config
   ;; Consult-yank-pop
@@ -70,6 +74,9 @@
 
   ;; Find File
   (key-seq-define-global "xf" 'find-file)
+
+  ;; Consult Mark
+  (key-seq-define-global "o0" 'consult-mark)
 
   ;; Switch buffer
   (exwm-input-set-key (kbd "C-SPC") (lambda ()
@@ -172,6 +179,7 @@ function."
 
 (use-package corfu
   :ensure t
+  :bind (:map corfu-map ("C-e" . corfu-complete))
   :init
   (setq corfu-auto-prefix 2
 	corfu-auto-delay 0.35
@@ -315,10 +323,26 @@ function."
 (use-package vertico-quick
   :after vertico
   :bind (:map vertico-map
-         ("M-i" . vertico-quick-insert)
-         ("C-'" . vertico-quick-exit)
-         ("C-o" . vertico-quick-embark))
+	 ("M-i" . vertico-quick-insert)
+	 ("C-'" . vertico-quick-exit)
+	 ("C-o" . vertico-quick-embark))
   :config
+  (defun vertico-posframe--handle-minibuffer-window ()
+  "Handle minibuffer window."
+  (let ((show-minibuffer-p (vertico-posframe--show-minibuffer-p))
+	(minibuffer-window (active-minibuffer-window)))
+    (setq-local max-mini-window-height 1)
+    ;; Let minibuffer-window's height = 1
+    (when-let* ((win (active-minibuffer-window))
+		((not (frame-root-window-p win))))
+      (window-resize minibuffer-window
+		     (- (window-pixel-height minibuffer-window))
+		     nil nil 'pixelwise))
+    ;; Hide the context showed in minibuffer-window.
+    (set-window-vscroll minibuffer-window 100)
+    (when show-minibuffer-p
+      (set-window-vscroll minibuffer-window 0))))
+
   (defun vertico-quick-embark (&optional arg)
     "Embark on candidate using quick keys."
     (interactive)
@@ -356,7 +380,7 @@ function."
 	vertico-posframe-poshandler #'posframe-poshandler-window-top-center-offset
 	vertico-posframe-parameters '((alpha-background . 85)
 				      (parent-frame . nil)
-				      (cursor-type . 'bar)
+				      (cursor . 'hbar)
 				      (left-fringe . 0)
 				      (right-fringe . 0)))
   (defun posframe-poshandler-window-top-center-offset (info)

@@ -37,6 +37,8 @@
   :bind (("s-<tab>" . expreg-expand)
 	 ("S-TAB" . expreg-expand)))
 
+(key-chord-define-global "-=" 'flymake-show-buffer-diagnostics)
+
 (show-paren-mode 1)
 
 (use-package hungry-delete
@@ -78,15 +80,6 @@ This command does not push text to `kill-ring'."
      (point))))
 (global-set-key (kbd "M-d") 'delete-word-no-copy)
 
-(use-package multiple-cursors
-  :defer
-  :ensure t
-  :bind (("M-/" . mc/mark-next-like-this))
-  :config (defun my/work-around-multiple-cursors-issue ()
-	      (load "multiple-cursors-core.el")
-	      (remove-hook 'multiple-cursors-mode #'my/work-around-multiple-cursors-issue))
-  :hook ((multiple-cursors-mode . my/work-around-multiple-cursors-issue)))
-
 (defun open-line-below ()
   (interactive)
   (move-end-of-line 1)
@@ -111,6 +104,9 @@ This command does not push text to `kill-ring'."
   :ensure t
   :hook (prog-mode . rainbow-delimiters-mode))
 
+(defun mark-line () (back-to-indentation) (set-mark-command nil) (move-end-of-line))
+(global-set-key (kbd "C-,") 'mark-line)
+
 (use-package spell-fu
   :ensure t
   :custom (ispell-personal-dictionary "/home/jasonmj/.emacs.d/spell-fu/personal.txt")
@@ -127,6 +123,10 @@ This command does not push text to `kill-ring'."
   :ensure t
   :bind (("M-i" . symbol-overlay-put))
   :hook ((prog-mode . symbol-overlay-mode)))
+
+(use-package topsy
+  :ensure t
+  :hook prog-mode)
 
 (use-package undo-fu
   :ensure t

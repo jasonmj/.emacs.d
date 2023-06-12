@@ -4,6 +4,12 @@
   :config
   ;; Markdown
   (define-hostmode poly-markdown-hostmode :mode 'markdown-mode)
+  (define-innermode poly-markdown-json-innermode
+      :mode 'js-json-mode
+      :head-matcher "```json"
+      :tail-matcher "```"
+      :head-mode 'host
+      :tail-mode 'host)
   (define-innermode poly-markdown-shell-innermode
     :mode 'sh-mode
     :head-matcher "```shell"
@@ -18,7 +24,7 @@
     :tail-mode 'host)
   (define-polymode poly-markdown-mode
     :hostmode 'poly-markdown-hostmode
-    :innermodes '(poly-markdown-shell-innermode poly-markdown-elixir-innermode))
+    :innermodes '(poly-markdown-json-innermode poly-markdown-shell-innermode poly-markdown-elixir-innermode))
   ;; Elixir
   (define-hostmode poly-elixir-ts-hostmode :mode 'elixir-ts-mode)
   (define-innermode poly-elixir-ts-doc-innermode

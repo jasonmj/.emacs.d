@@ -77,8 +77,9 @@
   (defun clear-shell-buffer () (interactive)
        (erase-buffer)
        (comint-send-input)
-       (previous-line)
-       (delete-char 1))
+       (beginning-of-buffer)
+       (delete-char 1)
+       (end-of-line))
   :hook ((shell-mode . compilation-shell-minor-mode)))
 
 (defun clean-compilation-filename (filename)
@@ -94,6 +95,14 @@
 (advice-add 'compilation-find-file :around #'compilation-find-file-fixer)
 
 (defun return-to-shell-mode () (interactive) (with-current-buffer (current-buffer) (shell-mode)))
+
+(defun comint-send-tab ()
+  "Send a tab character to the current buffer's process"
+  (interactive)
+  (comint-send-input t t)
+  (process-send-string (current-buffer) "\t"))
+(define-key shell-mode-map (kbd "S-<iso-lefttab>") 'comint-send-tab)
+;; (add-to-list 'completion-at-point-functions 'comint-send-tab)
 
 (defun shell-buffer (buffer-name)
   (let* ((shell-buffer-exists (member buffer-name
@@ -119,12 +128,13 @@
 (use-package sticky-shell
   :straight (:type git :host github :repo "andyjda/sticky-shell")
   :hook (shell-mode . sticky-shell-mode)
-  :custom
+  :config
   (defun clear-shell-buffer-to-last-prompt () (interactive)
        (end-of-buffer)
        (set-mark (point))
        (comint-previous-prompt 1)
-       (next-line)
+       (end-of-line)
+       (forward-char)
        (delete-active-region))
   :bind (:map shell-mode-map
 	      ("C-S-l" . clear-shell-buffer-to-last-prompt)))

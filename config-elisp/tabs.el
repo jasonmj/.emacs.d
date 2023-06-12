@@ -15,6 +15,7 @@
 
 (use-package tab-line
   :bind (("C-<tab>" . tab-line-switch-to-next-tab)
+	 ("C-<iso-lefttab>" . tab-line-switch-to-prev-tab)
 	 ("C-S-<iso-lefttab>" . tab-line-switch-to-prev-tab))
   :hook (after-init . global-tab-line-mode)
   :custom

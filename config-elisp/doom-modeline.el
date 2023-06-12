@@ -16,8 +16,3 @@
   (defun setup-custom-doom-modeline ()
     (doom-modeline-set-modeline 'my-simple-line 'default))
   :hook ((after-init . setup-custom-doom-modeline)))
-
-(use-package fancy-battery
-  :ensure t
-  :hook (after-init . fancy-battery-mode)
-  :config (setq fancy-battery-show-percentage t))

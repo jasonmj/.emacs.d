@@ -24,13 +24,3 @@ https://github.com/seagle0128/doom-modeline
       (doom-modeline-set-modeline 'my-simple-line 'default))
     :hook ((after-init . setup-custom-doom-modeline)))
 #+end_src
-* Fancy Battery
-Display battery in Emacs Mode line.
-
-https://github.com/emacsorphanage/fancy-battery
-#+begin_src emacs-lisp
-  (use-package fancy-battery
-    :ensure t
-    :hook (after-init . fancy-battery-mode)
-    :config (setq fancy-battery-show-percentage t))
-#+end_src

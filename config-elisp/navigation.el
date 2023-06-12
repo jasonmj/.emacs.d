@@ -46,7 +46,7 @@
 
 (key-chord-define-global ".," 'other-window)
 
-(key-seq-define-global "o0" 'pop-to-mark-command)
+;;(key-seq-define-global "o0" 'pop-to-mark-command)
 (key-seq-define-global "O)" 'pop-global-mark)
 
 (use-package popper
@@ -55,7 +55,7 @@
   :custom
   (popper-mode-line t)
   (popper-window-height nil)
-  (popper-reference-buffers '("^shell:" "^Aweshell:"))
+  (popper-reference-buffers '("^Shell:" "^Aweshell:"))
   :init
   (popper-mode +1)
   (popper-echo-mode +1))
@@ -99,6 +99,10 @@
 (global-set-key (kbd "C-s-p") 'up-node)
 
 (global-set-key (kbd "C-s-n") 'down-list)
+
+(use-package tabgo
+  :ensure t
+  :bind ("C-S-SPC" . tabgo))
 
 (use-package windmove :ensure t)
 (exwm-input-set-key (kbd "s-b") 'windmove-left)

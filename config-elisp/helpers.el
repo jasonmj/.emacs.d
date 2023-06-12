@@ -12,6 +12,7 @@
   (blamer-idle-time 2)
   (blamer-min-offset 70)
   (blamer-posframe-configurations `(:left-fringe 20 :right-fringe 20 :y-pixel-offset 20 :x-pixel-offset -20 :border-width 1 :border-color ,(face-attribute 'default :foreground) :lines-truncate t :accept-focus nil))
+
   :custom-face
   (blamer-face ((t :foreground "#7a88cf"
 		   :background "unspecified"

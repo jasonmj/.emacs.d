@@ -25,7 +25,7 @@
 (use-package exwm :ensure t)
 (require 'exwm-config)
 (exwm-config-example)
-(exwm-enable)
+;;(exwm-enable)
 
 ;;; Straight
 (defvar native-comp-deferred-compilation-deny-list ())

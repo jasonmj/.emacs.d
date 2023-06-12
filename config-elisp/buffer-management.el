@@ -6,6 +6,7 @@
 				       "\\*Disabled Command\\*"
 				       "\\*Org [^z-a]+Output\\*"
 				       "\\*xref\\*"
+				       "\\*xob\\*"
 				       "\\*ednc-log\\*"
 				       "\\*straight-process\\*"
 				       "\\*blamer\\*"
