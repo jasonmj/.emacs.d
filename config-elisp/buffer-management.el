@@ -34,7 +34,10 @@
     (_ (kill-buffer (current-buffer)))))
 (global-set-key (kbd "C-x k") 'my/kill-this-buffer)
 (key-seq-define-global "gw" 'my/kill-this-buffer)
-(key-seq-define-global "fw" (lambda () (interactive) (kill-buffer-and-window)))
+(key-seq-define-global "fw" (lambda () (interactive)
+			      (if (eq (length (window-list)) 1)
+				  (my/kill-this-buffer)
+				(kill-buffer-and-window))))
 
 (key-seq-define-global "xv" (lambda () (interactive) (revert-buffer t t)))
 
