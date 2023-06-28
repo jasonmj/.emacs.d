@@ -7,19 +7,41 @@ https://github.com/minad/cape
 #+begin_src emacs-lisp
   (use-package cape
     :ensure t
-    :bind (("C-c q" . completion-at-point)
-	   :map shell-mode-map
-	   ("C-r" . cape-history)
-	   ("C-S-r" . complete-tag))
+    :bind (("C-c q" . completion-at-point))
+    :hook (shell-mode . (lambda () (define-key shell-mode-map (kbd "C-r") 'cape-history)))
+    :config
+    (defun cape-history (&optional interactive)
+      "Complete from Eshell, Comint or minibuffer history.
+       See also `consult-history' for a more flexible variant based on
+       `completing-read'.  If INTERACTIVE is nil the function acts like a Capf."
+      (interactive (list t))
+      (if interactive
+	  (cape-interactive #'cape-history)
+	(let (history bol)
+	  (cond
+	   ((derived-mode-p 'eshell-mode)
+	    (setq history eshell-history-ring
+		  bol (save-excursion (eshell-bol) (point))))
+	   ((derived-mode-p 'comint-mode)
+	    (setq history comint-input-ring
+	      bol (save-excursion (comint-bol) (point))))
+	   ((and (minibufferp) (not (eq minibuffer-history-variable t)))
+	    (setq history (symbol-value minibuffer-history-variable)
+		  bol (line-beginning-position))))
+	  (when (ring-p history)
+	    (setq history (ring-elements history)))
+	  (when history
+	    `(,bol ,(point)
+		   ,(cape--table-with-properties (delete-dups history) :sort nil)
+		   ,@cape--history-properties)))))
     :init
     (add-to-list 'completion-at-point-functions #'comint-completion-at-point)
-    ;; (add-to-list 'completion-at-point-functions #'tags-completion-at-point-function)
     (add-to-list 'completion-at-point-functions #'cape-dabbrev)
     (add-to-list 'completion-at-point-functions #'cape-file)
-    (add-to-list 'completion-at-point-functions #'cape-history)
+    (add-to-list 'completion-at-point-functions (list (cape-capf-buster #'cape-history)))
     (add-to-list 'completion-at-point-functions #'cape-keyword)
     (add-to-list 'completion-at-point-functions #'cape-abbrev)
-    ;; (add-to-list 'completion-at-point-functions #'cape-ispell)
+    (add-to-list 'completion-at-point-functions #'cape-ispell)
     (add-to-list 'completion-at-point-functions #'cape-symbol))
 #+end_src
 * Consult
@@ -206,7 +228,7 @@ https://github.com/minad/corfu
     :bind (:map corfu-map ("C-e" . corfu-complete))
     :init
     (setq corfu-auto-prefix 2
-	  corfu-auto-delay 0.35
+	  corfu-auto-delay 0.15
 	  corfu-auto t
 	  corfu-cycle t
 	  corfu-quit-no-match t
@@ -382,36 +404,29 @@ https://github.com/radian-software/prescient.el
   (use-package vertico
     :ensure t
     :init
-    (vertico-mode))
+    (vertico-mode)
+    (vertico-indexed-mode 1)
+	(setq vertico-indexed-start 1)
+	(defun vertico-indexed-insert (i)
+	  (setq vertico--index (- i 1))
+	  (call-interactively #'vertico-insert)
+	  (call-interactively #'vertico-exit))
+       (loopy-iter
+	 (with (map vertico-map))
+	 (numbering i :from 1 :to 9)
+	 (define-key map (kbd (format "s-%d" i)) `(lambda () (interactive) (vertico-indexed-insert ,i)))))
 
   (use-package vertico-quick
     :after vertico
     :bind (:map vertico-map
-	   ("M-i" . vertico-quick-insert)
-	   ("C-'" . vertico-quick-exit)
-	   ("C-o" . vertico-quick-embark))
+		("M-i" . vertico-quick-insert)
+		("C-'" . vertico-quick-exit)
+		("C-o" . vertico-quick-embark))
     :config
-    (defun vertico-posframe--handle-minibuffer-window ()
-    "Handle minibuffer window."
-    (let ((show-minibuffer-p (vertico-posframe--show-minibuffer-p))
-	  (minibuffer-window (active-minibuffer-window)))
-      (setq-local max-mini-window-height 1)
-      ;; Let minibuffer-window's height = 1
-      (when-let* ((win (active-minibuffer-window))
-		  ((not (frame-root-window-p win))))
-	(window-resize minibuffer-window
-		       (- (window-pixel-height minibuffer-window))
-		       nil nil 'pixelwise))
-      ;; Hide the context showed in minibuffer-window.
-      (set-window-vscroll minibuffer-window 100)
-      (when show-minibuffer-p
-	(set-window-vscroll minibuffer-window 0))))
-
     (defun vertico-quick-embark (&optional arg)
       "Embark on candidate using quick keys."
       (interactive)
-      (when (vertico-quick-jump)
-	(embark-act arg))))
+      (when (vertico-quick-jump) (embark-act arg))))
 #+end_src
 ** Completing Read Multiple
 #+begin_src emacs-lisp
@@ -438,6 +453,7 @@ https://github.com/radian-software/prescient.el
 #+begin_src emacs-lisp
   (use-package vertico-posframe
     :ensure t
+    :init (vertico-posframe-mode 1)
     :config
     (setq vertico-posframe-border-width 20
 	  vertico-posframe-hide-minibuffer t
@@ -446,11 +462,14 @@ https://github.com/radian-software/prescient.el
 	  vertico-posframe-min-height 10
 	  vertico-posframe-width 110
 	  vertico-posframe-poshandler #'posframe-poshandler-window-top-center-offset
-	  vertico-posframe-parameters '((alpha-background . 85)
+	  vertico-posframe-parameters '((alpha . 85)
 					(parent-frame . nil)
 					(cursor . 'hbar)
 					(left-fringe . 0)
 					(right-fringe . 0)))
+
+    (custom-set-faces `(vertico-posframe-border ((t (:background nil)))))
+
     (defun posframe-poshandler-window-top-center-offset (info)
       "Posframe's position handler.
 
@@ -463,19 +482,7 @@ https://github.com/radian-software/prescient.el
 	     (window-width (plist-get info :parent-window-width))
 	     (posframe-width (plist-get info :posframe-width)))
 	(cons (+ window-left (/ (- window-width posframe-width) 2))
-	      (+ window-top 64))))
-    (vertico-indexed-mode 1)
-    (setq vertico-indexed-start 1)
-    (defun vertico-indexed-insert (i)
-      (setq vertico--index (- i 1))
-      (call-interactively #'vertico-insert)
-      (call-interactively #'vertico-exit))
-   (loopy-iter
-     (with (map vertico-map))
-     (numbering i :from 1 :to 9)
-     (define-key map (kbd (format "s-%d" i)) `(lambda () (interactive) (vertico-indexed-insert ,i))))
-    (custom-set-faces '(vertico-posframe-border ((t nil))))
-    (vertico-posframe-mode 1))
+	      (+ window-top 64)))))
 #+end_src
 * Yasnippet
 #+begin_src emacs-lisp
