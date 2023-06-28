@@ -238,8 +238,8 @@
 #+begin_src emacs-lisp
   (defun maybe-modalka-mode (&rest args)
     (if (or (minibufferp)
-	    (eq (get-buffer " *corfu*") nil)
-	    (not (equal (with-current-buffer (get-buffer " *corfu*") (buffer-string)) ""))
+	    (and (not (eq (get-buffer " *corfu*") nil))
+		 (not (equal (with-current-buffer (get-buffer " *corfu*") (buffer-string)) "")))
 	    (eq major-mode 'exwm-mode)
 	    (eq major-mode 'epa-pinentry-mode)
 	    (eq major-mode 'epg-pinentry-mode)
