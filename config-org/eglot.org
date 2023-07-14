@@ -7,7 +7,7 @@ https://github.com/casouri/eldoc-box
 #+begin_src emacs-lisp
   (use-package eldoc-box
     :ensure t
-    :bind ("M-D" . eldoc-box-eglot-help-at-point)
+    ;; :hook (eglot-managed-mode-hook . eldoc-box-hover-mode)
     :config
     (custom-set-faces `(eldoc-box-body ((t (:background ,(face-attribute 'default :background) :foreground ,(face-attribute 'default :foreground))))))
     (custom-set-faces `(eldoc-box-border ((t (:background ,(face-attribute 'default :foreground))))))
@@ -15,8 +15,7 @@ https://github.com/casouri/eldoc-box
     :custom
     (eglot-menu-string "")
     (eldoc-box-offset '(16 16 40))
-    (eldoc-idle-delay 6.0)
-    :hook (eglot-managed-mode . eldoc-box-hover-mode))
+    (eldoc-idle-delay 300))
 #+end_src
 * Eglot
 Eglot is the Emacs client for the Language Server Protocol (LSP). 

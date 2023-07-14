@@ -12,12 +12,15 @@
   (blamer-idle-time 2)
   (blamer-min-offset 70)
   (blamer-posframe-configurations `(:left-fringe 20 :right-fringe 20 :y-pixel-offset 20 :x-pixel-offset -20 :border-width 1 :border-color ,(face-attribute 'default :foreground) :lines-truncate t :accept-focus nil))
-
   :custom-face
   (blamer-face ((t :foreground "#7a88cf"
 		   :background "unspecified"
 		   :italic t)))
   :config
+  (setq blamer--regexp-info
+   (concat "^(?\\(?1:[^ ]*\\) [^ ]*[[:blank:]]?\(\\(?2:.*\\)"
+	   "\s\\(?3:[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\)"
+	   "\s\\(?4:[0-9]\\{2\\}:[0-9]\\{2\\}:[0-9]\\{2\\}\\)"))
   (with-current-buffer (get-buffer-create blamer--buffer-name) (face-remap-add-relative 'fringe :background (face-attribute 'default :background) :foreground (face-attribute 'default :background)))
   (global-blamer-mode 1))
 
@@ -33,7 +36,13 @@
 	    (message "Copied '%s'" filename))
 	(warn "Current buffer is not attached to a file!"))))
 
-(use-package devdocs :ensure t)
+(use-package devdocs
+  :ensure t
+  :config
+  (defun devdocs-at-point ()
+    (interactive)
+    (devdocs-lookup nil (selection-or-thing-at-point)))
+  (global-set-key (kbd "M-D") 'devdocs-at-point))
 
 (global-set-key (kbd "C-s-e") 'eval-region)
 

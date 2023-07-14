@@ -234,7 +234,7 @@
     (modalka-define-kbd "<return>" "RET")
     (define-key modalka-mode-map (kbd "C-w") nil))
 #+end_src
-* Enable Modalka on Window Configuration Change
+* Automatically Enable Modalka
 #+begin_src emacs-lisp
   (defun maybe-modalka-mode (&rest args)
     (if (or (minibufferp)
@@ -255,6 +255,7 @@
 	    (eq major-mode 'shell-mode)
 	    (eq major-mode 'vterm-mode)
 	    (eq major-mode 'magit-status-mode)
+	    (eq major-mode 'magit-stash-mode)
 	    (eq major-mode 'text-mode)
 	    (eq major-mode 'dired-mode))
 	(progn

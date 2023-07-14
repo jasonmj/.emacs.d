@@ -2,6 +2,7 @@
   :ensure t
   :custom
   (bufler-filter-buffer-name-regexps '("\\*Compile-Log\\*"
+				       "\\*Backtrace\\*"
 				       "\\*direnv\\*"
 				       "\\*Disabled Command\\*"
 				       "\\*Org [^z-a]+Output\\*"

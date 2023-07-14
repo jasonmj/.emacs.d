@@ -51,7 +51,7 @@ Quickly change display configurations with functions that call `xrandr`.
     (defun display-vertical()
       (interactive)
       (start-process-shell-command
-       "xrandr" nil "xrandr --output DP-0 --off --output DP-1 --primary --mode 3840x2160 --pos 0x0 --rotate left --output HDMI-0 --off --output DP-2 --off"))
+       "xrandr" nil "xrandr --output DP-0 --off --output DP-1 --off --output HDMI-0 --mode 3840x2160 --pos 0x0 --rotate left --output DP-2 --off"))
     (defun display-horizontal()
       (interactive)
       (start-process-shell-command
@@ -235,7 +235,12 @@ Allows specific configurations to be applied to particular buffers.
 #+end_src
 * Start EXWM
 #+begin_src emacs-lisp
-  (add-to-list 'after-init-hook 'exwm-init)
+  (defun start-exwm ()
+    (require 'exwm)
+    (require 'exwm-randr)
+    (exwm-randr-enable)
+    (exwm-init))
+  (add-to-list 'after-init-hook 'start-exwm)
   ;;(setq exwm-workspace-minibuffer-position 'bottom)
 #+end_src
 * Tab Line Workaround
@@ -276,7 +281,7 @@ Resize EXWM windows to make space for the tab line.
 		  width width*
 		  height height*)))
 	(when (bound-and-true-p tab-line-mode)
-	   (setq y (+ y (frame-char-height) 5)))
+	   (setq y (+ y (frame-char-height) 0)))
 	(exwm--set-geometry id x y width height)
 	(xcb:+request exwm--connection (make-instance 'xcb:MapWindow :window id))
 	(exwm-layout--set-state id xcb:icccm:WM_STATE:NormalState)

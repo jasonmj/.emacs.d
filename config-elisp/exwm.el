@@ -37,7 +37,7 @@
   (defun display-vertical()
     (interactive)
     (start-process-shell-command
-     "xrandr" nil "xrandr --output DP-0 --off --output DP-1 --primary --mode 3840x2160 --pos 0x0 --rotate left --output HDMI-0 --off --output DP-2 --off"))
+     "xrandr" nil "xrandr --output DP-0 --off --output DP-1 --off --output HDMI-0 --mode 3840x2160 --pos 0x0 --rotate left --output DP-2 --off"))
   (defun display-horizontal()
     (interactive)
     (start-process-shell-command
@@ -201,7 +201,12 @@
 (add-hook 'exwm-update-title-hook 'zoom-fixer)
 (add-hook 'exwm-update-class-hook 'zoom-fixer)
 
-(add-to-list 'after-init-hook 'exwm-init)
+(defun start-exwm ()
+  (require 'exwm)
+  (require 'exwm-randr)
+  (exwm-randr-enable)
+  (exwm-init))
+(add-to-list 'after-init-hook 'start-exwm)
 ;;(setq exwm-workspace-minibuffer-position 'bottom)
 
 (defun exwm-layout--show (id &optional window)
@@ -239,7 +244,7 @@
 		width width*
 		height height*)))
       (when (bound-and-true-p tab-line-mode)
-	 (setq y (+ y (frame-char-height))))
+	 (setq y (+ y (frame-char-height) 0)))
       (exwm--set-geometry id x y width height)
       (xcb:+request exwm--connection (make-instance 'xcb:MapWindow :window id))
       (exwm-layout--set-state id xcb:icccm:WM_STATE:NormalState)

@@ -241,6 +241,7 @@
 	  (eq major-mode 'shell-mode)
 	  (eq major-mode 'vterm-mode)
 	  (eq major-mode 'magit-status-mode)
+	  (eq major-mode 'magit-stash-mode)
 	  (eq major-mode 'text-mode)
 	  (eq major-mode 'dired-mode))
       (progn

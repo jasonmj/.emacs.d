@@ -27,11 +27,17 @@
 	  `(,bol ,(point)
 		 ,(cape--table-with-properties (delete-dups history) :sort nil)
 		 ,@cape--history-properties)))))
+  (add-hook 'shell-mode-hook (lambda ()
+			       (setq-local completion-at-point-functions
+					   (list (cape-capf-buster #'cape-history)
+						 #'cape-dabbrev
+						 #'cape-file))))
+
   :init
   (add-to-list 'completion-at-point-functions #'comint-completion-at-point)
   (add-to-list 'completion-at-point-functions #'cape-dabbrev)
   (add-to-list 'completion-at-point-functions #'cape-file)
-  (add-to-list 'completion-at-point-functions (list (cape-capf-buster #'cape-history)))
+  ;;(add-to-list 'completion-at-point-functions #'cape-history)
   (add-to-list 'completion-at-point-functions #'cape-keyword)
   (add-to-list 'completion-at-point-functions #'cape-abbrev)
   (add-to-list 'completion-at-point-functions #'cape-ispell)
@@ -74,8 +80,8 @@
   (xref-show-definitions-function #'consult-xref)
   (consult-line-start-from-top t)
   (consult-preview-key 'any)
-  (consult-buffer-filter '("^ " "\\` " "\\*Echo Area" "\\*Minibuf" "\\*Quail Completions"
-			   "\\*elixir-ls" "Flymake log" "Shell command output" "direnv" "\\*scratch"
+  (consult-buffer-filter '("^ " "\\` " "\\*Echo Area" "\\*Minibuf" "\\*Quail Completions" "\\*Backtrace"
+			   "\\*elixir-ls" "Flymake log" "Shell command output" "direnv" "\\*scratch" "Shell:"
 			   "\\*Messages" "\\*Warning" "*magit-" "magit-process" "*vterm" "vterm" "^:"
 			   "*straight-" "*elfeed-log" "*trace of SMTP session" "\\*Compile-Log" "\\*blamer"
 			   "*format-all-error" "*Async-" "COMMIT_EDITMSG" "shell: " "\\*ednc-log" "TAGS"
@@ -101,18 +107,36 @@
   (key-seq-define-global "o0" 'consult-mark)
 
   ;; Switch buffer
-  (exwm-input-set-key (kbd "C-SPC") (lambda ()
+  (defun my/buffer-switch ()
 				      (interactive)
 				      (if (project-current)
 					  (consult-project-buffer)
-					(consult-buffer))))
+					(consult-buffer)))
+  (exwm-input-set-key (kbd "C-SPC") 'my/buffer-switch)
   (key-seq-define-global "cz" 'execute-extended-command)
 
+  (defun consult-preview-posframe-focus ()
+    ;; (posframe-delete-all)
+    ;; (vertico-posframe--handle-minibuffer-window)
+    ;; (run-with-idle-timer 2 nil (lambda ()
+    ;; 				 (let* ((frame (vertico-posframe--show vertico-posframe--buffer (point)))
+    ;; 					(win (car (window-list frame)))
+    ;; 					(buffer (window-buffer win)))
+    ;; 				   ;; (select-frame-set-input-focus frame)
+    ;; 				   ;; (select-window win)
+    ;; 				   (set-buffer buffer)
+    ;; 				   (switch-to-buffer buffer)
+    ;; 				   )))
+    )
+  (add-hook 'consult-after-jump-hook 'consult-preview-posframe-focus)
+
   ;; Configure previews
-  (consult-customize consult-recent-file :preview-key 'nil
-		     consult-theme :preview-key '(:debounce 0.5 any)
-		     consult-project-buffer :preview-key 'nil
-		     consult-buffer :preview-key 'nil))
+  (consult-customize consult-recent-file :preview-key nil
+		     consult-theme :preview-key nil
+		     consult-project-buffer :preview-key nil
+		     ;; consult-ripgrep :preview-key nil
+		     ;; consult-buffer :preview-key nil
+		     my/buffer-switch :preview-key nil))
 
 (defun consult-line-at-point ()
   (interactive)
@@ -339,18 +363,52 @@ function."
 
 (use-package vertico
   :ensure t
-  :init
+  :config
   (vertico-mode)
   (vertico-indexed-mode 1)
-      (setq vertico-indexed-start 1)
-      (defun vertico-indexed-insert (i)
-	(setq vertico--index (- i 1))
-	(call-interactively #'vertico-insert)
-	(call-interactively #'vertico-exit))
-     (loopy-iter
-       (with (map vertico-map))
-       (numbering i :from 1 :to 9)
-       (define-key map (kbd (format "s-%d" i)) `(lambda () (interactive) (vertico-indexed-insert ,i)))))
+  (setq vertico-indexed-start 1)
+  (defun vertico-indexed-insert (i)
+    (setq vertico--index (- i 1))
+    (call-interactively #'vertico-insert)
+    (call-interactively #'vertico-exit))
+  (loopy-iter
+   (with (map vertico-map))
+   (numbering i :from 1 :to 9)
+   (define-key map (kbd (format "s-%d" i)) `(lambda () (interactive) (vertico-indexed-insert ,i))))
+
+  ;; Enable vertico-multiform
+  ;; (vertico-multiform-mode)
+  ;; (define-minor-mode vertico-disabled-mode
+  ;; "Disable vertico."
+  ;; :global t :group 'vertico
+  ;; (cond
+  ;;  (vertico-disabled-mode
+  ;;   (advice-add 'vertico--setup :around #'ignore))
+  ;;  (t
+  ;;   (advice-remove 'vertico--setup #'ignore))))
+  ;; (setq vertico-multiform-commands
+  ;; 	'((consult-project-buffer disabled)
+  ;; 	  (t posframe)))
+
+  (defun vertico-buffer--redisplay (win)
+    "Redisplay window WIN."
+  (when-let (mbwin (active-minibuffer-window))
+    (when (eq (window-buffer mbwin) (current-buffer))
+      (unless (eq win mbwin)
+	(setq-local truncate-lines (< (window-point win)
+				      (* 0.8 (window-width win))))
+	(set-window-point win (point))
+	(set-window-hscroll win 0))
+      (when (and vertico-buffer-hide-prompt
+		 (not (frame-root-window-p mbwin)))
+	(window-resize mbwin (- (window-pixel-height mbwin)) nil nil 'pixelwise)
+	(set-window-vscroll mbwin 100))
+      (let ((old cursor-in-non-selected-windows)
+	    (new (and (eq (selected-window) mbwin)
+		      (if (memq cursor-type '(nil t)) 'hbar cursor-type))))
+	(unless (eq new old)
+	  (setq-local cursor-in-non-selected-windows new)
+	  (force-mode-line-update t)))))))
 
 (use-package vertico-quick
   :after vertico
@@ -414,7 +472,22 @@ function."
 	   (window-width (plist-get info :parent-window-width))
 	   (posframe-width (plist-get info :posframe-width)))
       (cons (+ window-left (/ (- window-width posframe-width) 2))
-	    (+ window-top 64)))))
+	    (+ window-top 64))))
+  (defun vertico-posframe--handle-minibuffer-window ()
+      "Handle minibuffer window."
+      (let ((show-minibuffer-p (vertico-posframe--show-minibuffer-p))
+	    (minibuffer-window (active-minibuffer-window)))
+	(setq-local max-mini-window-height 1)
+	;; Let minibuffer-window's height = 1
+	(when-let* ((win (active-minibuffer-window))
+		    ((not (frame-root-window-p win))))
+	  (window-resize minibuffer-window
+			 (- (window-pixel-height minibuffer-window))
+			 nil nil 'pixelwise))
+	;; Hide the context showed in minibuffer-window.
+	(set-window-vscroll minibuffer-window 100)
+	(when show-minibuffer-p
+	  (set-window-vscroll minibuffer-window 0)))))
 
 (use-package yasnippet
   :ensure t
