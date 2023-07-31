@@ -134,6 +134,10 @@ This command does not push text to `kill-ring'."
      (point))))
 (global-set-key (kbd "M-d") 'delete-word-no-copy)
 #+end_src
+* Markdown Mode
+#+begin_src emacs-lisp
+  (use-package markdown-mode :ensure t)
+#+end_src
 * Open Line Below
 #+begin_src emacs-lisp
 (defun open-line-below ()

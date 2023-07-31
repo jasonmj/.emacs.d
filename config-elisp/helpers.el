@@ -79,6 +79,11 @@
 
 (global-hl-line-mode +1)
 
+(use-package indent-bars
+  :ensure t
+  :straight (:type git :host github :repo "jdtsmith/indent-bars")
+  :hook ((prog-mode) . indent-bars-mode))
+
 (key-seq-define-global "gf" 'keyboard-escape-quit)
 
 (mouse-avoidance-mode 'banish)

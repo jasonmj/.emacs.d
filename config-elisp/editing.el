@@ -80,6 +80,8 @@ This command does not push text to `kill-ring'."
      (point))))
 (global-set-key (kbd "M-d") 'delete-word-no-copy)
 
+(use-package markdown-mode :ensure t)
+
 (defun open-line-below ()
   (interactive)
   (move-end-of-line 1)
