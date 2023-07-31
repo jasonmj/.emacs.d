@@ -158,7 +158,7 @@
         ("S-TAB" . (C-left C-S-right C-c))
         ("M-<" . C-home)
         ("M->" . C-end)))
-  (exwm-input-set-key (kbd "C-'") (lambda () (interactive) (exwm-input--fake-key 'C-k)))
+  (exwm-input-set-key (kbd "C-'") (lambda () (interactive) (if (eq major-mode 'exwm-mode) (exwm-input--fake-key 'C-k) (insert "'"))))
   (defun exwm-manage-keys-hook ()
     (exwm-input-set-simulation-keys
      (mapcar (lambda (c) (cons (kbd (car c)) (cdr c))) exwm-input-global-simulation-keys)))
