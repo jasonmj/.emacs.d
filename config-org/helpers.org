@@ -9,33 +9,6 @@ https://github.com/SebastienWae/app-launcher
   :straight '(app-launcher :host github :repo "SebastienWae/app-launcher")
   :bind (("C-s-SPC" . app-launcher-run-app)))
 #+end_src
-* Blamer
-A git blame plugin for emacs inspired by VS Code's GitLens plugin.
-
-https://github.com/Artawower/blamer.el
-#+begin_src emacs-lisp
-  (use-package blamer
-    :ensure t
-    :bind (("M-I" . blamer-show-posframe-commit-info))
-    :defer 20
-    :custom
-    (blamer-type 'both)
-    (blamer-show-avatar-p nil)
-    (blamer-idle-time 2)
-    (blamer-min-offset 70)
-    (blamer-posframe-configurations `(:left-fringe 20 :right-fringe 20 :y-pixel-offset 20 :x-pixel-offset -20 :border-width 1 :border-color ,(face-attribute 'default :foreground) :lines-truncate t :accept-focus nil))
-    :custom-face
-    (blamer-face ((t :foreground "#7a88cf"
-		     :background "unspecified"
-		     :italic t)))
-    :config
-    (setq blamer--regexp-info
-     (concat "^(?\\(?1:[^ ]*\\) [^ ]*[[:blank:]]?\(\\(?2:.*\\)"
-	     "\s\\(?3:[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\)"
-	     "\s\\(?4:[0-9]\\{2\\}:[0-9]\\{2\\}:[0-9]\\{2\\}\\)"))
-    (with-current-buffer (get-buffer-create blamer--buffer-name) (face-remap-add-relative 'fringe :background (face-attribute 'default :background) :foreground (face-attribute 'default :background)))
-    (global-blamer-mode 1))
-#+end_src
 * Copy File Name
 Copy the current buffer file name to the clipboard.
 #+begin_src emacs-lisp
@@ -106,8 +79,7 @@ https://github.com/magnars/fold-this.el
       (fold-this
        (car (car (region-bounds)))
        (cdr (car (region-bounds)))))
-    :bind (:map shell-mode-map
-	   ("C-<return>" . expand-and-fold-this)))
+    :bind (:map shell-mode-map ("C-<return>" . expand-and-fold-this)))
 #+end_src
 * Helpful
 A better Emacs *help* buffer.
@@ -118,6 +90,13 @@ https://github.com/Wilfred/helpful
     :ensure t
     :bind (("C-h f" . helpful-function)
            ("C-h v" . helpful-variable)))
+#+end_src
+* Hide Show Minor Mode
+Minor mode to selectively hide/show code and comment blocks.
+#+begin_src emacs-lisp
+    (use-package hs-minor-mode
+      :hook ((heex-ts-mode prog-mode) . hs-minor-mode)
+      :bind (("C-r" . hs-toggle-hiding)))
 #+end_src
 * Highlight Current Line
 Highlights the line about the current buffer's point in all live windows.
@@ -132,7 +111,7 @@ https://github.com/jdtsmith/indent-bars
   (use-package indent-bars
     :ensure t
     :straight (:type git :host github :repo "jdtsmith/indent-bars")
-    :hook ((prog-mode) . indent-bars-mode))
+    :hook ((heex-ts-mode prog-mode) . (lambda () (run-with-idle-timer 0.05 nil (lambda () (indent-tabs-mode -1) (indent-bars-mode 1))))))
 #+end_src
 * Keyboard Escape Quit
 This command can exit an interactive command such as query-replace, can clear out a prefix argument or a region, can get out of the minibuffer or other recursive edit, cancel the use of the current buffer (for special-purpose buffers), or go back to just one window (by deleting all but the selected window).
@@ -157,6 +136,44 @@ https://github.com/ecraven/pinentry-emacs
   (use-package pinentry
     :ensure t
     :hook (after-init . pinentry-start))
+#+end_src
+* Sideline
+Show information on the side.
+
+https://github.com/emacs-sideline/sideline
+#+begin_src emacs-lisp
+(use-package sideline
+  :init
+  (setq sideline-backends-left-skip-current-line t   ; don't display on current line (left)
+        sideline-backends-right-skip-current-line t  ; don't display on current line (right)
+        sideline-order-left 'down                    ; or 'up
+        sideline-order-right 'up                     ; or 'down
+        sideline-format-left "%s   "                 ; format for left aligment
+        sideline-format-right "   %s"                ; format for right aligment
+        sideline-priority 100                        ; overlays' priority
+        sideline-display-backend-name t))            ; display the backend name
+#+end_src
+** Sideline Blame
+Show blame messages with sideline.
+
+https://github.com/emacs-sideline/sideline-blame
+#+begin_src emacs-lisp
+  (use-package sideline
+    :ensure t
+    :init (add-to-list 'sideline-backends-right '(sideline-blame . down)))
+#+end_src
+** Sideline Flymake
+Show flymake errors with sideline.
+
+https://github.com/emacs-sideline/sideline-flymake
+#+begin_src emacs-lisp
+  (use-package sideline-flymake
+    :ensure t
+    :hook (flymake-mode . sideline-mode)
+    :init
+    (setq sideline-flymake-display-mode 'point) ; 'point to show errors only on point
+						; 'line to show errors on the current line
+    (add-to-list 'sideline-backends-right '(sideline-flymake . up)))
 #+end_src
 * Short Answer Yes/No
 #+begin_src emacs-lisp

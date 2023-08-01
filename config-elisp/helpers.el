@@ -2,28 +2,6 @@
   :straight '(app-launcher :host github :repo "SebastienWae/app-launcher")
   :bind (("C-s-SPC" . app-launcher-run-app)))
 
-(use-package blamer
-  :ensure t
-  :bind (("M-I" . blamer-show-posframe-commit-info))
-  :defer 20
-  :custom
-  (blamer-type 'both)
-  (blamer-show-avatar-p nil)
-  (blamer-idle-time 2)
-  (blamer-min-offset 70)
-  (blamer-posframe-configurations `(:left-fringe 20 :right-fringe 20 :y-pixel-offset 20 :x-pixel-offset -20 :border-width 1 :border-color ,(face-attribute 'default :foreground) :lines-truncate t :accept-focus nil))
-  :custom-face
-  (blamer-face ((t :foreground "#7a88cf"
-		   :background "unspecified"
-		   :italic t)))
-  :config
-  (setq blamer--regexp-info
-   (concat "^(?\\(?1:[^ ]*\\) [^ ]*[[:blank:]]?\(\\(?2:.*\\)"
-	   "\s\\(?3:[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\)"
-	   "\s\\(?4:[0-9]\\{2\\}:[0-9]\\{2\\}:[0-9]\\{2\\}\\)"))
-  (with-current-buffer (get-buffer-create blamer--buffer-name) (face-remap-add-relative 'fringe :background (face-attribute 'default :background) :foreground (face-attribute 'default :background)))
-  (global-blamer-mode 1))
-
 (defun copy-file-name ()
     "Copy the current buffer file name to the clipboard."
     (interactive)
@@ -69,20 +47,23 @@
     (fold-this
      (car (car (region-bounds)))
      (cdr (car (region-bounds)))))
-  :bind (:map shell-mode-map
-	 ("C-<return>" . expand-and-fold-this)))
+  :bind (:map shell-mode-map ("C-<return>" . expand-and-fold-this)))
 
 (use-package helpful
   :ensure t
   :bind (("C-h f" . helpful-function)
          ("C-h v" . helpful-variable)))
 
+(use-package hs-minor-mode
+  :hook ((heex-ts-mode prog-mode) . hs-minor-mode)
+  :bind (("C-r" . hs-toggle-hiding)))
+
 (global-hl-line-mode +1)
 
 (use-package indent-bars
   :ensure t
   :straight (:type git :host github :repo "jdtsmith/indent-bars")
-  :hook ((prog-mode) . indent-bars-mode))
+  :hook ((heex-ts-mode prog-mode) . (lambda () (run-with-idle-timer 0.05 nil (lambda () (indent-tabs-mode -1) (indent-bars-mode 1))))))
 
 (key-seq-define-global "gf" 'keyboard-escape-quit)
 
@@ -96,6 +77,29 @@
 (use-package pinentry
   :ensure t
   :hook (after-init . pinentry-start))
+
+(use-package sideline
+  :init
+  (setq sideline-backends-left-skip-current-line t   ; don't display on current line (left)
+        sideline-backends-right-skip-current-line t  ; don't display on current line (right)
+        sideline-order-left 'down                    ; or 'up
+        sideline-order-right 'up                     ; or 'down
+        sideline-format-left "%s   "                 ; format for left aligment
+        sideline-format-right "   %s"                ; format for right aligment
+        sideline-priority 100                        ; overlays' priority
+        sideline-display-backend-name t))            ; display the backend name
+
+(use-package sideline
+  :ensure t
+  :init (add-to-list 'sideline-backends-right '(sideline-blame . down)))
+
+(use-package sideline-flymake
+  :ensure t
+  :hook (flymake-mode . sideline-mode)
+  :init
+  (setq sideline-flymake-display-mode 'point) ; 'point to show errors only on point
+					      ; 'line to show errors on the current line
+  (add-to-list 'sideline-backends-right '(sideline-flymake . up)))
 
 (defalias 'yes-or-no-p 'y-or-n-p)
 
