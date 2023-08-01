@@ -25,7 +25,33 @@
 (use-package exwm :ensure t)
 (require 'exwm-config)
 (exwm-config-example)
-;;(exwm-enable)
+
+;;; Maybe EXWM Set Key
+(defun emacs-set-key (key cmd)
+  (if (eq system-type 'darwin)
+      (global-set-key key cmd)
+    (exwm-input-set-key key cmd)))
+
+;;; MacOS Customizations
+(when (eq system-type 'darwin)
+    (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
+      (add-to-list 'default-frame-alist '(ns-appearance . dark))
+      (setq ns-use-proxy-icon nil)
+      (setq frame-title-format nil)
+      (setq mac-control-modifier 'super)
+      (setq mac-command-modifier 'control)
+      (add-to-list 'default-frame-alist '(fullscreen . maximized))
+      (global-set-key (kbd "C-S-w") 'save-buffers-kill-terminal)
+      (exec-path-from-shell-initialize)
+      (emacs-set-key (kbd "C-c f") 'firefox)
+      (emacs-set-key (kbd "s-1") (lambda () (interactive) (call-process-shell-command "skhd -k 'shift + ctrl - 1'")))
+      (emacs-set-key (kbd "s-2") (lambda () (interactive) (call-process-shell-command "skhd -k 'shift + ctrl - 2'")))
+      (emacs-set-key (kbd "s-3") (lambda () (interactive) (call-process-shell-command "skhd -k 'shift + ctrl - 3'")))
+      (emacs-set-key (kbd "s-4") (lambda () (interactive) (call-process-shell-command "skhd -k 'shift + ctrl - 4'")))
+      (key-seq-define-global "sf" 'firefox)
+      (defun firefox ()
+        (interactive)
+        (start-process-shell-command "firefox fullscreen" nil "/Applications/Firefox.app/Contents/MacOS/firefox")))
 
 ;;; Straight
 (defvar native-comp-deferred-compilation-deny-list ())

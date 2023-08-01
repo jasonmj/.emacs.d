@@ -71,7 +71,7 @@ Present a list of recently used directories and open the selected one in dired.
 
       (let ((dir (completing-read "Recent directory: " recent-dirs)))
 	(dired dir))))
-  (exwm-input-set-key (kbd "C-x d") 'dired-recent-dirs)
+  (emacs-set-key (kbd "C-x d") 'dired-recent-dirs)
 #+end_src
 * Dired-x
 Extra Dired functionality.

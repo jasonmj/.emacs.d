@@ -22,9 +22,9 @@
       (modalka-mode 1)))
   (update-modalka-mode-line))
 (key-seq-define-global "ii" 'toggle-modalka)
-(exwm-input-set-key (kbd "s-i") 'toggle-modalka)
-(exwm-input-set-key (kbd "<delete>") 'toggle-modalka)
-(exwm-input-set-key (kbd "<print>") 'toggle-modalka)
+(emacs-set-key (kbd "s-i") 'toggle-modalka)
+(emacs-set-key (kbd "<delete>") 'toggle-modalka)
+(emacs-set-key (kbd "<print>") 'toggle-modalka)
 #+end_src
 * Update Mode Line Indication
 #+begin_src emacs-lisp

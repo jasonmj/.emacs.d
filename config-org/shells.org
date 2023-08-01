@@ -78,7 +78,7 @@ Quickly create an eshell with a name or switch to an open eshell with completing
 					eshell-buffers))
 	   (buffer-name (completing-read "Eshell buffers: " eshell-buffer-names)))
       (eshell-buffer buffer-name)))
-  (exwm-input-set-key (kbd "C-`") 'eshell-with-name)
+  (emacs-set-key (kbd "C-`") 'eshell-with-name)
 #+end_src
 ** xterm-color
 #+begin_src emacs-lisp
@@ -155,7 +155,7 @@ Quickly create a shell with a name or switch to an open shell with completing re
 					shell-buffers))
 	   (buffer-name (completing-read "Shell buffers: " shell-buffer-names)))
       (shell-buffer buffer-name)))
-  (exwm-input-set-key (kbd "M-`") 'shell-with-name)
+  (emacs-set-key (kbd "M-`") 'shell-with-name)
 #+end_src
 ** Sticky Shell
 Minor mode to keep track of previous prompt in your shell.
@@ -245,5 +245,5 @@ https://github.com/andyjda/sticky-shell
 (use-package vterm-toggle
   :ensure t
   :config
-  (exwm-input-set-key (kbd "C-s-t") 'vterm-toggle))
+  (emacs-set-key (kbd "C-s-t") 'vterm-toggle))
 #+end_src

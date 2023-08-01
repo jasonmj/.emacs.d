@@ -112,7 +112,7 @@
 				      (if (project-current)
 					  (consult-project-buffer)
 					(consult-buffer)))
-  (exwm-input-set-key (kbd "C-SPC") 'my/buffer-switch)
+  (emacs-set-key (kbd "C-SPC") 'my/buffer-switch)
   (key-seq-define-global "cz" 'execute-extended-command)
 
   (defun consult-preview-posframe-focus ()
@@ -147,7 +147,7 @@
 (defun consult-ripgrep-at-point ()
   (interactive)
   (consult-ripgrep nil (selection-or-thing-at-point)))
-(exwm-input-set-key (kbd "S-SPC") 'consult-ripgrep-at-point)
+(emacs-set-key (kbd "S-SPC") 'consult-ripgrep-at-point)
 
 (defun selection-or-thing-at-point ()
   (cond

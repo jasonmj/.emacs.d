@@ -60,7 +60,7 @@
   (popper-mode +1)
   (popper-echo-mode +1))
 
-(exwm-input-set-key (kbd "C-x x") 'scratch-buffer)
+(emacs-set-key (kbd "C-x x") 'scratch-buffer)
 (key-chord-define-global "xx" 'scratch-buffer)
 
 (global-set-key (kbd "s-a") 'mark-whole-buffer)
@@ -105,19 +105,19 @@
   :bind ("C-S-SPC" . tabgo))
 
 (use-package windmove :ensure t)
-(exwm-input-set-key (kbd "s-b") 'windmove-left)
-(exwm-input-set-key (kbd "s-f") 'windmove-right)
-(exwm-input-set-key (kbd "s-p") 'windmove-up)
-(exwm-input-set-key (kbd "s-n") 'windmove-down)
-(exwm-input-set-key (kbd "C-1") 'delete-other-windows)
-(exwm-input-set-key (kbd "C-2") (lambda () (interactive) (split-window-below)
+(emacs-set-key (kbd "s-b") 'windmove-left)
+(emacs-set-key (kbd "s-f") 'windmove-right)
+(emacs-set-key (kbd "s-p") 'windmove-up)
+(emacs-set-key (kbd "s-n") 'windmove-down)
+(emacs-set-key (kbd "C-1") 'delete-other-windows)
+(emacs-set-key (kbd "C-2") (lambda () (interactive) (split-window-below)
 				  (run-with-idle-timer 0.15 nil (lambda() (interactive) (windmove-down)))))
-(exwm-input-set-key (kbd "C-3") (lambda () (interactive) (split-window-right) (windmove-right)))
-(exwm-input-set-key (kbd "<C-escape>") 'delete-window)
+(emacs-set-key (kbd "C-3") (lambda () (interactive) (split-window-right) (windmove-right)))
+(emacs-set-key (kbd "<C-escape>") 'delete-window)
 
 (winner-mode 1)
-(exwm-input-set-key (kbd "s-z") 'winner-undo)
-(exwm-input-set-key (kbd "s-Z") 'winner-redo)
+(emacs-set-key (kbd "s-z") 'winner-undo)
+(emacs-set-key (kbd "s-Z") 'winner-redo)
 
 (use-package zoom
   :ensure t

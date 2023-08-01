@@ -16,9 +16,9 @@
       (modalka-mode 1)))
   (update-modalka-mode-line))
 (key-seq-define-global "ii" 'toggle-modalka)
-(exwm-input-set-key (kbd "s-i") 'toggle-modalka)
-(exwm-input-set-key (kbd "<delete>") 'toggle-modalka)
-(exwm-input-set-key (kbd "<print>") 'toggle-modalka)
+(emacs-set-key (kbd "s-i") 'toggle-modalka)
+(emacs-set-key (kbd "<delete>") 'toggle-modalka)
+(emacs-set-key (kbd "<print>") 'toggle-modalka)
 
 (defun update-modalka-mode-line()
   (if (bound-and-true-p modalka-mode)

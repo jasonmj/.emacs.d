@@ -60,7 +60,7 @@
 				      eshell-buffers))
 	 (buffer-name (completing-read "Eshell buffers: " eshell-buffer-names)))
     (eshell-buffer buffer-name)))
-(exwm-input-set-key (kbd "C-`") 'eshell-with-name)
+(emacs-set-key (kbd "C-`") 'eshell-with-name)
 
 (use-package xterm-color
   :ensure t
@@ -123,7 +123,7 @@
 				      shell-buffers))
 	 (buffer-name (completing-read "Shell buffers: " shell-buffer-names)))
     (shell-buffer buffer-name)))
-(exwm-input-set-key (kbd "M-`") 'shell-with-name)
+(emacs-set-key (kbd "M-`") 'shell-with-name)
 
 (use-package sticky-shell
   :straight (:type git :host github :repo "andyjda/sticky-shell")
@@ -202,4 +202,4 @@
 (use-package vterm-toggle
   :ensure t
   :config
-  (exwm-input-set-key (kbd "C-s-t") 'vterm-toggle))
+  (emacs-set-key (kbd "C-s-t") 'vterm-toggle))

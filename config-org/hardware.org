@@ -3,15 +3,15 @@
 * Audio Controls
 Adjust the volume up and down or toggle audio mute. 
 #+begin_src emacs-lisp
-  (exwm-input-set-key (kbd "<XF86AudioLowerVolume>") (lambda ()
+  (emacs-set-key (kbd "<XF86AudioLowerVolume>") (lambda ()
 						       (interactive)
 						       (call-process-shell-command "pamixer -d 2 --allow-boost")
 						       (process-send-string xob-process (shell-command-to-string "pamixer --get-volume"))))
-  (exwm-input-set-key (kbd "<XF86AudioRaiseVolume>") (lambda ()
+  (emacs-set-key (kbd "<XF86AudioRaiseVolume>") (lambda ()
 						       (interactive)
 						       (call-process-shell-command "pamixer -i 2 --allow-boost")
 						       (process-send-string xob-process (shell-command-to-string "pamixer --get-volume"))))
-  (exwm-input-set-key (kbd "<XF86AudioMute>") (lambda ()
+  (emacs-set-key (kbd "<XF86AudioMute>") (lambda ()
 						(interactive)
 						(call-process-shell-command "pamixer -t")
 						(process-send-string xob-process (shell-command-to-string "pamixer --get-volume"))))
@@ -36,24 +36,24 @@ https://github.com/jasonmj/battery-notifier
 * Lock
 Use slock to lock the screen when the power button is pressed with the shift key. 
 #+begin_src emacs-lisp
-  (exwm-input-set-key (kbd "<S-XF86PowerOff>") (lambda () (interactive) (shell-command "slock")))
+  (emacs-set-key (kbd "<S-XF86PowerOff>") (lambda () (interactive) (shell-command "slock")))
 #+end_src
 * Screen Brightness
 Increase or decrease the screen brightness. Alternatively set the max/min brightness with shift + brightness keys. 
 #+begin_src emacs-lisp
-  (exwm-input-set-key (kbd "<S-XF86MonBrightnessDown>") (lambda ()
+  (emacs-set-key (kbd "<S-XF86MonBrightnessDown>") (lambda ()
 							  (interactive)
 							  (call-process-shell-command "xbacklight -set 5")
 							  (process-send-string xob-process (shell-command-to-string "xbacklight -get"))))
-  (exwm-input-set-key (kbd "<S-XF86MonBrightnessUp>") (lambda ()
+  (emacs-set-key (kbd "<S-XF86MonBrightnessUp>") (lambda ()
 							(interactive)
 							(call-process-shell-command "xbacklight -set 100")
 							(process-send-string xob-process (shell-command-to-string "xbacklight -get"))))
-  (exwm-input-set-key (kbd "<XF86MonBrightnessDown>") (lambda ()
+  (emacs-set-key (kbd "<XF86MonBrightnessDown>") (lambda ()
 							(interactive)
 							(call-process-shell-command "xbacklight -dec 5")
 							(process-send-string xob-process (shell-command-to-string "xbacklight -get"))))
-  (exwm-input-set-key (kbd "<XF86MonBrightnessUp>") (lambda ()
+  (emacs-set-key (kbd "<XF86MonBrightnessUp>") (lambda ()
 						      (interactive)
 						      (call-process-shell-command "xbacklight -inc 5")
 						      (process-send-string xob-process (shell-command-to-string "xbacklight -get"))))
@@ -68,8 +68,8 @@ Suspend the machine with "C-x ." or suspend and lock with "C-x >".
   (interactive)
   (shell-command "systemctl suspend")
   (shell-command "slock"))
-(exwm-input-set-key (kbd "C-x >") 'suspend-lock)
-(exwm-input-set-key (kbd "C-x .") 'suspend)
+(emacs-set-key (kbd "C-x >") 'suspend-lock)
+(emacs-set-key (kbd "C-x .") 'suspend)
 #+end_src
 * xob
 #+begin_src emacs-lisp

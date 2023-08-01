@@ -55,7 +55,7 @@
 
     (let ((dir (completing-read "Recent directory: " recent-dirs)))
       (dired dir))))
-(exwm-input-set-key (kbd "C-x d") 'dired-recent-dirs)
+(emacs-set-key (kbd "C-x d") 'dired-recent-dirs)
 
 (use-package dired-x
   :bind (("C-x C-d" . dired-x-find-file))
