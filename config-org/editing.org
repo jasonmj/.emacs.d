@@ -56,7 +56,7 @@ Expand the current region based on a smart usage of regex.
 
 https://github.com/casouri/lunarymacs/blob/master/site-lisp/expreg.el
 #+begin_src emacs-lisp
-  (load-file "/home/jasonmj/.emacs.d/elisp/expreg.el")
+  (load-file "~/.emacs.d/elisp/expreg.el")
   (use-package expreg
     :bind (("s-<tab>" . expreg-expand)
 	   ("S-TAB" . expreg-expand)))
@@ -184,7 +184,7 @@ https://codeberg.org/ideasman42/emacs-spell-fu/
 #+begin_src emacs-lisp
   (use-package spell-fu
     :ensure t
-    :custom (ispell-personal-dictionary "/home/jasonmj/.emacs.d/spell-fu/personal.txt")
+    :config (setq ispell-personal-dictionary "~/.emacs.d/.local/etc/ispell/.pws")
     :hook ((prog-mode . spell-fu-mode)
 	   (org-mode . spell-fu-mode)
 	   (markdown-mode . spell-fu-mode)))

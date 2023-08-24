@@ -35,7 +35,8 @@ Use delta (https://github.com/dandavison/delta) when viewing diffs in Magit.
 
 https://github.com/dandavison/magit-delta
 #+begin_src emacs-lisp
-  (use-package magit-delta
+  (unless (eq system-type 'darwin)
+    (use-package magit-delta
     :ensure t
-    :hook (magit-mode . magit-delta-mode))
+    :hook (magit-mode . magit-delta-mode)))
 #+end_src

@@ -1,13 +1,18 @@
 (use-package request :ensure t)
 
-(setq toggl--headers '(("Authorization" . (auth-source-pick-first-password :host "www.toggl.com" :user "jasonmj"))))
+(defun set-toggl-secrets ()
+  (setq toggl--headers '(("Authorization" . (auth-source-pick-first-password :host "www.toggl.com" :user "jasonmj"))))
+  (setq toggl-auth-token (auth-source-pick-first-password :host "api.toggl.com" :user "jasonmj")))
+
+(setq toggl--headers nil)
+(add-hook 'emacs-startup-hook 'set-toggl-secrets)
 
 (defun toggl-stop-timer()
   (interactive)
   (request
     "https://www.toggl.com/api/v8/time_entries/current"
     :parser 'json-read
-    :headers '(("Authorization" . (auth-source-pick-first-password :host "www.toggl.com" :user "jasonmj")))
+    :headers 'toggl--headers
     :success
     (cl-function
      (lambda (&key data &allow-other-keys)
@@ -23,7 +28,7 @@
   (request
     (concat "https://www.toggl.com/api/v8/time_entries/" (number-to-string timer-id) "/stop")
     :parser 'json-read
-    :headers '(("Authorization" . (auth-source-pick-first-password :host "www.toggl.com" :user "jasonmj")))
+    :headers 'toggl-headers
     :success
     (cl-function
      (lambda (&key data &allow-other-keys)
@@ -41,7 +46,7 @@
     :type "POST"
     :data '(("tid" . (number-to-string toggl-last-timer)))
     :parser 'json-read
-    :headers '(("Authorization" . (auth-source-pick-first-password :host "www.toggl.com" :user "jasonmj")))
+    :headers 'toggl-headers
     :success
     (cl-function
      (lambda (&key data &allow-other-keys)
@@ -62,7 +67,7 @@
 	      ("C-x t s" . org-toggl-set-project)
 	      ("C-c C-x TAB" . org-toggl-clock-in))
   :custom
-  (toggl-auth-token (auth-source-pick-first-password :host "api.toggl.com" :user "jasonmj"))
+  (toggl-auth-token "")
   (org-toggl-inherit-toggl-properties t)
   :hook ((after-init . toggl-get-projects)
 	 (after-init . toggl-timer-watch)

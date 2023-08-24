@@ -60,10 +60,11 @@
 
 (global-hl-line-mode +1)
 
-(use-package indent-bars
+(unless (not (eq system-type 'darwin))
+  (use-package indent-bars
   :ensure t
   :straight (:type git :host github :repo "jdtsmith/indent-bars")
-  :hook ((heex-ts-mode prog-mode) . (lambda () (run-with-idle-timer 0.05 nil (lambda () (indent-tabs-mode -1) (indent-bars-mode 1))))))
+  :hook (prog-mode . indent-bars-mode)))
 
 (key-seq-define-global "gf" 'keyboard-escape-quit)
 
@@ -89,7 +90,7 @@
         sideline-priority 100                        ; overlays' priority
         sideline-display-backend-name t))            ; display the backend name
 
-(use-package sideline
+(use-package sideline-blame
   :ensure t
   :init (add-to-list 'sideline-backends-right '(sideline-blame . down)))
 

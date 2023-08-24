@@ -60,7 +60,7 @@
 				      eshell-buffers))
 	 (buffer-name (completing-read "Eshell buffers: " eshell-buffer-names)))
     (eshell-buffer buffer-name)))
-(emacs-set-key (kbd "C-`") 'eshell-with-name)
+(emacs-set-key (kbd "M-`") 'eshell-with-name)
 
 (use-package xterm-color
   :ensure t
@@ -73,6 +73,7 @@
 
 (use-package shell
   :bind (("C-l" . clear-shell-buffer))
+  :custom (shell-file-name (if (eq system-type 'darwin) "/opt/homebrew/bin/bash" "/run/current-system/sw/bin/bash"))
   :config
   (defun clear-shell-buffer () (interactive)
        (erase-buffer)
@@ -123,7 +124,7 @@
 				      shell-buffers))
 	 (buffer-name (completing-read "Shell buffers: " shell-buffer-names)))
     (shell-buffer buffer-name)))
-(emacs-set-key (kbd "M-`") 'shell-with-name)
+(emacs-set-key (kbd "C-`") 'shell-with-name)
 
 (use-package sticky-shell
   :straight (:type git :host github :repo "andyjda/sticky-shell")

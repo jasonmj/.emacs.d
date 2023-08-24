@@ -4,7 +4,7 @@ The Emacs Desktop Notification Center helps you manage all your desktop notifica
 
 https://github.com/sinic/ednc
 #+begin_src emacs-lisp
-  (use-package ednc
+  (unless (eq system-type 'darwin)(use-package ednc
     :ensure t
     :init (ednc-mode)
     :config
@@ -78,5 +78,5 @@ https://github.com/sinic/ednc
 				     :refposhandler 'posframe-refposhandler-exwm
 				     :override-parameters '((alpha-background . 85)))))))))
     (add-hook 'ednc-notification-presentation-functions #'show-posframe-in-buffer)
-    :hook ((ednc-view-mode . customize-ednc-view)))
+    :hook ((ednc-view-mode . customize-ednc-view))))
 #+end_src

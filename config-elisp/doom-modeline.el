@@ -3,7 +3,7 @@
   :custom (doom-modeline-icon nil)
   :config
   (doom-modeline-def-segment exwm-workspace
-    (propertize (concat " [" (number-to-string exwm-workspace-current-index) "]") 'face '(:weight bold)))
+    (if (eq system-type 'darwin) (propertize "") (propertize (concat " [" (number-to-string exwm-workspace-current-index) "]") 'face '(:weight bold))))
 
   (doom-modeline-def-segment toggl-timer
     (let* ((description (if (fboundp 'toggl-get-timer) (toggl-get-timer) "No timer")))

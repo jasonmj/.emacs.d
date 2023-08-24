@@ -28,3 +28,21 @@
 	 ("\\.exs\\'" . elixir-ts-mode)
 	 ("\\.heex\\'" . heex-ts-mode)
 	 ("\\.leex\\'" . heex-ts-mode)))
+
+(defun format-elixir-region (beg end)
+  "Formats the selected region (if any) with Elixir's `Code.format_string!/1`"
+  (interactive "r")
+  (let* ((column-indent (- beg (point-at-bol)))
+	 (region-contents (buffer-substring beg end))
+	 (snippet (replace-regexp-in-string "\"" "\\\"" region-contents nil t))
+	 (command (concat
+		   "cd ~/ && mix run --no-mix-exs -e 'Code.format_string!(\""
+		   snippet
+		   "\") |> IO.iodata_to_binary() |> IO.puts()'"))
+	 (result (string-trim (shell-command-to-string command))))
+    (kill-region beg end)
+    (insert result)
+    (set-mark (point))
+    (goto-char beg)
+    (syntax-overlay-region)
+    (indent-rigidly (region-beginning) (region-end) column-indent)))

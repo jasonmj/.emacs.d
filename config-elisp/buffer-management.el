@@ -40,6 +40,62 @@
 				  (my/kill-this-buffer)
 				(kill-buffer-and-window))))
 
+(defun hs-process-filter (process output)
+  (mapcar (lambda (str)
+	    (if (string-match "\"windows\":" str)
+		(setq mac-windows-list (nth 1 (split-string str "36m"))))) (split-string output "")))
+
+(setq hs-process (make-process :name "hs" :command '("hs") :filter 'hs-process-filter))
+(setq mac-windows-list "")
+
+(defun get-windows-string ()
+  (process-send-string hs-process "spoon.hs_select_window:list_mac_windows()\n")
+  (accept-process-output hs-process 2)
+  mac-windows-list)
+
+(defun get-mac-window-list ()
+  (let* ((windows-string (get-windows-string))
+	 (json-string windows-string)
+	 (windows-hash-table (gethash "windows" (json-parse-string json-string)))
+	 (window-list '()))
+    (mapcar (lambda (v)
+	      (let* ((app (gethash "app" v))
+		     (title (gethash "title" v))
+		     (id (gethash "id" v)))
+		(add-to-list 'window-list `(,(concat app " - " title) . ,id))))
+	    windows-hash-table)
+    window-list))
+
+(defun switch-mac-window ()
+  (interactive)
+  (let* ((window-list (get-mac-window-list))
+	 (window-choice (cdr (assoc (completing-read "Switch window: " window-list) window-list))))
+    (focus-mac-window window-choice)))
+
+(defun focus-mac-window (window-id)
+  (let* ((command (concat "spoon.hs_select_window:switch_to_mac_window(\"" window-id  "\")\n")))
+    (process-send-string hs-process command)))
+
+(defun delayed-switch-mac-window ()
+  (interactive)
+  (run-with-idle-timer 0.2 nil 'switch-mac-window)
+  (get-windows-string))
+
+(emacs-set-key (kbd "C-SPC") 'delayed-switch-mac-window)
+
+(defun get-emacs-buffer-list ()
+  (cdr (mapcar #'string-trim (mapcar #'buffer-name (delq nil (delete-dups
+							      (flatten-tree (mapcar (lambda (group)
+										      (unless (equal (car group) "\*Special")
+											(mapcar (lambda (buffer-or-buffers)
+												  (let* ((group-buffers (if (eq (type-of buffer-or-buffers) 'buffer) buffer-or-buffers (car (cdr buffer-or-buffers))))
+													 (clean-group-buffers (if (eq (type-of group-buffers) 'buffer)
+																  group-buffers
+																(delq nil (delete-dups group-buffers))))
+													 (buffer-list '()))
+												    (if (eq (type-of clean-group-buffers) 'buffer) clean-group-buffers
+												      (mapcar (lambda (item) (if (eq (type-of item) 'buffer) item)) clean-group-buffers)))) (cdr group)))) (bufler-buffers)))))))))
+
 (key-seq-define-global "xv" (lambda () (interactive) (revert-buffer t t)))
 
 (global-set-key (kbd "C-s") 'save-buffer)

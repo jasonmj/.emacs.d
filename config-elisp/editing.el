@@ -32,7 +32,7 @@
 
 (electric-pair-mode 1)
 
-(load-file "/home/jasonmj/.emacs.d/elisp/expreg.el")
+(load-file "~/.emacs.d/elisp/expreg.el")
 (use-package expreg
   :bind (("s-<tab>" . expreg-expand)
 	 ("S-TAB" . expreg-expand)))
@@ -111,7 +111,7 @@ This command does not push text to `kill-ring'."
 
 (use-package spell-fu
   :ensure t
-  :custom (ispell-personal-dictionary "/home/jasonmj/.emacs.d/spell-fu/personal.txt")
+  :config (setq ispell-personal-dictionary "~/.emacs.d/.local/etc/ispell/.pws")
   :hook ((prog-mode . spell-fu-mode)
 	 (org-mode . spell-fu-mode)
 	 (markdown-mode . spell-fu-mode)))

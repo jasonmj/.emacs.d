@@ -19,6 +19,6 @@
   (read-process-output-max (* 1024 1024))
   :config
   (add-to-list 'eglot-server-programs '(python-mode . ("pyright-langserver" "--stdio")))
-  (add-to-list 'eglot-server-programs '(elixir-ts-mode . ("/home/jasonmj/git/elixir-lsp/elixir-ls-1.14-25.1/language_server.sh"
-							  "/home/jasonmj/git/mhanberg/credo-language-server/bin/credo-language-server")))
+  (add-to-list 'eglot-server-programs '(elixir-ts-mode . ("~/git/elixir-ls/language_server.sh"
+							  "~/git/elixir-tools/credo-language-server/bin/credo-language-server")))
   (push :documentHighlightProvider eglot-ignored-server-capabilities))

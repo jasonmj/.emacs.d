@@ -73,8 +73,9 @@ Suspend the machine with "C-x ." or suspend and lock with "C-x >".
 #+end_src
 * xob
 #+begin_src emacs-lisp
-(setq xob-process (make-process :name "xob"
-				:buffer nil
-				:command '("xob")
-				:connection-type 'pipe))
+  (unless (eq system-type 'darwin)
+    (setq xob-process (make-process :name "xob"
+				    :buffer nil
+				    :command '("xob")
+				    :connection-type 'pipe)))
 #+end_src

@@ -28,7 +28,7 @@
     (progn
       (custom-set-faces '(doom-modeline-bar ((t (:background "DarkGoldenrod1")))))
       (setq doom-modeline-bar-width 6)))
-  (exwm-layout--refresh))
+  (unless (eq system-type 'darwin) (exwm-layout--refresh)))
 
 (defun modalka-exwm-click()
   (interactive)
@@ -266,7 +266,7 @@
       (progn
         (exwm-input-release-keyboard)
         (setq exwm-input-line-mode-passthrough t)
-        (define-exwm-keys))
+        (unless (eq system-type 'darwin) (define-exwm-keys)))
     (progn
       (setq exwm-input-line-mode-passthrough nil)
       (define-emacs-keys))))

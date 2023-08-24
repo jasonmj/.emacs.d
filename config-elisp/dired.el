@@ -2,10 +2,13 @@
   :bind (("s-d" . (lambda () (interactive) (dired "~/downloads")))
 	 :map dired-mode-map
 	 ("C-c C-p" . wdired-change-to-wdired-mode))
+  :config
+  (if (eq system-type 'darwin)
+      (setq dired-listing-switches "-al")
+    (setq dired-listing-switches "-l -A -h -v --group-directories-first"))
   :custom
   (dired-recursive-deletes 'always)
   (dired-recursive-copies 'always)
-  (dired-listing-switches "-l -A -h -v --group-directories-first")
   (dired-dwim-target t)
   (dired-auto-revert-buffer t)
   :hook ((dired-mode . auto-revert-mode)

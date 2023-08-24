@@ -18,6 +18,7 @@
   :custom
   (magit-pg-command "git --no-pager log --branches --remotes --topo-order --decorate=full --pretty=format:\"%H%x00%P%x00%an%x00%ar%x00%s%x00%d\" -n 100"))
 
-(use-package magit-delta
+(unless (eq system-type 'darwin)
+  (use-package magit-delta
   :ensure t
-  :hook (magit-mode . magit-delta-mode))
+  :hook (magit-mode . magit-delta-mode)))
