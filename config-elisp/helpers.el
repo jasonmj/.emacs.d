@@ -80,6 +80,7 @@
   :hook (after-init . pinentry-start))
 
 (use-package sideline
+  :ensure t
   :init
   (setq sideline-backends-left-skip-current-line t   ; don't display on current line (left)
         sideline-backends-right-skip-current-line t  ; don't display on current line (right)

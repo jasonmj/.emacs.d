@@ -45,7 +45,8 @@
 	    (if (string-match "\"windows\":" str)
 		(setq mac-windows-list (nth 1 (split-string str "36m"))))) (split-string output "")))
 
-(setq hs-process (make-process :name "hs" :command '("hs") :filter 'hs-process-filter))
+(when (eq system-type 'darwin)
+  (setq hs-process (make-process :name "hs" :command '("hs") :filter 'hs-process-filter)))
 (setq mac-windows-list "")
 
 (defun get-windows-string ()
