@@ -88,10 +88,22 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(safe-local-variable-values
+   '((eval setq-local projectile-run-project-function
+	   (lambda nil (interactive)
+	     (async-shell-command "nix-shell --run \"iex -S mix phx.server\"")
+	     (switch-to-buffer "*Async Shell Command*") (rename-buffer "iex") (magit-status)
+	     (run-with-idle-timer 5 nil
+				  (lambda nil
+				    (start-process-shell-command "firefox" nil
+								 "/Applications/Firefox.app/Contents/MacOS/firefox \"http://localhost:4000\""))))))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(doom-modeline-bar ((t (:background "cyan1"))))
+ '(eldoc-box-body ((t (:background "White" :foreground "Black"))))
+ '(eldoc-box-border ((t (:background "Black"))))
+ '(vertico-posframe-border ((t (:background nil))))
+ '(which-key-posframe-border ((t nil))))

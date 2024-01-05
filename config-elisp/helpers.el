@@ -60,13 +60,24 @@
 
 (global-hl-line-mode +1)
 
-(unless (not (eq system-type 'darwin))
+(unless (eq system-type 'darwin)
   (use-package indent-bars
   :ensure t
   :straight (:type git :host github :repo "jdtsmith/indent-bars")
   :hook (prog-mode . indent-bars-mode)))
 
 (key-seq-define-global "gf" 'keyboard-escape-quit)
+
+(use-package keycast
+  :ensure t
+  :config
+  (define-minor-mode keycast-mode
+    "Show current command and its key binding in the mode line (fix for use with doom-mode-line)."
+    :global t
+    (if keycast-mode
+	(add-hook 'pre-command-hook 'keycast--update t)
+      (remove-hook 'pre-command-hook 'keycast--update)))
+  (add-to-list 'global-mode-string '("" mode-line-keycast)))
 
 (mouse-avoidance-mode 'banish)
 (setq mouse-avoidance-banish-position '((frame-or-window . frame)

@@ -18,7 +18,7 @@
   :config (fira-code-mode-set-font)
   :hook prog-mode)
 
-(set-face-attribute 'default nil :font "Iosevka 14")
+(set-face-attribute 'default nil :font "Iosevka Fixed 18")
 
 (setq-default truncate-lines -1)
 

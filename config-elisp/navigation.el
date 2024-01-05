@@ -55,7 +55,7 @@
   :custom
   (popper-mode-line t)
   (popper-window-height nil)
-  (popper-reference-buffers '("^Shell:" "^Aweshell:"))
+  (popper-reference-buffers '("^Shell:" "^Aweshell:" "-shell\\*$"))
   :init
   (popper-mode +1)
   (popper-echo-mode +1))
@@ -99,6 +99,9 @@
 (global-set-key (kbd "C-s-p") 'up-node)
 
 (global-set-key (kbd "C-s-n") 'down-list)
+
+(setq window-combination-resize t
+      split-width-threshold 300)
 
 (use-package tabgo
   :ensure t

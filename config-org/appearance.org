@@ -41,7 +41,7 @@ https://github.com/jming422/fira-code-mode
 * Font Face
 Set the default face font attribute. 
 #+begin_src emacs-lisp
-  (set-face-attribute 'default nil :font "Iosevka 14")
+  (set-face-attribute 'default nil :font "Iosevka Fixed 18")
 #+end_src
 * Line Truncation
 Never truncate lines by default. 

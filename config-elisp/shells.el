@@ -81,7 +81,10 @@
        (beginning-of-buffer)
        (delete-char 1)
        (end-of-line))
-  :hook ((shell-mode . compilation-shell-minor-mode)))
+  :hook ((shell-mode . (lambda ()
+			 (compilation-shell-minor-mode)
+			 (run-with-idle-timer 0.5 nil 'pcomplete-shell-setup)
+			 (run-with-idle-timer 0.5 nil 'bash-completion-setup)))))
 
 (defun clean-compilation-filename (filename)
   (string-trim
@@ -97,13 +100,89 @@
 
 (defun return-to-shell-mode () (interactive) (with-current-buffer (current-buffer) (shell-mode)))
 
-(defun comint-send-tab ()
-  "Send a tab character to the current buffer's process"
-  (interactive)
-  (comint-send-input t t)
-  (process-send-string (current-buffer) "\t"))
-(define-key shell-mode-map (kbd "S-<iso-lefttab>") 'comint-send-tab)
-;; (add-to-list 'completion-at-point-functions 'comint-send-tab)
+(defun iex-autocomplete (proc expr)
+  (let* ((suffix "\" |> String.to_charlist() |> Enum.reverse() |> IEx.Autocomplete.expand(self()) |> elem(2) |> Enum.map(&to_string/1)\n")
+	 (cmd (concat "\"" expr suffix)))
+    (set-process-filter proc 'iex-output-filter)
+    (process-send-string proc cmd)
+    (sleep-for 0.15)
+    (set-process-filter proc 'comint-output-filter)
+    (with-current-buffer (get-buffer-create "*tmp*") (build-iex-completions (buffer-string)))))
+
+(defun iex-output-filter (proc-filter output)
+  (with-current-buffer (get-buffer-create "*tmp*") (insert (strip-ansi-chars output))))
+
+(defun strip-ansi-chars (str)
+  (let ((clean-str (ansi-color-apply str)))
+    (set-text-properties 0 (length clean-str) nil clean-str)
+    clean-str))
+
+(defun build-iex-completions (buffer-str)
+  (let* ((str (string-join (cdr (butlast (split-string buffer-str "\n")))))
+	 (str2 (if (< (length str) 4)
+		   "x[]x"
+		 str))
+	 (substr (substring str2 2 -2))
+	 (completions (delete-dups (split-string substr "\", \"")))
+	 (cands (mapcar (lambda (completion) (if (eq completion "")
+					    nil
+					  (iex-complete expr completion))) completions)))
+    cands))
+
+(defun iex-complete (expr completion)
+  (let ((first-char (substring completion nil 1))
+	(combined (string-merge expr completion)))
+    (cond
+     ((equal first-char (upcase first-char)) (concat combined "."))
+     ((equal first-char (downcase first-char)) (concat (substring combined nil -2) "("))
+     (t combined))))
+
+(defun string-merge (str1 str2)
+  (let* ((last-node (car (last (split-string (concat str1 "") "\\."))))
+	 (last-char (substring str1 -1 nil))
+	 (zipped (-zip-pair (split-string str2 "") (split-string last-node "")))
+	 (combined (concat str1 (substring str2 (- (length zipped) 2)))))
+    (cond
+     ((equal last-char ".") (concat str1 str2))
+     (t combined))))
+
+(defun iex-capf ()
+  (when-let ((proc (get-buffer-process (current-buffer)))
+	 (start (process-mark proc))
+	 (end (point))
+	 (expr (buffer-substring-no-properties start end)))
+    (list start end
+	  (completion-table-dynamic
+	   (lambda (_)
+	     (when-let ((proc (get-buffer-process (current-buffer)))
+			(expr (buffer-substring-no-properties (process-mark proc) (point)))
+			(result (while-no-input (iex-autocomplete proc expr))))
+	       (when (get-buffer "*tmp*") (kill-buffer "*tmp*"))
+	       (and (consp result) result))))
+	  :exclusive 'no)))
+
+(defun iex-input-filter (input)
+  (let ((clean-input (strip-ansi-chars input)))
+    (cond
+     ((and (> (length clean-input) 2) (equal (substring clean-input nil 3) "iex"))
+      (run-with-idle-timer 1.5 nil 'setup-iex-autocompletion)
+      (setq-local completion-at-point-functions (cons #'iex-capf completion-at-point-functions))
+      input)
+     (t input))))
+
+(defun setup-iex-autocompletion ()
+  (let ((proc (get-buffer-process (current-buffer))))
+    (set-process-filter proc (lambda (proc output) nil))
+    (process-send-string proc "Process.put(:evaluator, IEx.Server.start_evaluator(1, []))\n")
+    (sleep-for 0.1)
+    (set-process-filter proc 'comint-output-filter)))
+
+(defun restore-default-shell-capfs ()
+  (setq-local completion-at-point-functions default-capfs))
+
+(add-to-list 'comint-input-filter-functions 'iex-input-filter)
+(advice-add 'comint-quit-subjob :after 'restore-default-shell-capfs)
+(add-hook 'shell-mode-hook (lambda () (setq-local default-capfs completion-at-point-functions)))
 
 (defun shell-buffer (buffer-name)
   (let* ((shell-buffer-exists (member buffer-name

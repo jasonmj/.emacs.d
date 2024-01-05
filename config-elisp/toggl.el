@@ -1,6 +1,7 @@
 (use-package request :ensure t)
 
 (defun set-toggl-secrets ()
+  (interactive)
   (setq toggl--headers '(("Authorization" . (auth-source-pick-first-password :host "www.toggl.com" :user "jasonmj"))))
   (setq toggl-auth-token (auth-source-pick-first-password :host "api.toggl.com" :user "jasonmj")))
 
