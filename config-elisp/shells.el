@@ -105,28 +105,45 @@
 (define-key shell-mode-map (kbd "S-<iso-lefttab>") 'comint-send-tab)
 
 (defun cape--iex-input-filter (input)
-  (let ((clean-input (strip-ansi-chars input)))
-    (cond
-     ((and (> (length clean-input) 2) (equal (substring clean-input nil 3) "iex"))
-      (run-with-idle-timer 3 nil 'cape--iex-setup)
-      input)
-     (t nil))))
+  (cond
+   ((cape--iex-starts-with-iex input)
+    (set-process-filter (current-buffer-process) 'cape--iex-bootstrap-filter)
+    input)
+   (t nil)))
 
-(defun cape--iex-output-filter (proc-filter output)
-  (with-current-buffer (get-buffer-create "*tmp*") (insert (strip-ansi-chars output))))
+(defun current-buffer-process ()
+  (get-buffer-process (current-buffer)))
 
-(defun cape--iex-setup ()
+(defun cape--iex-starts-with-iex (str)
+  (let ((clean-str (strip-ansi-chars str)))
+    (and (> (length clean-str) 2) (equal (substring clean-str nil 3) "iex"))))
+
+(defun cape--iex-bootstrap-filter (proc output)
+  (let ((lines (split-string output "\n")))
+    (mapcar (lambda (line)
+	      (if (cape--iex-starts-with-iex line) (cape--iex-setup proc)))
+	    lines)
+    (comint-output-filter proc output)))
+
+(defun cape--iex-output-filter (proc output)
+  (with-current-buffer (get-buffer-create "*tmp*") (insert (strip-ansi-chars output)))
+  (cape--iex-maybe-restore-output-filter proc output))
+
+(defun cape--iex-maybe-restore-output-filter (proc output)
+  (if (cape--iex-starts-with-iex output)
+      (set-process-filter proc 'comint-output-filter)
+    nil))
+
+(defun cape--iex-setup (proc)
   (message "setting up iex autocompletion...")
-  (let ((proc (get-buffer-process (current-buffer))))
-    (advice-add #'comint-quit-subjob :after #'cape--iex-teardown)
-    (set-process-filter proc (lambda (proc output) nil))
-    (process-send-string proc "Process.put(:evaluator, IEx.Server.start_evaluator(1, []))\n")
-    (sleep-for 0.1)
-    (set-process-filter proc 'comint-output-filter)
-    (setq-local default-capfs completion-at-point-functions)
-    (setq-local completion-at-point-functions (cons #'cape-iex completion-at-point-functions))))
+  (advice-add #'comint-quit-subjob :after #'cape--iex-teardown)
+  (set-process-filter proc #'cape--iex-maybe-restore-output-filter)
+  (process-send-string proc "Process.put(:evaluator, IEx.Server.start_evaluator(1, []))\n")
+  (setq-local default-capfs completion-at-point-functions)
+  (setq-local completion-at-point-functions (cons #'cape-iex completion-at-point-functions)))
 
 (defun cape--iex-teardown ()
+  (set-process-filter (current-buffer-process) 'comint-output-filter)
   (setq-local completion-at-point-functions default-capfs)
   (advice-remove #'comint-quit-subjob #'restore-default-shell-capfs))
 
@@ -136,7 +153,6 @@
     (set-process-filter proc 'cape--iex-output-filter)
     (process-send-string proc cmd)
     (sleep-for 0.1)
-    (set-process-filter proc 'comint-output-filter)
     (with-current-buffer (get-buffer-create "*tmp*") (cape--iex-build-completions (buffer-string)))))
 
 (defun cape--iex-build-completions (buffer-str)
