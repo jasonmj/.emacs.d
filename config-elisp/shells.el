@@ -103,7 +103,128 @@
   (comint-send-input t t)
   (process-send-string (current-buffer) "\t"))
 (define-key shell-mode-map (kbd "S-<iso-lefttab>") 'comint-send-tab)
-;; (add-to-list 'completion-at-point-functions 'comint-send-tab)
+
+(defun cape--iex-input-filter (input)
+  (let ((clean-input (strip-ansi-chars input)))
+    (cond
+     ((and (> (length clean-input) 2) (equal (substring clean-input nil 3) "iex"))
+      (run-with-idle-timer 3 nil 'cape--iex-setup)
+      input)
+     (t nil))))
+
+(defun cape--iex-output-filter (proc-filter output)
+  (with-current-buffer (get-buffer-create "*tmp*") (insert (strip-ansi-chars output))))
+
+(defun cape--iex-setup ()
+  (message "setting up iex autocompletion...")
+  (let ((proc (get-buffer-process (current-buffer))))
+    (advice-add #'comint-quit-subjob :after #'cape--iex-teardown)
+    (set-process-filter proc (lambda (proc output) nil))
+    (process-send-string proc "Process.put(:evaluator, IEx.Server.start_evaluator(1, []))\n")
+    (sleep-for 0.1)
+    (set-process-filter proc 'comint-output-filter)
+    (setq-local default-capfs completion-at-point-functions)
+    (setq-local completion-at-point-functions (cons #'cape-iex completion-at-point-functions))))
+
+(defun cape--iex-teardown ()
+  (setq-local completion-at-point-functions default-capfs)
+  (advice-remove #'comint-quit-subjob #'restore-default-shell-capfs))
+
+(defun cape--iex-autocomplete (proc expr)
+  (let* ((suffix "\" |> String.to_charlist() |> Enum.reverse() |> IEx.Autocomplete.expand(self()) |> (case do: ({:yes, [], x} -> Enum.map(x, &to_string/1); {:yes, x, _} -> [to_string(x)]; _ -> to_string(nil);))\n")
+	 (cmd (concat "\"" expr suffix)))
+    (set-process-filter proc 'cape--iex-output-filter)
+    (process-send-string proc cmd)
+    (sleep-for 0.1)
+    (set-process-filter proc 'comint-output-filter)
+    (with-current-buffer (get-buffer-create "*tmp*") (cape--iex-build-completions (buffer-string)))))
+
+(defun cape--iex-build-completions (buffer-str)
+  (let* ((separator (if (eq system-type 'darwin) "\n" "\n"))
+	 (str (string-join (cdr (butlast (split-string buffer-str separator)))))
+	 (str2 (if (< (length str) 4)
+		   "x[]x"
+		 str))
+	 (substr (substring str2 2 -2))
+	 (completions (delete-dups (split-string substr "\", \"")))
+	 (cands (mapcar (lambda (completion)
+			  (if (length= completion 0) nil (cape--iex-format-candidate expr completion))) completions)))
+    (prescient-sort cands)))
+
+(defun cape--iex-get-candidate-annotation (str)
+  (let* ((last-char (substring str -1))
+	(last-node (cape--iex-last-node str))
+	(last-node-first-char (if (length< last-node 1) "" (substring last-node nil 1))))
+    (cond
+     ((equal last-node-first-char (upcase last-node-first-char)) "alias")
+     ((equal last-node-first-char (downcase last-node-first-char)) "function")
+     (t "IEx"))))
+
+(defun cape--iex-get-candidate-kind (str)
+  (let* ((last-char (substring str -1))
+	(last-node (cape--iex-last-node str))
+	(last-node-first-char (if (length< last-node 1) "" (substring last-node nil 1))))
+    (cond
+     ((equal last-node-first-char (upcase last-node-first-char)) 'snippet)
+     ((equal last-node-first-char (downcase last-node-first-char)) 'function)
+     (t 'text))))
+
+(defun cape--iex-first-node (str)
+  (car (split-string (concat str "") "\\.")))
+
+(defun cape--iex-last-node (str)
+  (car (last (split-string (concat str "") "\\."))))
+
+(defun cape--iex-format-candidate (expr completion)
+  (let ((first-char (substring completion nil 1))
+	(last-char (substring completion -1))
+	(combined (string-merge expr completion)))
+    (cond
+     ((equal completion ".") (concat expr completion))
+     ((equal first-char (upcase first-char)) (concat combined "."))
+     ((and (equal first-char (downcase first-char))
+	   (not (eq (string-match-p "^[0-9]+$" last-char) nil))) (concat (substring combined nil -2) "("))
+     (t combined))))
+
+(defun cape-iex ()
+  (when-let ((proc (get-buffer-process (current-buffer)))
+	     (start (process-mark proc))
+	     (end (point))
+	     (expr (buffer-substring-no-properties start end)))
+    `(,start ,end
+	  ,(completion-table-dynamic
+	   (lambda (_)
+	     (when-let ((proc (get-buffer-process (current-buffer)))
+			(expr (buffer-substring-no-properties (process-mark proc) (point)))
+			(result (while-no-input (cape--iex-autocomplete proc expr))))
+	       (when (get-buffer "*tmp*") (kill-buffer "*tmp*"))
+	       (and (consp result) result))))
+	  :exclusive 'no
+	  :company-kind cape--iex-get-candidate-kind
+	  :annotation-function (lambda (s) (concat " " (cape--iex-get-candidate-annotation s))))))
+
+(defun string-merge (str1 str2)
+  (let* ((first-node (cape--iex-first-node str1))
+	 (last-node (cape--iex-last-node str1))
+	 (last-char (substring str1 -1 nil))
+	 (zipped (-zip-pair (split-string str2 "") (split-string last-node "")))
+	 (combined (concat str1 (substring str2 (- (length zipped) 2)))))
+    (cond
+     ((and (equal first-node last-node)
+	   (not (equal str1 str2))
+	   (string-match-p (regexp-quote str1) str2)) str2)
+     ((and (equal first-node last-node)
+	   (not (equal str1 str2))) (concat str1 str2))
+     ((equal last-char ".") (concat str1 str2))
+     ((not (string-match-p (regexp-quote last-node) str2)) (concat str1 str2))
+     (t combined))))
+
+(defun strip-ansi-chars (str)
+  (let ((clean-str (ansi-color-apply str)))
+    (set-text-properties 0 (length clean-str) nil clean-str)
+    clean-str))
+
+(add-to-list 'comint-input-filter-functions 'cape--iex-input-filter)
 
 (defun shell-buffer (buffer-name)
   (let* ((shell-buffer-exists (member buffer-name
