@@ -34,6 +34,7 @@
     ('4 (call-interactively #'kill-buffer))
     (_ (kill-buffer (current-buffer)))))
 (global-set-key (kbd "C-x k") 'my/kill-this-buffer)
+(global-set-key (kbd "C-w") 'my/kill-this-buffer)
 (key-seq-define-global "gw" 'my/kill-this-buffer)
 (key-seq-define-global "fw" (lambda () (interactive)
 			      (if (eq (length (window-list)) 1)
@@ -85,17 +86,19 @@
 (emacs-set-key (kbd "C-SPC") 'delayed-switch-mac-window)
 
 (defun get-emacs-buffer-list ()
-  (cdr (mapcar #'string-trim (mapcar #'buffer-name (delq nil (delete-dups
-							      (flatten-tree (mapcar (lambda (group)
-										      (unless (equal (car group) "\*Special")
-											(mapcar (lambda (buffer-or-buffers)
-												  (let* ((group-buffers (if (eq (type-of buffer-or-buffers) 'buffer) buffer-or-buffers (car (cdr buffer-or-buffers))))
-													 (clean-group-buffers (if (eq (type-of group-buffers) 'buffer)
-																  group-buffers
-																(delq nil (delete-dups group-buffers))))
-													 (buffer-list '()))
-												    (if (eq (type-of clean-group-buffers) 'buffer) clean-group-buffers
-												      (mapcar (lambda (item) (if (eq (type-of item) 'buffer) item)) clean-group-buffers)))) (cdr group)))) (bufler-buffers)))))))))
+  (delete " *server*"
+	  (append `(,(buffer-name))
+		  (cdr (mapcar #'string-trim (mapcar #'buffer-name (delq nil (delete-dups
+									      (flatten-tree (mapcar (lambda (group)
+												      (unless (equal (car group) "\*Special")
+													(mapcar (lambda (buffer-or-buffers)
+														  (let* ((group-buffers (if (eq (type-of buffer-or-buffers) 'buffer) buffer-or-buffers (car (cdr buffer-or-buffers))))
+															 (clean-group-buffers (if (eq (type-of group-buffers) 'buffer)
+																		  group-buffers
+																		(delq nil (delete-dups group-buffers))))
+															 (buffer-list '()))
+														    (if (eq (type-of clean-group-buffers) 'buffer) clean-group-buffers
+														      (mapcar (lambda (item) (if (eq (type-of item) 'buffer) item)) clean-group-buffers)))) (cdr group)))) (bufler-buffers)))))))))))
 
 (key-seq-define-global "xv" (lambda () (interactive) (revert-buffer t t)))
 

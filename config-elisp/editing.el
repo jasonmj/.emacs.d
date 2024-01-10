@@ -32,8 +32,8 @@
 
 (electric-pair-mode 1)
 
-(load-file "~/.emacs.d/elisp/expreg.el")
 (use-package expreg
+  :ensure t
   :bind (("s-<tab>" . expreg-expand)
 	 ("S-TAB" . expreg-expand)))
 
@@ -105,6 +105,13 @@ This command does not push text to `kill-ring'."
 (use-package rainbow-delimiters
   :ensure t
   :hook (prog-mode . rainbow-delimiters-mode))
+
+(defun refill-region (beg end)
+  (interactive "*r")
+  (unfill-region beg end)
+  (let ((end (line-end-position)))
+    (fill-region beg end)))
+(global-set-key (kbd "C-x r r") 'refill-region)
 
 (defun mark-line () (back-to-indentation) (set-mark-command nil) (move-end-of-line))
 (global-set-key (kbd "C-,") 'mark-line)

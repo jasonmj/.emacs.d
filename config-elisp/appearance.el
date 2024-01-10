@@ -1,8 +1,8 @@
 (use-package circadian
   :ensure t
   :custom
-  (circadian-themes '(("7:00"  . modus-operandi)
-		      ("17:30" . modus-vivendi)))
+  (circadian-themes '(("7:00"  . modus-operandi-tinted)
+		      ("17:30" . modus-vivendi-tinted)))
   :hook (after-init . circadian-setup))
 
 (use-package emacs

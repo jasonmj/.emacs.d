@@ -80,7 +80,7 @@ When visiting a file, point returns to the last place it was when previously vis
 #+end_src
 * Set Fill Column
 #+begin_src emacs-lisp
-  (setq-default fill-column 100)
+  (setq-default fill-column 80)
 #+end_src
 * Turn Off Lockfiles
 Disable the use of lockfiles.

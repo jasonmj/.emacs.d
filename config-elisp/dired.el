@@ -82,6 +82,7 @@
 	      ("[" . (lambda nil (interactive) (dired-single-buffer "..")))
 	      ("]" . dired-single-buffer)
 	      ([return] . dired-single-buffer)
+	      ([?\r] . dired-single-buffer)
 	      ([mouse-1] . dired-single-buffer-mouse))
   :init (set (make-local-variable 'mouse-1-click-follows-link) nil))
 

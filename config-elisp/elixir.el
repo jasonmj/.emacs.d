@@ -34,7 +34,11 @@
   (interactive "r")
   (let* ((column-indent (- beg (point-at-bol)))
 	 (region-contents (buffer-substring beg end))
-	 (snippet (replace-regexp-in-string "\"" "\\\"" region-contents nil t))
+	 (snippet_1 (replace-regexp-in-string "\"" "\\\"" region-contents nil t))
+	 (snippet_2 (replace-regexp-in-string "#Ecto.Association.NotLoaded" "" snippet_1 nil t))
+	 (snippet_3 (replace-regexp-in-string "#Ecto.Schema.Metadata<:loaded, " "" snippet_2 nil t))
+	 (snippet_4 (replace-regexp-in-string "<(.*?)>" "association not loaded" snippet_3 nil t))
+	 (snippet (replace-regexp-in-string ">," "," snippet_4 nil t))
 	 (command (concat
 		   "cd ~/ && mix run --no-mix-exs -e 'Code.format_string!(\""
 		   snippet
@@ -46,3 +50,14 @@
     (goto-char beg)
     (syntax-overlay-region)
     (indent-rigidly (region-beginning) (region-end) column-indent)))
+
+(global-set-key (kbd "C-x F r") 'format-elixir-region)
+
+(defun copy-test-line ()
+  (interactive)
+  (let* ((full-path (buffer-file-name))
+	 (root (project-root (project-current)))
+	 (path-from-home (replace-regexp-in-string "/Users/jjohnson/" "~/" full-path nil t))
+	 (path (replace-regexp-in-string root "" path-from-home nil t))
+	 (line-number (number-to-string (line-number-at-pos))))
+    (kill-new (concat "mix test.watch " path ":" line-number))))

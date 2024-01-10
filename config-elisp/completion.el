@@ -228,7 +228,7 @@ function."
   :bind (:map corfu-map ("C-e" . corfu-complete))
   :init
   (setq corfu-auto-prefix 2
-	corfu-auto-delay 0.15
+	corfu-auto-delay 0.1
 	corfu-auto t
 	corfu-cycle t
 	corfu-quit-no-match t

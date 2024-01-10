@@ -33,7 +33,7 @@
 (add-to-list 'savehist-additional-variables 'mark-ring)
 (add-to-list 'savehist-additional-variables 'global-mark-ring)
 
-(setq-default fill-column 100)
+(setq-default fill-column 80)
 
 (setq-default create-lockfiles nil)
 

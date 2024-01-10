@@ -84,7 +84,7 @@ https://github.com/karthink/popper
     :custom
     (popper-mode-line t)
     (popper-window-height nil)
-    (popper-reference-buffers '("^Shell:" "^Aweshell:"))
+    (popper-reference-buffers '("^Shell:" "^Aweshell:" "-shell\\*$"))
     :init
     (popper-mode +1)
     (popper-echo-mode +1))
@@ -138,6 +138,11 @@ Smart node movement based on expreg-expand.
 
   (global-set-key (kbd "C-s-n") 'down-list)
 #+end_src
+* Split Windows Horizontally
+#+begin_src emacs-lisp
+(setq window-combination-resize t
+      split-width-threshold 300)
+#+end_src
 * Tabgo
 avy-like jumper for tab-bar and tab-line.
 
@@ -161,7 +166,6 @@ Defines a set of routines, windmove-{left,up,right, down}, for selection of wind
   (emacs-set-key (kbd "C-3") (lambda () (interactive) (split-window-right) (windmove-right)))
   (emacs-set-key (kbd "<C-escape>") 'delete-window)
 #+end_src
-
 * Winner Undo
 Winner mode is a global minor mode that records the changes in the window configuration (i.e. how
 the frames are partitioned into windows) so that the changes can be "undone" using the command
