@@ -81,7 +81,10 @@
        (beginning-of-buffer)
        (delete-char 1)
        (end-of-line))
-  :hook ((shell-mode . compilation-shell-minor-mode)))
+  :hook ((shell-mode . (lambda ()
+			 (compilation-shell-minor-mode)
+			 (run-with-idle-timer 0.5 nil 'pcomplete-shell-setup)
+			 (run-with-idle-timer 0.5 nil 'bash-completion-setup)))))
 
 (defun clean-compilation-filename (filename)
   (string-trim
