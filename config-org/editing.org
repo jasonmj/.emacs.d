@@ -99,6 +99,17 @@ https://github.com/cofi/evil-numbers
     :bind (("M-s-p" . evil-numbers/inc-at-pt)
 	   ("M-s-n" . evil-numbers/dec-at-pt)))
 #+end_src
+* Indent Bars
+Fast, configurable indentation guide-bars for Emacs
+
+https://github.com/jdtsmith/indent-bars
+#+begin_src emacs-lisp
+  (unless (not (eq system-type 'darwin))
+    (use-package indent-bars
+    :ensure t
+    :straight (:type git :host github :repo "jdtsmith/indent-bars")
+    :hook (prog-mode . indent-bars-mode)))
+#+end_src
 * Kill Ring Clear
 #+begin_src emacs-lisp
 (defun kill-ring-clear () (interactive) (setq kill-ring nil))

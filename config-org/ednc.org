@@ -65,18 +65,19 @@ https://github.com/sinic/ednc
 		    (if old (erase-buffer) (ednc-view-mode))
 		    (insert (ednc-format-notification new t))
 		    (when (posframe-workable-p)
-		      (posframe-show name
-				     :accept-focus nil
-				     :poshandler '(lambda (_info) '(-6 . 38))
-				     :max-width 45
-				     :border-width 1
-				     :header-line-height 10
-				     :left-fringe 30
-				     :right-fringe 30
-				     :border-color (if (eq (ednc--get-hint (ednc-notification-hints new) "urgency") 1) "red" (face-attribute 'default :foreground))
-				     :timeout 5
-				     :refposhandler 'posframe-refposhandler-exwm
-				     :override-parameters '((alpha-background . 85)))))))))
+		      (unless (eq major-mode 'exwm-mode)
+			(posframe-show name
+				       :accept-focus nil
+				       :poshandler '(lambda (_info) '(-6 . 38))
+				       :max-width 45
+				       :border-width 1
+				       :header-line-height 10
+				       :left-fringe 30
+				       :right-fringe 30
+				       :border-color (if (eq (ednc--get-hint (ednc-notification-hints new) "urgency") 1) "red" (face-attribute 'default :foreground))
+				       :timeout 5
+				       :refposhandler 'posframe-refposhandler-exwm
+				       :override-parameters '((alpha-background . 85))))))))))
     (add-hook 'ednc-notification-presentation-functions #'show-posframe-in-buffer)
     :hook ((ednc-view-mode . customize-ednc-view))))
 #+end_src

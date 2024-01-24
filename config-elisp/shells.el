@@ -78,8 +78,8 @@
   (defun clear-shell-buffer () (interactive)
        (erase-buffer)
        (comint-send-input)
-       (beginning-of-buffer)
-       (delete-char 1)
+       (sleep-for 0.05)
+       (delete-region 1 (pos-bol))
        (end-of-line))
   :hook ((shell-mode . (lambda ()
 			 (compilation-shell-minor-mode)
@@ -118,7 +118,7 @@
   (get-buffer-process (current-buffer)))
 
 (defun cape--iex-starts-with-iex (str)
-  (let ((clean-str (strip-ansi-chars str)))
+  (let ((clean-str (s-trim (strip-ansi-chars str))))
     (and (> (length clean-str) 2) (equal (substring clean-str nil 3) "iex"))))
 
 (defun cape--iex-bootstrap-filter (proc output)
@@ -133,9 +133,11 @@
   (cape--iex-maybe-restore-output-filter proc output))
 
 (defun cape--iex-maybe-restore-output-filter (proc output)
-  (if (cape--iex-starts-with-iex output)
-      (set-process-filter proc 'comint-output-filter)
-    nil))
+  (mapcar (lambda (line)
+	    (if (cape--iex-starts-with-iex line)
+		(set-process-filter proc 'comint-output-filter)
+	      nil))
+	  (string-split output "\n")))
 
 (defun cape--iex-setup (proc)
   (message "setting up iex autocompletion...")
@@ -147,7 +149,7 @@
 
 (defun cape--iex-teardown ()
   (set-process-filter (current-buffer-process) 'comint-output-filter)
-  (setq-local completion-at-point-functions default-capfs)
+  (if default-capfs (setq-local completion-at-point-functions default-capfs))
   (advice-remove #'comint-quit-subjob #'restore-default-shell-capfs))
 
 (defun cape--iex-autocomplete (proc expr)
@@ -160,11 +162,9 @@
 
 (defun cape--iex-build-completions (buffer-str)
   (let* ((separator (if (eq system-type 'darwin) "\n" "\n"))
-	 (str (string-join (cdr (butlast (split-string buffer-str separator)))))
-	 (str2 (if (< (length str) 4)
-		   "x[]x"
-		 str))
-	 (substr (substring str2 2 -2))
+	 (strs (butlast (split-string buffer-str separator)))
+	 (str (if (eq (length strs) 1) (car strs) (string-join (cdr strs))))
+	 (substr (if (< (length str) 4) str (substring str 2 -2)))
 	 (completions (delete-dups (split-string substr "\", \"")))
 	 (cands (mapcar (lambda (completion)
 			  (if (length= completion 0) nil (cape--iex-format-candidate expr completion))) completions)))

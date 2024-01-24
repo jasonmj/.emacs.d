@@ -26,6 +26,7 @@
 (use-package use-package-chords
   :ensure t
   :demand t
+  :custom (key-chord-safety-interval-forward 0.1)
   :config (key-chord-mode t))
 (use-package key-seq :ensure t)
 

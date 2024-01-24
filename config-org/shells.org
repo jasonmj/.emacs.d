@@ -101,8 +101,8 @@ Quickly create an eshell with a name or switch to an open eshell with completing
     (defun clear-shell-buffer () (interactive)
 	 (erase-buffer)
 	 (comint-send-input)
-	 (beginning-of-buffer)
-	 (delete-char 1)
+	 (sleep-for 0.05)
+	 (delete-region 1 (pos-bol))
 	 (end-of-line))
     :hook ((shell-mode . (lambda ()
 			   (compilation-shell-minor-mode)
@@ -164,9 +164,11 @@ Quickly create an eshell with a name or switch to an open eshell with completing
     (cape--iex-maybe-restore-output-filter proc output))
 
   (defun cape--iex-maybe-restore-output-filter (proc output)
-    (if (cape--iex-starts-with-iex output)
-	(set-process-filter proc 'comint-output-filter)
-      nil))
+    (mapcar (lambda (line)
+	      (if (cape--iex-starts-with-iex line)
+		  (set-process-filter proc 'comint-output-filter)
+		nil))
+	    (string-split output "\n")))
 
   (defun cape--iex-setup (proc)
     (message "setting up iex autocompletion...")
@@ -178,7 +180,7 @@ Quickly create an eshell with a name or switch to an open eshell with completing
 
   (defun cape--iex-teardown ()
     (set-process-filter (current-buffer-process) 'comint-output-filter)
-    (setq-local completion-at-point-functions default-capfs)
+    (if default-capfs (setq-local completion-at-point-functions default-capfs))
     (advice-remove #'comint-quit-subjob #'restore-default-shell-capfs))
 
   (defun cape--iex-autocomplete (proc expr)

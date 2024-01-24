@@ -103,16 +103,12 @@ Highlights the line about the current buffer's point in all live windows.
 #+begin_src emacs-lisp
   (global-hl-line-mode +1)
 #+end_src
-* Indent Bars
-Fast, configurable indentation guide-bars for Emacs
-
-https://github.com/jdtsmith/indent-bars
+* Inspect
+A simple logging function that prints the given value as a string to the messages buffer.
 #+begin_src emacs-lisp
-  (unless (not (eq system-type 'darwin))
-    (use-package indent-bars
-    :ensure t
-    :straight (:type git :host github :repo "jdtsmith/indent-bars")
-    :hook (prog-mode . indent-bars-mode)))
+  (defun inspect (val &optional label)
+    (let ((label-str (if label (concat label ": ") "")))
+      (message (concat label-str "%s") val)))
 #+end_src
 * Keyboard Escape Quit
 This command can exit an interactive command such as query-replace, can clear out a prefix argument or a region, can get out of the minibuffer or other recursive edit, cancel the use of the current buffer (for special-purpose buffers), or go back to just one window (by deleting all but the selected window).
@@ -150,10 +146,10 @@ https://github.com/emacs-sideline/sideline
           sideline-backends-right-skip-current-line t  ; don't display on current line (right)
           sideline-order-left 'down                    ; or 'up
           sideline-order-right 'up                     ; or 'down
-          sideline-format-left "%s   "                 ; format for left aligment
-          sideline-format-right "   %s"                ; format for right aligment
+          sideline-format-left "%s   "                 ; format for left alignment
+          sideline-format-right "   %s"                ; format for right alignment
           sideline-priority 100                        ; overlays' priority
-          sideline-display-backend-name t))            ; display the backend name
+          sideline-display-backend-name nil))            ; display the backend name
 #+end_src
 ** Sideline Blame
 Show blame messages with sideline.
@@ -169,13 +165,12 @@ Show flymake errors with sideline.
 
 https://github.com/emacs-sideline/sideline-flymake
 #+begin_src emacs-lisp
-  (use-package sideline-flymake
-    :ensure t
-    :hook (flymake-mode . sideline-mode)
-    :init
-    (setq sideline-flymake-display-mode 'point) ; 'point to show errors only on point
-						; 'line to show errors on the current line
-    (add-to-list 'sideline-backends-right '(sideline-flymake . up)))
+    (use-package sideline-flymake
+      :ensure t
+      :hook (flymake-mode . sideline-mode)
+      :custom (sideline-flymake-display-mode 'point)
+      :init
+      (add-to-list 'sideline-backends-left '(sideline-flymake . up)))
 #+end_src
 * Short Answer Yes/No
 #+begin_src emacs-lisp

@@ -60,11 +60,9 @@
 
 (global-hl-line-mode +1)
 
-(unless (not (eq system-type 'darwin))
-  (use-package indent-bars
-  :ensure t
-  :straight (:type git :host github :repo "jdtsmith/indent-bars")
-  :hook (prog-mode . indent-bars-mode)))
+(defun inspect (val &optional label)
+  (let ((label-str (if label (concat label ": ") "")))
+    (message (concat label-str "%s") val)))
 
 (key-seq-define-global "gf" 'keyboard-escape-quit)
 
@@ -86,10 +84,10 @@
         sideline-backends-right-skip-current-line t  ; don't display on current line (right)
         sideline-order-left 'down                    ; or 'up
         sideline-order-right 'up                     ; or 'down
-        sideline-format-left "%s   "                 ; format for left aligment
-        sideline-format-right "   %s"                ; format for right aligment
+        sideline-format-left "%s   "                 ; format for left alignment
+        sideline-format-right "   %s"                ; format for right alignment
         sideline-priority 100                        ; overlays' priority
-        sideline-display-backend-name t))            ; display the backend name
+        sideline-display-backend-name nil))            ; display the backend name
 
 (use-package sideline-blame
   :ensure t
@@ -98,10 +96,9 @@
 (use-package sideline-flymake
   :ensure t
   :hook (flymake-mode . sideline-mode)
+  :custom (sideline-flymake-display-mode 'point)
   :init
-  (setq sideline-flymake-display-mode 'point) ; 'point to show errors only on point
-					      ; 'line to show errors on the current line
-  (add-to-list 'sideline-backends-right '(sideline-flymake . up)))
+  (add-to-list 'sideline-backends-left '(sideline-flymake . up)))
 
 (defalias 'yes-or-no-p 'y-or-n-p)
 
