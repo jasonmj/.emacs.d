@@ -94,7 +94,7 @@ https://github.com/minad/consult
     (consult-preview-key 'any)
     (consult-buffer-filter '("^ " "\\` " "\\*Echo Area" "\\*Minibuf" "\\*Quail Completions" "\\*Backtrace"
 			     "\\*elixir-ls" "Flymake log" "Shell command output" "direnv" "\\*scratch" "Shell:"
-			     "\\*Messages" "\\*Warning" "*magit-" "magit-process" "*vterm" "vterm" "^:"
+			     "\\*Messages" "\\*Warning" "*magit-" "magit-process" "*vterm" "vterm" "^:" ".+-shell*"
 			     "*straight-" "*elfeed-log" "*trace of SMTP session" "\\*Compile-Log" "\\*blamer"
 			     "*format-all-error" "*Async-" "COMMIT_EDITMSG" "shell: " "\\*ednc-log" "TAGS"
 			     "*lsp-" "*EGLOT" "*pyls" "*vc" "*citre-ctags*" "*flycheck-posframe-buffer*" "*xob*"))

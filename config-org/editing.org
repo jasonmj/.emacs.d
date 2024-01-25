@@ -222,15 +222,6 @@ https://github.com/wolray/symbol-overlay
     :bind (("M-i" . symbol-overlay-put))
     :hook ((prog-mode . symbol-overlay-mode)))
 #+end_src
-* Topsy
-Simple sticky header showing definition beyond top of window.
-
-https://github.com/alphapapa/topsy.el
-#+begin_src emacs-lisp
-(use-package topsy
-  :ensure t
-  :hook prog-mode)
-#+end_src
 * Undo Fu
 #+begin_src emacs-lisp
   (use-package undo-fu
@@ -257,6 +248,16 @@ Unfill the region, joining text paragraphs into a single logical line.  This is 
   (use-package emacs
     :bind (("M-u" . upcase-char)
 	   ("M-l" . downcase-dwim)))
+#+end_src
+* Window Stool
+Emacs package that provides code context/breadcrumbs similar to context.vim and topsy. Like a stepping stool for your window.
+
+https://github.com/JasZhe/window-stool
+#+begin_src emacs-lisp
+  (use-package window-stool
+    :ensure t
+    :straight (:type git :host github :repo "jaszhe/window-stool")
+    :hook prog-mode)
 #+end_src
 * WS Butler Mode
 Unobtrusively trim extraneous white-space *ONLY* in lines edited. 

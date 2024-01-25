@@ -18,7 +18,7 @@
     (concat "^[[:space:]]*\\("
 	    "@moduledoc\\|@behaviour\\|@callback\\|@type\\|@typedoc\\|@doc\\|@spec\\|@impl"
 	    "\\|def\\(\\|p\\|callback\\|delegate\\|impl\\|overridable\\|exception\\|struct\\|guard\\|guardp\\|record\\|recordp\\|macro\\|macrop\\|macrocallback\\|protocol\\)"
-	    "\\|describe\\|test\\|setup\\|let\\|it\\|context\\|before\\|schema"
+	    "\\|describe\\|feature\\|test\\|setup\\|let\\|it\\|context\\|before\\|schema"
 	    "\\|use\\|alias\\|import\\|require"
 	    "\\)\\([[:space:]]\\|(\\)"))
   (defvar html-outline-regexp "^[[:space:]]*<[^/>]+?\\(>\\|\n\\)")

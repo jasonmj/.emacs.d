@@ -191,11 +191,12 @@
   (car (last (split-string (concat str "") "\\."))))
 
 (defun cape--iex-format-candidate (expr completion)
-  (let ((first-char (substring completion nil 1))
+  (let* ((clean-completion (replace-regexp-in-string "\\\\" "" completion nil t))
+	(first-char (substring completion nil 1))
 	(last-char (substring completion -1))
-	(combined (string-merge expr completion)))
+	(combined (string-merge expr clean-completion)))
     (cond
-     ((equal completion ".") (concat expr completion))
+     ((equal completion ".") (concat expr clean-completion))
      ((equal first-char (upcase first-char)) (concat combined "."))
      ((and (equal first-char (downcase first-char))
 	   (not (eq (string-match-p "^[0-9]+$" last-char) nil))) (concat (substring combined nil -2) "("))

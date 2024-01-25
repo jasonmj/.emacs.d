@@ -6,7 +6,6 @@
   (setq toggl-auth-token (auth-source-pick-first-password :host "api.toggl.com" :user "jasonmj")))
 
 (setq toggl--headers nil)
-(add-hook 'emacs-startup-hook 'set-toggl-secrets)
 
 (defun toggl-stop-timer()
   (interactive)
