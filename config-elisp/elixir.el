@@ -29,13 +29,7 @@
 	  (call-process-shell-command (concat "cd " (project-root (project-current)) " && " "NIX_SKIP_SHELL_HOOK=true nix-shell --run \"mix format " (buffer-file-name) "\""))
 	(elixir-format)))
     (revert-buffer t t))
-  :hook ((elixir-ts-mode . (lambda ()
-			     (unless (eq system-type 'darwin)
-			       (setq indent-tabs-mode nil)
-			       (indent-bars-mode t)
-			       (setq indent-tabs-mode t))
-			     (setq-local outline-regexp elixir-outline-regexp)
-			     ))
+  :hook ((elixir-ts-mode . (lambda () (setq-local outline-regexp elixir-outline-regexp)))
 	 (heex-ts-mode . (lambda () (setq-local outline-regexp html-outline-regexp)))
 	 (heex-ts-mode . hungry-delete-mode)
 	 (heex-ts-mode . display-line-numbers-mode))
@@ -50,10 +44,8 @@
   (let* ((column-indent (- beg (point-at-bol)))
 	 (region-contents (buffer-substring beg end))
 	 (snippet_1 (replace-regexp-in-string "\"" "\\\"" region-contents nil t))
-	 (snippet_2 (replace-regexp-in-string "#Ecto.Association.NotLoaded" "" snippet_1 nil t))
-	 (snippet_3 (replace-regexp-in-string "#Ecto.Schema.Metadata<:loaded, " "" snippet_2 nil t))
-	 (snippet_4 (replace-regexp-in-string "<(.*?)>" "association not loaded" snippet_3 nil t))
-	 (snippet (replace-regexp-in-string ">," "," snippet_4 nil t))
+	 (snippet_2 (replace-regexp-in-string "\\(#Ecto\.Schema\.Metadata.+>\\)" ":ecto_metadata" snippet_1 nil t))
+	 (snippet (replace-regexp-in-string "\\(#Ecto\.Association\.NotLoaded.+>\\)" ":association_not_loaded" snippet_2 nil t))
 	 (command (concat
 		   "cd ~/ && mix run --no-mix-exs -e 'Code.format_string!(\""
 		   snippet
@@ -99,17 +91,19 @@
 			     (full-filepath (concat (project-root (project-current)) file))
 			     (line-number (string-to-number (nth 1 (split-string line ":"))))
 			     (details (string-join (cdr (cdr (mapcar 's-trim lines))) "\n")))
+			(inspect file "file")
 			(flymake-mix-test--push-diag full-filepath line-number details))))
 		lines))))
 
 (defun flymake-mix-test--push-diag (file line msg)
-  (let* ((buffer (get-buffer (car (last (split-string file "/")))))
-	 (reg (flymake-diag-region buffer line))
-	 (beg (car reg))
-	 (end (cdr reg)))
-    (with-current-buffer buffer
-      (push (flymake-make-diagnostic file beg end :error msg) flymake-mix-test-diags)
-      (flymake-mix-test--report-to-flymake flymake-mix-test-diags))))
+  (let* ((buffer (get-buffer (car (last (split-string file "/"))))))
+    (when buffer
+      (let* ((reg (flymake-diag-region buffer line))
+	     (beg (car reg))
+	     (end (cdr reg)))
+	(with-current-buffer buffer
+	  (push (flymake-make-diagnostic file beg end :error msg) flymake-mix-test-diags)
+	  (flymake-mix-test--report-to-flymake flymake-mix-test-diags))))))
 
 (defun flymake-mix-test--report-to-flymake (diags)
   (save-restriction

@@ -47,7 +47,7 @@
     (fold-this
      (car (car (region-bounds)))
      (cdr (car (region-bounds)))))
-  :bind (:map shell-mode-map ("C-<return>" . expand-and-fold-this)))
+  :bind (:map shell-mode-map ("C-S-r" . expand-and-fold-this)))
 
 (use-package helpful
   :ensure t

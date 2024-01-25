@@ -81,7 +81,9 @@
        (sleep-for 0.05)
        (delete-region 1 (pos-bol))
        (end-of-line))
+  (defvar shell-outline-regexp ".*\\([0-9]+\) test\\)\\([[:space:]]\\|(\\)")
   :hook ((shell-mode . (lambda ()
+			 (setq-local outline-regexp shell-outline-regexp)
 			 (compilation-shell-minor-mode)
 			 (run-with-idle-timer 0.5 nil 'pcomplete-shell-setup)
 			 (run-with-idle-timer 0.5 nil 'bash-completion-setup)))))
@@ -99,13 +101,6 @@
 (advice-add 'compilation-find-file :around #'compilation-find-file-fixer)
 
 (defun return-to-shell-mode () (interactive) (with-current-buffer (current-buffer) (shell-mode)))
-
-(defun comint-send-tab ()
-  "Send a tab character to the current buffer's process"
-  (interactive)
-  (comint-send-input t t)
-  (process-send-string (current-buffer) "\t"))
-(define-key shell-mode-map (kbd "S-<iso-lefttab>") 'comint-send-tab)
 
 (defun cape--iex-input-filter (input)
   (cond
@@ -137,7 +132,8 @@
 	    (if (cape--iex-starts-with-iex line)
 		(set-process-filter proc 'comint-output-filter)
 	      nil))
-	  (string-split output "\n")))
+	  (string-split output "\n"))
+  (comint-output-filter proc output))
 
 (defun cape--iex-setup (proc)
   (message "setting up iex autocompletion...")
