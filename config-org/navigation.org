@@ -20,8 +20,7 @@ https://github.com/andre-r/centered-cursor-mode.el
 #+begin_src emacs-lisp
   (use-package centered-cursor-mode
     :ensure t
-    :bind ("s--" . centered-cursor-mode)
-    :init (global-centered-cursor-mode))
+    :bind ("s--" . centered-cursor-mode))
 #+end_src
 * Copy and Keep Highlight
 Copy the currently selected region and keep it selected. 

@@ -35,6 +35,8 @@
 
 (setq-default fill-column 80)
 
+(setq maximum-scroll-margin 0)
+
 (setq-default create-lockfiles nil)
 
 (setq warning-minimum-level :error)

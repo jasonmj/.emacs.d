@@ -62,7 +62,7 @@
 	 ;; ("M-s D" . consult-locate)
 	 ("s-s" . consult-ripgrep)
 	 ;; ("M-s r" . consult-ripgrep)
-	 ("M-s" . consult-line)
+	 ("M-s" . my/consult-line)
 	 ;; ("M-s L" . consult-line-multi)
 	 ;; ("M-s u" . consult-focus-lines)
 	 ("C-x f" . find-file)
@@ -89,6 +89,10 @@
 
   :config
   ;; Consult-yank-pop
+  (defun my/consult-line (&optional initial start)
+    (interactive (list nil (not (not current-prefix-arg))))
+    (if (boundp indent-bars-mode) (indent-bars-mode -1))
+    (consult-line initial start))
   (defun my/consult-yank-pop (orig-fun &rest args)
     (interactive "p")
     (if (equal major-mode 'exwm-mode)
@@ -140,7 +144,7 @@
 
 (defun consult-line-at-point ()
   (interactive)
-  (consult-line (selection-or-thing-at-point)))
+  (my/consult-line (selection-or-thing-at-point)))
 (key-seq-define-global "vf" 'consult-line-at-point)
 (key-seq-define-global "vd" 'consult-line-at-point)
 
@@ -153,16 +157,16 @@
   (cond
    ;; If there is selection use it
    ((and transient-mark-mode
-	 mark-active
-	 (not (eq (mark) (point))))
+         mark-active
+         (not (eq (mark) (point))))
     (let ((mark-saved (mark))
-	  (point-saved (point)))
+          (point-saved (point)))
       (deactivate-mark)
       (buffer-substring-no-properties mark-saved point-saved)))
    ;; Otherwise, use symbol at point or empty
    (t (format "%s"
-	      (or (thing-at-point 'symbol)
-		  "")))))
+              (or (thing-at-point 'symbol)
+                  "")))))
 
 (require 'request)
 
@@ -228,7 +232,7 @@ function."
   :bind (:map corfu-map ("C-e" . corfu-complete))
   :init
   (setq corfu-auto-prefix 2
-	corfu-auto-delay 0.1
+	corfu-auto-delay 0.05
 	corfu-auto t
 	corfu-cycle t
 	corfu-quit-no-match t

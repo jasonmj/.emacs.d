@@ -55,6 +55,20 @@
   :bind (("M-s-p" . evil-numbers/inc-at-pt)
 	 ("M-s-n" . evil-numbers/dec-at-pt)))
 
+(use-package indent-bars
+  :ensure t
+  :straight (indent-bars :type git :host github :repo "jdtsmith/indent-bars")
+  :config
+  (defun my/indent-bars-init ()
+    (indent-tabs-mode -1)
+    (indent-bars-setup))
+  (defun my/minibuffer-exit ()
+    (run-with-idle-timer 0.05 nil (lambda ()
+                                   (if (and (derived-mode-p 'prog-mode) (not indent-bars-mode)) 
+                                       (my/indent-bars-init)))))
+  (add-hook 'minibuffer-exit-hook 'my/minibuffer-exit)
+  :hook (prog-mode . (lambda () (setq indent-tabs-mode nil) (indent-bars-mode))))'
+
 (defun kill-ring-clear () (interactive) (setq kill-ring nil))
 
 (global-set-key (kbd "C-k") (lambda () (interactive) (insert-char 32 1) (kill-whole-line)))

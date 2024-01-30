@@ -49,6 +49,11 @@
      (cdr (car (region-bounds)))))
   :bind (:map shell-mode-map ("C-S-r" . expand-and-fold-this)))
 
+(use-package flymake-cursor
+  :ensure t
+  :hook (prog-mode . flymake-cursor-mode)
+  :custom (max-mini-window-height 0.5))
+
 (use-package helpful
   :ensure t
   :bind (("C-h f" . helpful-function)
@@ -81,13 +86,14 @@
   :ensure t
   :init
   (setq sideline-backends-left-skip-current-line t   ; don't display on current line (left)
-        sideline-backends-right-skip-current-line t  ; don't display on current line (right)
-        sideline-order-left 'down                    ; or 'up
-        sideline-order-right 'up                     ; or 'down
-        sideline-format-left "%s   "                 ; format for left alignment
-        sideline-format-right "   %s"                ; format for right alignment
-        sideline-priority 100                        ; overlays' priority
-        sideline-display-backend-name nil))            ; display the backend name
+	sideline-backends-right-skip-current-line t  ; don't display on current line (right)
+	sideline-order-left 'down                    ; or 'up
+	sideline-order-right 'up                     ; or 'down
+	sideline-format-left "%s   "                 ; format for left alignment
+	sideline-format-right "   %s"                ; format for right alignment
+	sideline-priority 100                        ; overlays' priority
+	sideline-delay 5                             ; delay before displaying sideline
+	sideline-display-backend-name nil))          ; display the backend name
 
 (use-package sideline-blame
   :ensure t
@@ -98,7 +104,8 @@
   :hook (flymake-mode . sideline-mode)
   :custom (sideline-flymake-display-mode 'point)
   :init
-  (add-to-list 'sideline-backends-left '(sideline-flymake . up)))
+  ;; (add-to-list 'sideline-backends-left '(sideline-flymake . up))
+  )
 
 (defalias 'yes-or-no-p 'y-or-n-p)
 

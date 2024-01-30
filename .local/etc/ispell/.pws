@@ -10,6 +10,7 @@ backfill
 bitwise
 bufferedexecutor
 buildroot
+casterror
 changeset
 changesets
 checkgroup
@@ -70,6 +71,7 @@ nullable
 oban
 openapi
 params
+phx
 pid
 postgres
 postinstall
@@ -80,6 +82,7 @@ preloaded
 preloads
 priv
 pubsub
+refrigeratorsensorsform
 remotesensormodules
 replayweather
 repo

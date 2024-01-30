@@ -8,8 +8,7 @@
 
 (use-package centered-cursor-mode
   :ensure t
-  :bind ("s--" . centered-cursor-mode)
-  :init (global-centered-cursor-mode))
+  :bind ("s--" . centered-cursor-mode))
 
 (defun copy-keep-highlight (beg end)
   (interactive "r")

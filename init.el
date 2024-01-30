@@ -46,6 +46,8 @@
 
   (setq mac-control-modifier 'super)
   (setq mac-command-modifier 'control)
+  (setq mac-option-modifier 'meta)
+  (setq mac-pass-command-to-system nil)
 
   (global-set-key (kbd "C-S-w") 'save-buffers-kill-terminal)
 

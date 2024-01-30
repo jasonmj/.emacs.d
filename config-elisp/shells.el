@@ -103,24 +103,17 @@
 (defun return-to-shell-mode () (interactive) (with-current-buffer (current-buffer) (shell-mode)))
 
 (defun cape--iex-input-filter (input)
-  (cond
-   ((cape--iex-starts-with-iex input)
-    (set-process-filter (current-buffer-process) 'cape--iex-bootstrap-filter)
-    input)
-   (t nil)))
+  (if (cape--iex-starts-with-iex input)
+    (set-process-filter (current-buffer-process) 'cape--iex-bootstrap-filter)))
 
-(defun current-buffer-process ()
-  (get-buffer-process (current-buffer)))
+(defun current-buffer-process () (get-buffer-process (current-buffer)))
 
 (defun cape--iex-starts-with-iex (str)
-  (let ((clean-str (s-trim (strip-ansi-chars str))))
-    (and (> (length clean-str) 2) (equal (substring clean-str nil 3) "iex"))))
+    (string-match-p "^iex" (s-trim (strip-ansi-chars str))))
 
 (defun cape--iex-bootstrap-filter (proc output)
   (let ((lines (split-string output "\n")))
-    (mapcar (lambda (line)
-	      (if (cape--iex-starts-with-iex line) (cape--iex-setup proc)))
-	    lines)
+    (mapcar (lambda (line) (if (cape--iex-starts-with-iex line) (cape--iex-setup proc))) lines)
     (comint-output-filter proc output)))
 
 (defun cape--iex-output-filter (proc output)
@@ -128,12 +121,8 @@
   (cape--iex-maybe-restore-output-filter proc output))
 
 (defun cape--iex-maybe-restore-output-filter (proc output)
-  (mapcar (lambda (line)
-	    (if (cape--iex-starts-with-iex line)
-		(set-process-filter proc 'comint-output-filter)
-	      nil))
-	  (string-split output "\n"))
-  (comint-output-filter proc output))
+  (mapcar (lambda (line) (if (cape--iex-starts-with-iex line) (set-process-filter proc 'comint-output-filter) nil))
+	  (string-split output "\n")))
 
 (defun cape--iex-setup (proc)
   (message "setting up iex autocompletion...")

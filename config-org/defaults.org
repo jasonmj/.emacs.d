@@ -82,6 +82,10 @@ When visiting a file, point returns to the last place it was when previously vis
 #+begin_src emacs-lisp
   (setq-default fill-column 80)
 #+end_src
+* Scroll Margin
+#+begin_src emacs-lisp
+(setq maximum-scroll-margin 0)
+#+end_src
 * Turn Off Lockfiles
 Disable the use of lockfiles.
 #+begin_src emacs-lisp

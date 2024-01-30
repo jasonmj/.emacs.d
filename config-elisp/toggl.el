@@ -69,6 +69,7 @@
   :custom
   (toggl-auth-token "")
   (org-toggl-inherit-toggl-properties t)
-  :hook ((after-init . toggl-get-projects)
+  :hook ((after-init . set-toggl-secrets)
+	 (after-init . toggl-get-projects)
 	 (after-init . toggl-timer-watch)
 	 (after-init . org-toggl-integration-mode)))

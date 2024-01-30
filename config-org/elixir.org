@@ -39,6 +39,11 @@ https://github.com/wkirschbaum/elixir-ts-mode
 	  (elixir-format)))
       (revert-buffer t t))
     :hook ((elixir-ts-mode . (lambda () (setq-local outline-regexp elixir-outline-regexp)))
+	   (elixir-ts-mode . (lambda ()
+			       (unless (eq system-type 'darwin)
+				 (setq indent-tabs-mode nil)
+				 (indent-bars-mode t)
+				 (setq indent-tabs-mode t))))
 	   (heex-ts-mode . (lambda () (setq-local outline-regexp html-outline-regexp)))
 	   (heex-ts-mode . hungry-delete-mode)
 	   (heex-ts-mode . display-line-numbers-mode))
@@ -55,11 +60,10 @@ https://github.com/wkirschbaum/elixir-ts-mode
     (let* ((column-indent (- beg (point-at-bol)))
 	   (region-contents (buffer-substring beg end))
 	   (snippet_1 (replace-regexp-in-string "\"" "\\\"" region-contents nil t))
-	   (snippet_2 (replace-regexp-in-string "\\(#Ecto\.Schema\.Metadata.+>\\)" ":ecto_metadata" snippet_1 nil t))
-	   (snippet (replace-regexp-in-string "\\(#Ecto\.Association\.NotLoaded.+>\\)" ":association_not_loaded" snippet_2 nil t))
+	   (snippet_2 (replace-regexp-in-string "\\(#.+<.+>\\)" ":elixir_data" snippet_1 nil t))
 	   (command (concat
 		     "cd ~/ && mix run --no-mix-exs -e 'Code.format_string!(\""
-		     snippet
+		     snippet_2
 		     "\") |> IO.iodata_to_binary() |> IO.puts()'"))
 	   (result (string-trim (shell-command-to-string command))))
       (kill-region beg end)
@@ -106,9 +110,35 @@ A backend for flymake that reports mix test errors as diagnostics to associated 
 			       (full-filepath (concat (project-root (project-current)) file))
 			       (line-number (string-to-number (nth 1 (split-string line ":"))))
 			       (details (string-join (cdr (cdr (mapcar 's-trim lines))) "\n")))
-			  (inspect file "file")
 			  (flymake-mix-test--push-diag full-filepath line-number details))))
-		  lines))))
+		  lines)))
+    (if (string-match-p "^error:.+" output)
+	(let* ((details (progn
+		      (string-match "error:\\(.+\)\\)" output)
+		      (match-string-no-properties 1 output)))
+	       (reference (progn
+		      (string-match "\\(.+:[0-9]+\\):" output)
+		      (match-string-no-properties 1 output)))
+	       (file (s-trim (car (string-split reference ":"))))
+	       (full-filepath (concat (project-root (project-current)) file))
+	       (line-number (string-to-number (car (last (string-split reference ":"))))))
+	  (if (and details line-number)
+	      (progn
+		(flymake-mix-test--push-diag full-filepath line-number (s-trim details))
+		(run-with-idle-timer 1 nil (lambda () (flymake-mix-test--goto-error))))))))
+
+  (defun flymake-mix-test--goto-error ()
+    (let* ((diag (car flymake-mix-test-diags))
+	   (file (flymake--diag-locus diag))
+	   (file-name (car (last (string-split file "/"))))
+	   (buffer (get-buffer file-name)))
+      (if diag
+	  (with-current-buffer buffer
+	    (let ((pos (flymake-diagnostic-beg diag)))
+	      (if (and buffer pos)
+		  (progn
+		    (switch-to-buffer buffer)
+		    (goto-char pos))))))))
 
   (defun flymake-mix-test--push-diag (file line msg)
     (let* ((buffer (get-buffer (car (last (split-string file "/"))))))

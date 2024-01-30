@@ -81,6 +81,16 @@ https://github.com/magnars/fold-this.el
        (cdr (car (region-bounds)))))
     :bind (:map shell-mode-map ("C-S-r" . expand-and-fold-this)))
 #+end_src
+* Flymake Cursor
+Show flymake errors in minibuffer. 
+
+https://github.com/flymake/emacs-flymake-cursor
+#+begin_src emacs-lisp
+  (use-package flymake-cursor
+    :ensure t
+    :hook (prog-mode . flymake-cursor-mode)
+    :custom (max-mini-window-height 0.5))
+#+end_src
 * Helpful
 A better Emacs *help* buffer.
 
@@ -143,13 +153,14 @@ https://github.com/emacs-sideline/sideline
     :ensure t
     :init
     (setq sideline-backends-left-skip-current-line t   ; don't display on current line (left)
-          sideline-backends-right-skip-current-line t  ; don't display on current line (right)
-          sideline-order-left 'down                    ; or 'up
-          sideline-order-right 'up                     ; or 'down
-          sideline-format-left "%s   "                 ; format for left alignment
-          sideline-format-right "   %s"                ; format for right alignment
-          sideline-priority 100                        ; overlays' priority
-          sideline-display-backend-name nil))            ; display the backend name
+	  sideline-backends-right-skip-current-line t  ; don't display on current line (right)
+	  sideline-order-left 'down                    ; or 'up
+	  sideline-order-right 'up                     ; or 'down
+	  sideline-format-left "%s   "                 ; format for left alignment
+	  sideline-format-right "   %s"                ; format for right alignment
+	  sideline-priority 100                        ; overlays' priority
+	  sideline-delay 5                             ; delay before displaying sideline
+	  sideline-display-backend-name nil))          ; display the backend name
 #+end_src
 ** Sideline Blame
 Show blame messages with sideline.
@@ -165,12 +176,13 @@ Show flymake errors with sideline.
 
 https://github.com/emacs-sideline/sideline-flymake
 #+begin_src emacs-lisp
-    (use-package sideline-flymake
-      :ensure t
-      :hook (flymake-mode . sideline-mode)
-      :custom (sideline-flymake-display-mode 'point)
-      :init
-      (add-to-list 'sideline-backends-left '(sideline-flymake . up)))
+  (use-package sideline-flymake
+    :ensure t
+    :hook (flymake-mode . sideline-mode)
+    :custom (sideline-flymake-display-mode 'point)
+    :init
+    ;; (add-to-list 'sideline-backends-left '(sideline-flymake . up))
+    )
 #+end_src
 * Short Answer Yes/No
 #+begin_src emacs-lisp
