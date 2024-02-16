@@ -11,6 +11,7 @@
 				       "\\*ednc-log\\*"
 				       "\\*straight-process\\*"
 				       "\\*blamer\\*"
+				       "\\*scratch\\*"
 				       "\\*Messages\\*"
 				       "\\*Warnings\\*"))
   :config
@@ -20,7 +21,8 @@
   (add-to-list 'window-selection-change-functions 'my/bufler-workspace-focus-buffer)
   (advice-add 'bufler-workspace-mode-lighter :override (lambda () ""))
   (bufler-workspace-mode t)
-  (bufler-workspace-tabs-mode t)
+  (load "bufler-workspace-tabs.el")
+  (bufler-workspace-workspaces-as-tabs-mode t)
   :hook ((exwm-update-title . my/bufler-workspace-focus-buffer)
 	 (exwm-manage-finish . my/bufler-workspace-focus-buffer)
 	 (exwm-workspace-switch . my/bufler-workspace-focus-buffer)
@@ -86,8 +88,8 @@
 (emacs-set-key (kbd "C-SPC") 'delayed-switch-mac-window)
 
 (defun get-emacs-buffer-list ()
-  (delete " *server*"
-	  (append `(,(buffer-name))
+  (seq-filter 'filter-emacs-buffers-for-hammerspoon
+	  (append `(,(with-current-buffer (buffer-name)))
 		  (cdr (mapcar #'string-trim (mapcar #'buffer-name (delq nil (delete-dups
 									      (flatten-tree (mapcar (lambda (group)
 												      (unless (equal (car group) "\*Special")
@@ -99,6 +101,9 @@
 															 (buffer-list '()))
 														    (if (eq (type-of clean-group-buffers) 'buffer) clean-group-buffers
 														      (mapcar (lambda (item) (if (eq (type-of item) 'buffer) item)) clean-group-buffers)))) (cdr group)))) (bufler-buffers)))))))))))
+
+(defun filter-emacs-buffers-for-hammerspoon (buf)
+  (not (string-match-p "magit-process:\\| *server*" (if (bufferp buf) (buffer-name buf) buf))))
 
 (key-seq-define-global "xv" (lambda () (interactive) (revert-buffer t t)))
 

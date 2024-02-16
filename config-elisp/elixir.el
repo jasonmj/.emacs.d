@@ -2,7 +2,7 @@
   (interactive)
   (let* ((full-path (buffer-file-name))
 	 (root (project-root (project-current)))
-	 (path-from-home (replace-regexp-in-string (shell-command-to-string "echo $HOME") "~/" full-path nil t))
+	 (path-from-home (replace-regexp-in-string (s-trim (shell-command-to-string "echo $HOME")) "~" full-path nil t))
 	 (path (replace-regexp-in-string root "" path-from-home nil t))
 	 (line-number (number-to-string (line-number-at-pos))))
     (kill-new (concat "mix test.watch " path ":" line-number))))
@@ -11,7 +11,7 @@
 (use-package elixir-ts-mode
   :ensure t
   :bind (:map elixir-ts-mode-map
-	      ("C-S-s" . (lambda () (interactive) (save-buffer) (my/elixir-format)))
+	      ("C-s" . (lambda () (interactive) (eglot-format) (run-with-idle-timer 0.1 nil (lambda () (save-buffer)))))
 	      ("M-RET" . (lambda () (interactive) (newline) (insert "|> ") (indent-for-tab-command))))
   :config
   (defvar elixir-outline-regexp
@@ -22,13 +22,6 @@
 	    "\\|use\\|alias\\|import\\|require"
 	    "\\)\\([[:space:]]\\|(\\)"))
   (defvar html-outline-regexp "^[[:space:]]*<[^/>]+?\\(>\\|\n\\)")
-  (defun my/elixir-format ()
-    (interactive)
-    (with-current-buffer (current-buffer)
-      (if (f-exists? (concat (project-root (project-current)) "/shell.nix"))
-	  (call-process-shell-command (concat "cd " (project-root (project-current)) " && " "NIX_SKIP_SHELL_HOOK=true nix-shell --run \"mix format " (buffer-file-name) "\""))
-	(elixir-format)))
-    (revert-buffer t t))
   :hook ((elixir-ts-mode . (lambda () (setq-local outline-regexp elixir-outline-regexp)))
 	 (elixir-ts-mode . (lambda ()
 			     (unless (eq system-type 'darwin)
@@ -40,8 +33,8 @@
 	 (heex-ts-mode . display-line-numbers-mode))
   :mode (("\\.ex\\'" . elixir-ts-mode)
 	 ("\\.exs\\'" . elixir-ts-mode)
-	 ("\\.heex\\'" . heex-ts-mode)
-	 ("\\.leex\\'" . heex-ts-mode)))
+	 ("\\.heex\\'" . elixir-ts-mode)
+	 ("\\.leex\\'" . elixir-ts-mode)))
 
 (defun format-elixir-region (beg end)
   "Formats the selected region (if any) with Elixir's `Code.format_string!/1`"
@@ -66,7 +59,12 @@
 
 (defun flymake-mix-test--output-filter (output)
   (let ((clean-output (s-trim (strip-ansi-chars output))))
-    (if (string-match-p "^Running tests" clean-output) (flymake-mix-test--clear-diags))
+    (if (string-match-p "^Running tests" clean-output)
+	(progn
+	  (flymake-mix-test--clear-diags)
+	  (let ((buffer (get-buffer (concat "*" (project-name (project-current)) "-shell*"))))
+	    (when buffer
+	      (with-current-buffer buffer (clear-shell-buffer-to-last-prompt) (deactivate-mark))))))
     (flymake-mix-test--process-output clean-output))
   nil)
 
@@ -94,9 +92,10 @@
 		      (let* ((file (s-trim (car (split-string line ":"))))
 			     (full-filepath (concat (project-root (project-current)) file))
 			     (line-number (string-to-number (nth 1 (split-string line ":"))))
-			     (details (string-join (cdr (cdr (mapcar 's-trim lines))) "\n")))
+			     (details (string-join (cdr (cdr lines)) "\n")))
 			(flymake-mix-test--push-diag full-filepath line-number details))))
 		lines)))
+  (if (string-match-p "0 failures" output) (message "Tests passed: 0 failures"))
   (if (string-match-p "^error:.+" output)
       (let* ((details (progn
 		    (string-match "error:\\(.+\)\\)" output)

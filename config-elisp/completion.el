@@ -1,47 +1,54 @@
 (use-package cape
-  :ensure t
-  :bind (("C-c q" . completion-at-point))
-  :hook (shell-mode . (lambda () (define-key shell-mode-map (kbd "C-r") 'cape-history)))
-  :config
-  (defun cape-history (&optional interactive)
-    "Complete from Eshell, Comint or minibuffer history.
-     See also `consult-history' for a more flexible variant based on
-     `completing-read'.  If INTERACTIVE is nil the function acts like a Capf."
-    (interactive (list t))
-    (if interactive
-	(cape-interactive #'cape-history)
-      (let (history bol)
-	(cond
-	 ((derived-mode-p 'eshell-mode)
-	  (setq history eshell-history-ring
-		bol (save-excursion (eshell-bol) (point))))
-	 ((derived-mode-p 'comint-mode)
-	  (setq history comint-input-ring
-	    bol (save-excursion (comint-bol) (point))))
-	 ((and (minibufferp) (not (eq minibuffer-history-variable t)))
-	  (setq history (symbol-value minibuffer-history-variable)
-		bol (line-beginning-position))))
-	(when (ring-p history)
-	  (setq history (ring-elements history)))
-	(when history
-	  `(,bol ,(point)
-		 ,(cape--table-with-properties (delete-dups history) :sort nil)
-		 ,@cape--history-properties)))))
-  (add-hook 'shell-mode-hook (lambda ()
-			       (setq-local completion-at-point-functions
-					   (list (cape-capf-buster #'cape-history)
-						 #'cape-dabbrev
-						 #'cape-file))))
+    :ensure t
+    :bind (("C-c q" . completion-at-point))
+    :hook (shell-mode . (lambda () (define-key shell-mode-map (kbd "C-r") 'cape-history)))
+    :config
+    (setq dabbrev-upcase-means-case-search t
+	  dabbrev-check-all-buffers nil
+	  dabbrev-check-other-buffers nil
+	  cape-dabbrev-min-length 0)
+    (defun cape-history (&optional interactive)
+      "Complete from Eshell, Comint or minibuffer history.
+       See also `consult-history' for a more flexible variant based on
+       `completing-read'.  If INTERACTIVE is nil the function acts like a Capf."
+      (interactive (list t))
+      (if interactive
+	  (cape-interactive #'cape-history)
+	(let (history bol)
+	  (cond
+	   ((derived-mode-p 'eshell-mode)
+	    (setq history eshell-history-ring
+		  bol (save-excursion (eshell-bol) (point))))
+	   ((derived-mode-p 'comint-mode)
+	    (setq history comint-input-ring
+	      bol (save-excursion (comint-bol) (point))))
+	   ((and (minibufferp) (not (eq minibuffer-history-variable t)))
+	    (setq history (symbol-value minibuffer-history-variable)
+		  bol (line-beginning-position))))
+	  (when (ring-p history)
+	    (setq history (ring-elements history)))
+	  (when history
+	    `(,bol ,(point)
+		   ,(cape--properties-table (delete-dups history) :sort nil)
+		   ,@cape--history-properties)))))
+    (add-hook 'shell-mode-hook (lambda ()
+				 (setq-local completion-at-point-functions
+					     (list (cape-capf-buster #'cape-history)
+						   #'cape-dabbrev
+						   #'cape-file))))
+    ;; (add-hook 'eglot-managed-mode-hook (lambda ()
+    ;;     				 (add-to-list 'completion-at-point-functions #'cape-dabbrev)))
 
-  :init
-  (add-to-list 'completion-at-point-functions #'comint-completion-at-point)
-  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
-  (add-to-list 'completion-at-point-functions #'cape-file)
-  ;;(add-to-list 'completion-at-point-functions #'cape-history)
-  (add-to-list 'completion-at-point-functions #'cape-keyword)
-  (add-to-list 'completion-at-point-functions #'cape-abbrev)
-  ;;(add-to-list 'completion-at-point-functions #'cape-ispell)
-  (add-to-list 'completion-at-point-functions #'cape-symbol))
+    :init
+    (add-to-list 'completion-at-point-functions #'comint-completion-at-point)
+    (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+    (add-to-list 'completion-at-point-functions #'cape-file)
+    (add-to-list 'completion-at-point-functions #'cape-history)
+    (add-to-list 'completion-at-point-functions #'cape-keyword)
+    (add-to-list 'completion-at-point-functions #'cape-abbrev)
+    (add-to-list 'completion-at-point-functions #'cape-dict)
+    (add-to-list 'completion-at-point-functions #'cape-elisp-symbol)
+)
 
 (use-package consult
   :ensure t
@@ -456,7 +463,7 @@ function."
 	vertico-posframe-min-height 10
 	vertico-posframe-width 110
 	vertico-posframe-poshandler #'posframe-poshandler-window-top-center-offset
-	vertico-posframe-parameters '((alpha . 85)
+	vertico-posframe-parameters '((alpha-background . 100)
 				      (parent-frame . nil)
 				      (cursor . 'hbar)
 				      (left-fringe . 0)

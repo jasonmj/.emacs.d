@@ -147,6 +147,18 @@ This command does not push text to `kill-ring'."
   :bind (("M-i" . symbol-overlay-put))
   :hook ((prog-mode . symbol-overlay-mode)))
 
+(defun toggle-true-false ()
+  (interactive)
+  (expreg-expand)
+  (let* ((beg (region-beginning))
+           (end (region-end))
+	 (selection (s-trim (buffer-substring-no-properties beg end)))
+	 (opposite (if (equal selection "true") "false" "true")))
+    (kill-region beg end)
+    (insert opposite)))
+
+(global-set-key (kbd "C-x t t") 'toggle-true-false)
+
 (use-package undo-fu
   :ensure t
   :bind (("C-z" . undo-fu-only-undo)

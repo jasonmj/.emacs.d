@@ -19,7 +19,8 @@
 	 ("C-M-S-<tab>" . tab-line-switch-to-prev-tab)
 	 ("C-<iso-lefttab>" . tab-line-switch-to-prev-tab)
 	 ("C-S-<iso-lefttab>" . tab-line-switch-to-prev-tab))
-  :hook (after-init . global-tab-line-mode)
+  :hook ((after-init . global-tab-line-mode)
+	 (after-init . init-tab-line-function))
   :custom
   (tab-line-new-button-show nil)
   (tab-line-switch-cycling t)
@@ -30,6 +31,37 @@
   (tab-line-close-button-show nil)
   (tab-line-tab-name-format-function 'my/tab-line-tab-name-format-default)
   :config
+  (defun my/tabs-project-filter (buffer)
+    (let* ((name (buffer-name buffer))
+	   (project (project-current)))
+      (if (eq project nil)
+	  name
+	(if (member name (mapcar 'buffer-name (project-buffers project)))
+	    buffer
+	  nil))))
+
+  (defun my/tabs-non-project-filter (buffer)
+    (not (with-current-buffer buffer (project-current))))
+
+  (defun my/tabs-shell-filter (buffer)
+    (eq (with-current-buffer buffer major-mode) 'shell-mode))
+
+  (defun my/tabs-ignore-filter (buffer)
+    (let* ((name (buffer-name buffer))
+	   (ignored "\\*scratch\\|vc\\|Messages\\|Dired log\\|[a-z]-shell\\|magit-process\\|straight-process\\|direnv\\|info\\|Backtrace\\|EGLOT.+\\*"))
+      (not (string-match-p ignored name))))
+
+  (defun my/tabs-function (&optional frame)
+    (let* ((buffers (if (eq (with-current-buffer (current-buffer) major-mode) 'shell-mode) (buffer-list frame) (bufler-workspace-buffers frame)))
+	   (project-filtered-buffers (seq-filter 'my/tabs-project-filter buffers))
+	   (non-project-filtered-buffers (seq-filter 'my/tabs-non-project-filter buffers)))
+      (cond ((with-current-buffer (current-buffer) (derived-mode-p 'shell-mode))
+	     (seq-filter 'my/tabs-shell-filter buffers))
+	    ((with-current-buffer (current-buffer) (project-current))
+	     (seq-filter 'my/tabs-ignore-filter project-filtered-buffers))
+	    (t
+	     (seq-filter 'my/tabs-ignore-filter non-project-filtered-buffers)))))
+
   (defun my/tab-line-tab-name-format-default (tab tabs)
     "Default function to use as `tab-line-tab-name-format-function', which see."
     (let* ((buffer-p (bufferp tab))
@@ -71,4 +103,5 @@
     (tab-line-switch-to-prev-tab)
     (tab-line-switch-to-next-tab)
     (my/kill-this-buffer))
-  (key-seq-define-global "gw" 'my/tab-line-close-tab))
+  (key-seq-define-global "gw" 'my/tab-line-close-tab)
+  (defun init-tab-line-function () (setq tab-line-tabs-function 'my/tabs-function)))

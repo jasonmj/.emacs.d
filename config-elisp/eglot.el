@@ -11,11 +11,12 @@
   (eldoc-box-offset '(16 16 40))
   (eldoc-box-max-pixel-height 450)
   (eldoc-documentation-strategy 'eldoc-documentation-enthusiast)
-  (eldoc-idle-delay 30)
+  (eldoc-idle-delay 999)
   (eldoc-box-cleanup-interval 1))
 
 (use-package eglot
   :hook ((elixir-ts-mode . eglot-ensure)
+	 (elixir-ts-mode-hook . eglot-ensure)
 	 (c-mode . eglot-ensure)
 	 (eglot--managed-mode . manually-activate-flymake)
 	 (python-mode . eglot-ensure))
@@ -23,10 +24,18 @@
   (eglot-extend-to-xref t)
   (read-process-output-max (* 1024 1024))
   :config
+  (add-to-list 'exec-path "/Users/jjohnson/git/elixir-ls/")
+  (add-to-list 'exec-path "/Users/jjohnson/git/lexical-lsp/lexical/_build/dev/package/lexical/bin/")
   (add-to-list 'eglot-stay-out-of 'flymake)
   (add-to-list 'eglot-server-programs '(python-mode . ("pyright-langserver" "--stdio")))
-  (add-to-list 'eglot-server-programs '(elixir-ts-mode . ("/Users/jjohnson/git/elixir-ls/language_server.sh")))
-  (push :documentHighlightProvider eglot-ignored-server-capabilities))
+  (add-to-list 'eglot-server-programs `((elixir-ts-mode heex-ts-mode) . ,(eglot-alternatives '("language_server.sh" "start_lexical.sh"))))
+  (push :documentHighlightProvider eglot-ignored-server-capabilities)
+  ;; (add-to-list 'exec-path "/Users/jjohnson/.nix-profile/bin/")
+  ;; (with-eval-after-load 'eglot
+  ;;   (add-to-list 'eglot-server-programs
+  ;;       	 `((elixir-ts-mode heex-ts-mode elixir-mode) .
+  ;;       	   ("nextls" "--stdio=true" :initializationOptions (:experimental (:completions (:enable t)))))))
+ )
 
 (defun manually-activate-flymake ()
   (add-hook 'flymake-diagnostic-functions #'eglot-flymake-backend nil t)

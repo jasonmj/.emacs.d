@@ -72,15 +72,17 @@
 	 (eshell-before-prompt . (lambda () (setq xterm-color-preserve-properties t)))))
 
 (use-package shell
-  :bind (("C-l" . clear-shell-buffer))
+  :bind (:map shell-mode-map ("C-l" . clear-shell-buffer))
   :custom (shell-file-name (if (eq system-type 'darwin) "/opt/homebrew/bin/bash" "/run/current-system/sw/bin/bash"))
   :config
   (defun clear-shell-buffer () (interactive)
        (erase-buffer)
        (comint-send-input)
+       (deactivate-mark)
        (sleep-for 0.05)
        (delete-region 1 (pos-bol))
-       (end-of-line))
+       (end-of-line)
+       (deactivate-mark))
   (defvar shell-outline-regexp ".*\\([0-9]+\) test\\)\\([[:space:]]\\|(\\)")
   :hook ((shell-mode . (lambda ()
 			 (setq-local outline-regexp shell-outline-regexp)
@@ -109,7 +111,7 @@
 (defun current-buffer-process () (get-buffer-process (current-buffer)))
 
 (defun cape--iex-starts-with-iex (str)
-    (string-match-p "^iex" (s-trim (strip-ansi-chars str))))
+    (string-match-p "iex" (s-trim (ansi-color-filter-apply str))))
 
 (defun cape--iex-bootstrap-filter (proc output)
   (let ((lines (split-string output "\n")))
@@ -117,11 +119,14 @@
     (comint-output-filter proc output)))
 
 (defun cape--iex-output-filter (proc output)
-  (with-current-buffer (get-buffer-create "*tmp*") (insert (strip-ansi-chars output)))
+  (with-current-buffer (get-buffer-create "*tmp*") (insert (ansi-color-filter-apply output)))
   (cape--iex-maybe-restore-output-filter proc output))
 
 (defun cape--iex-maybe-restore-output-filter (proc output)
-  (mapcar (lambda (line) (if (cape--iex-starts-with-iex line) (set-process-filter proc 'comint-output-filter) nil))
+  (mapcar (lambda (line)
+	    (if (cape--iex-starts-with-iex line)
+		(set-process-filter proc 'comint-output-filter)
+	      nil))
 	  (string-split output "\n")))
 
 (defun cape--iex-setup (proc)

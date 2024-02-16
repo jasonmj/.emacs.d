@@ -84,7 +84,8 @@ When visiting a file, point returns to the last place it was when previously vis
 #+end_src
 * Scroll Margin
 #+begin_src emacs-lisp
-(setq maximum-scroll-margin 0)
+(setq-default scroll-margin 0)
+(setq-default maximum-scroll-margin 0)
 #+end_src
 * Turn Off Lockfiles
 Disable the use of lockfiles.

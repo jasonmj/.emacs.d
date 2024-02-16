@@ -241,6 +241,22 @@ https://github.com/wolray/symbol-overlay
     :bind (("M-i" . symbol-overlay-put))
     :hook ((prog-mode . symbol-overlay-mode)))
 #+end_src
+* Toggle True/False
+Quickly toggle booleans.
+
+#+begin_src emacs-lisp
+(defun toggle-true-false ()
+  (interactive)
+  (expreg-expand)
+  (let* ((beg (region-beginning))
+           (end (region-end))
+	 (selection (s-trim (buffer-substring-no-properties beg end)))
+	 (opposite (if (equal selection "true") "false" "true")))
+    (kill-region beg end)
+    (insert opposite)))
+
+(global-set-key (kbd "C-x t t") 'toggle-true-false)
+#+end_src
 * Undo Fu
 #+begin_src emacs-lisp
   (use-package undo-fu
