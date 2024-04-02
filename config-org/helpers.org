@@ -50,6 +50,19 @@ https://github.com/emacsorphanage/git-gutter
     :ensure t
     :hook ((prog-mode . git-gutter-mode)))
 #+end_src
+* GitHub Copilot
+An unofficial Copilot plugin for Emacs.
+
+https://github.com/copilot-emacs/copilot.el
+#+begin_src emacs-lisp
+  (use-package copilot
+    :straight (:host github :repo "copilot-emacs/copilot.el" :files ("dist" "*.el"))
+    :ensure t
+    :hook ((elixir-ts-mode . copilot-mode))
+    :config
+    (add-to-list 'copilot-major-mode-alist '("elixir-ts" . "elixir"))
+    :bind (:map copilot-mode-map ("C-c e" . copilot-accept-completion)))
+#+end_src
 * Grip GitHub Markdown Previews
 Instant Github-flavored Markdown/Org preview using grip.
 

@@ -5,6 +5,7 @@
 				       "\\*Backtrace\\*"
 				       "\\*direnv\\*"
 				       "\\*Disabled Command\\*"
+				       "\\*copilot events\\*"
 				       "\\*Org [^z-a]+Output\\*"
 				       "\\*xref\\*"
 				       "\\*xob\\*"

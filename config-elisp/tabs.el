@@ -48,7 +48,7 @@
 
   (defun my/tabs-ignore-filter (buffer)
     (let* ((name (buffer-name buffer))
-	   (ignored "\\*scratch\\|vc\\|Messages\\|Dired log\\|[a-z]-shell\\|magit-process\\|straight-process\\|direnv\\|info\\|Backtrace\\|EGLOT.+\\*"))
+	   (ignored "\\*scratch\\|vc\\|Messages\\|copilot events\\|Dired log\\|[a-z]-shell\\|magit-process\\|straight-process\\|direnv\\|info\\|Backtrace\\|EGLOT.+\\*"))
       (not (string-match-p ignored name))))
 
   (defun my/tabs-function (&optional frame)

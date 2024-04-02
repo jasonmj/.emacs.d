@@ -30,6 +30,7 @@
   (add-to-list 'eglot-server-programs '(python-mode . ("pyright-langserver" "--stdio")))
   (add-to-list 'eglot-server-programs `((elixir-ts-mode heex-ts-mode) . ,(eglot-alternatives '("language_server.sh" "start_lexical.sh"))))
   (push :documentHighlightProvider eglot-ignored-server-capabilities)
+  (push :codeActionProvider eglot-ignored-server-capabilities)
   ;; (add-to-list 'exec-path "/Users/jjohnson/.nix-profile/bin/")
   ;; (with-eval-after-load 'eglot
   ;;   (add-to-list 'eglot-server-programs

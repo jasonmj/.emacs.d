@@ -12,6 +12,7 @@ https://github.com/alphapapa/bufler.el
 					 "\\*Backtrace\\*"
 					 "\\*direnv\\*"
 					 "\\*Disabled Command\\*"
+					 "\\*copilot events\\*"
 					 "\\*Org [^z-a]+Output\\*"
 					 "\\*xref\\*"
 					 "\\*xob\\*"

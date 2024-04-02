@@ -6,6 +6,16 @@
 	 (path (replace-regexp-in-string root "" path-from-home nil t))
 	 (line-number (number-to-string (line-number-at-pos))))
     (kill-new (concat "mix test.watch " path ":" line-number))))
+(global-set-key (kbd "C-c t l") 'copy-test-line)
+
+(defun copy-test-file ()
+  (interactive)
+  (let* ((full-path (buffer-file-name))
+	 (root (project-root (project-current)))
+	 (path-from-home (replace-regexp-in-string (s-trim (shell-command-to-string "echo $HOME")) "~" full-path nil t))
+	 (path (replace-regexp-in-string root "" path-from-home nil t)))
+    (kill-new (concat "mix test.watch " path))))
+(global-set-key (kbd "C-c t f") 'copy-test-file)
 
 (use-package elixir-mode :ensure t)
 (use-package elixir-ts-mode

@@ -28,6 +28,14 @@
   :ensure t
   :hook ((prog-mode . git-gutter-mode)))
 
+(use-package copilot
+  :straight (:host github :repo "copilot-emacs/copilot.el" :files ("dist" "*.el"))
+  :ensure t
+  :hook ((elixir-ts-mode . copilot-mode))
+  :config
+  (add-to-list 'copilot-major-mode-alist '("elixir-ts" . "elixir"))
+  :bind (:map copilot-mode-map ("C-c e" . copilot-accept-completion)))
+
 (use-package grip-mode
   :ensure t
   :defer t

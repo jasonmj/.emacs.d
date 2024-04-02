@@ -102,7 +102,7 @@ https://github.com/minad/consult
     (consult-buffer-filter '("^ " "\\` " "\\*Echo Area" "\\*Minibuf" "\\*Quail Completions" "\\*Backtrace"
 			     "\\*elixir-ls" "Flymake log" "Shell command output" "direnv" "\\*scratch" "Shell:"
 			     "\\*Messages" "\\*Warning" "*magit-" "magit-process" "*vterm" "vterm" "^:" ".+-shell*"
-			     "*straight-" "*elfeed-log" "*trace of SMTP session" "\\*Compile-Log" "\\*blamer"
+			     "*straight-" "*elfeed-log" "*trace of SMTP session" "\\*Compile-Log" "\\*copilot events"
 			     "*format-all-error" "*Async-" "COMMIT_EDITMSG" "shell: " "\\*ednc-log" "TAGS"
 			     "*lsp-" "*EGLOT" "*pyls" "*vc" "*citre-ctags*" "*flycheck-posframe-buffer*" "*xob*"))
 
@@ -526,14 +526,14 @@ https://github.com/radian-software/prescient.el
     :config
     (setq vertico-posframe-border-width 20
 	  vertico-posframe-hide-minibuffer t
-	  vertico-posframe-min-width 80
+	  vertico-posframe-min-width 110
 	  vertico-posframe-height nil
 	  vertico-posframe-min-height 10
 	  vertico-posframe-width 110
 	  vertico-posframe-poshandler #'posframe-poshandler-window-top-center-offset
 	  vertico-posframe-parameters '((alpha-background . 100)
-					(parent-frame . nil)
-					(cursor . 'hbar)
+					;;(parent-frame . nil)
+					;; (cursor . 'hbar)
 					(left-fringe . 0)
 					(right-fringe . 0)))
 
