@@ -238,7 +238,7 @@ function."
   :ensure t
   :bind (:map corfu-map ("C-e" . corfu-complete))
   :init
-  (setq corfu-auto-prefix 2
+  (setq corfu-auto-prefix 1
 	corfu-auto-delay 0.05
 	corfu-auto t
 	corfu-cycle t
@@ -463,9 +463,7 @@ function."
 	vertico-posframe-min-height 10
 	vertico-posframe-width 110
 	vertico-posframe-poshandler #'posframe-poshandler-window-top-center-offset
-	vertico-posframe-parameters '((alpha-background . 100)
-				      ;;(parent-frame . nil)
-				      ;; (cursor . 'hbar)
+	vertico-posframe-parameters '((alpha . 85)
 				      (left-fringe . 0)
 				      (right-fringe . 0)))
 

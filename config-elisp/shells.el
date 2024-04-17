@@ -72,7 +72,9 @@
 	 (eshell-before-prompt . (lambda () (setq xterm-color-preserve-properties t)))))
 
 (use-package shell
-  :bind (:map shell-mode-map ("C-l" . clear-shell-buffer))
+  :bind (:map shell-mode-map
+	      ("C-l" . clear-shell-buffer)
+	      ("C-d" . hungry-delete-forward))
   :custom (shell-file-name (if (eq system-type 'darwin) "/opt/homebrew/bin/bash" "/run/current-system/sw/bin/bash"))
   :config
   (defun clear-shell-buffer () (interactive)

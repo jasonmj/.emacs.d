@@ -9,6 +9,7 @@ backend
 backends
 backfill
 bitwise
+bool
 bufferedexecutor
 buildroot
 casterror
@@ -103,7 +104,9 @@ preloaded
 preloads
 priv
 pubsub
+refrigeratordoorsensor
 refrigeratorsensorsform
+remotesensormodule
 remotesensormodules
 replayweather
 repo
@@ -111,6 +114,7 @@ revalidate
 rtd
 runtime
 schemas
+semibold
 sensorsform
 setpoint
 setpoints

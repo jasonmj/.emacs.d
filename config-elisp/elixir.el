@@ -4,8 +4,9 @@
 	 (root (project-root (project-current)))
 	 (path-from-home (replace-regexp-in-string (s-trim (shell-command-to-string "echo $HOME")) "~" full-path nil t))
 	 (path (replace-regexp-in-string root "" path-from-home nil t))
-	 (line-number (number-to-string (line-number-at-pos))))
-    (kill-new (concat "mix test.watch " path ":" line-number))))
+	 (line-number (number-to-string (line-number-at-pos)))
+	 (cmd (if (string-match "ec2k" (caddr (project-current))) "watch mix espec " "mix test.watch ")))
+    (kill-new (concat cmd path ":" line-number))))
 (global-set-key (kbd "C-c t l") 'copy-test-line)
 
 (defun copy-test-file ()
@@ -13,8 +14,9 @@
   (let* ((full-path (buffer-file-name))
 	 (root (project-root (project-current)))
 	 (path-from-home (replace-regexp-in-string (s-trim (shell-command-to-string "echo $HOME")) "~" full-path nil t))
-	 (path (replace-regexp-in-string root "" path-from-home nil t)))
-    (kill-new (concat "mix test.watch " path))))
+	 (path (replace-regexp-in-string root "" path-from-home nil t))
+	 (cmd (if (string-match "ec2k" (caddr (project-current))) "watch mix espec " "mix test.watch ")))
+    (kill-new (concat cmd path))))
 (global-set-key (kbd "C-c t f") 'copy-test-file)
 
 (use-package elixir-mode :ensure t)
@@ -42,9 +44,7 @@
 	 (heex-ts-mode . hungry-delete-mode)
 	 (heex-ts-mode . display-line-numbers-mode))
   :mode (("\\.ex\\'" . elixir-ts-mode)
-	 ("\\.exs\\'" . elixir-ts-mode)
-	 ("\\.heex\\'" . elixir-ts-mode)
-	 ("\\.leex\\'" . elixir-ts-mode)))
+	 ("\\.exs\\'" . elixir-ts-mode)))
 
 (defun format-elixir-region (beg end)
   "Formats the selected region (if any) with Elixir's `Code.format_string!/1`"
