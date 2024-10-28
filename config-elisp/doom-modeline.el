@@ -11,7 +11,7 @@
 
   (doom-modeline-def-modeline 'my-simple-line
     '(bar matches buffer-info remote-host)
-    '(toggl-timer misc-info exwm-workspace major-mode process vcs checker))
+    '(misc-info exwm-workspace major-mode process vcs))
 
   (defun setup-custom-doom-modeline ()
     (doom-modeline-set-modeline 'my-simple-line 'default))

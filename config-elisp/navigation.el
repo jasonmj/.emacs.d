@@ -97,10 +97,22 @@
 	(concat without-suffix ".ex")
       file)))
 
+(defun spec-from-module (file)
+  (concat (file-name-sans-extension (replace-directory-in-path file "lib" "spec")) "_spec.exs"))
+
+(defun module-from-spec (file)
+  (let* ((replaced (replace-directory-in-path file "spec" "lib"))
+	 (without-suffix (if (> (length replaced) 0) (substring (file-name-sans-extension replaced) 0 -5))))
+    (if without-suffix
+	(concat without-suffix ".ex")
+      file)))
+
 (defun my/related-files-jumper (file)
   (list
     (test-from-module file)
-    (module-from-test file)))
+    (module-from-test file)
+    (spec-from-module file)
+    (module-from-spec file)))
 
 (setq related-files-jumpers (list #'my/related-files-jumper))
 
@@ -150,6 +162,17 @@
 (use-package tabgo
   :ensure t
   :bind ("C-S-SPC" . tabgo))
+
+(defun visit-line ()
+  (interactive)
+  (let* ((args (split-string (selection-or-thing-at-point) ":"))
+	 (filename (car args))
+	 (fullpath (concat (project-root (project-current)) filename))
+	 (line (car (cdr args))))
+    (find-file fullpath)
+    (goto-char (point-min))
+    (forward-line (- (string-to-number line) 1))))
+(global-set-key (kbd "C-x i") 'visit-line)
 
 (use-package windmove :ensure t)
 (emacs-set-key (kbd "s-b") 'windmove-left)

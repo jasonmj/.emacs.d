@@ -5,6 +5,11 @@ Revert any buffer associated with a file when the file changes on disk.
 #+begin_src emacs-lisp
   (setq global-auto-revert-mode t)
 #+end_src
+* Alert
+#+begin_src emacs-lisp
+  (require 'alert)
+  (setq alert-default-style 'osx-notifier)
+#+end_src
 * Bury Compilation Buffers If Successful
 Automatically bury the *compilation* buffer when compilation succeeds.
 

@@ -20,7 +20,7 @@
 	 ("C-<iso-lefttab>" . tab-line-switch-to-prev-tab)
 	 ("C-S-<iso-lefttab>" . tab-line-switch-to-prev-tab))
   :hook ((after-init . global-tab-line-mode)
-	 (after-init . init-tab-line-function))
+	 (global-tab-line-mode . init-tab-line-function))
   :custom
   (tab-line-new-button-show nil)
   (tab-line-switch-cycling t)

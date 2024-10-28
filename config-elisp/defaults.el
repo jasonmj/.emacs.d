@@ -1,5 +1,8 @@
 (setq global-auto-revert-mode t)
 
+(require 'alert)
+(setq alert-default-style 'osx-notifier)
+
 (use-package bury-successful-compilation :ensure t)
 
 (setq browse-url-generic-program "firefox"

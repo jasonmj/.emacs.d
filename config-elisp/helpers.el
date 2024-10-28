@@ -34,7 +34,14 @@
   :hook ((elixir-ts-mode . copilot-mode))
   :config
   (add-to-list 'copilot-major-mode-alist '("elixir-ts" . "elixir"))
-  :bind (:map copilot-mode-map ("C-c e" . copilot-accept-completion)))
+  :bind (:map copilot-mode-map
+	      ("TAB" . multi-tab)
+	      ("C-c c" . copilot-accept-completion)
+	      ("C-c C-c" . copilot-accept-completion)))
+
+(defun multi-tab ()
+  (interactive)
+  (unless (copilot-accept-completion) (unless (yas-expand) (indent-for-tab-command))))
 
 (use-package grip-mode
   :ensure t

@@ -239,7 +239,7 @@ function."
   :bind (:map corfu-map ("C-e" . corfu-complete))
   :init
   (setq corfu-auto-prefix 1
-	corfu-auto-delay 0.05
+	corfu-auto-delay 0.025
 	corfu-auto t
 	corfu-cycle t
 	corfu-quit-no-match t
@@ -456,14 +456,14 @@ function."
   :ensure t
   :init (vertico-posframe-mode 1)
   :config
-  (setq vertico-posframe-border-width 20
+  (setq vertico-posframe-border-width 12
 	vertico-posframe-hide-minibuffer t
 	vertico-posframe-min-width 110
 	vertico-posframe-height nil
 	vertico-posframe-min-height 10
-	vertico-posframe-width 110
+	vertico-posframe-width 130
 	vertico-posframe-poshandler #'posframe-poshandler-window-top-center-offset
-	vertico-posframe-parameters '((alpha . 85)
+	vertico-posframe-parameters '((alpha . (100 85))
 				      (left-fringe . 0)
 				      (right-fringe . 0)))
 
@@ -481,7 +481,7 @@ function."
 	   (window-width (plist-get info :parent-window-width))
 	   (posframe-width (plist-get info :posframe-width)))
       (cons (+ window-left (/ (- window-width posframe-width) 2))
-	    (+ window-top 64))))
+	    (+ window-top 128))))
   (defun vertico-posframe--handle-minibuffer-window ()
       "Handle minibuffer window."
       (let ((show-minibuffer-p (vertico-posframe--show-minibuffer-p))

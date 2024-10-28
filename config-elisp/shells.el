@@ -131,6 +131,10 @@
 	      nil))
 	  (string-split output "\n")))
 
+(defun cape--iex-restore-output-filter ()
+  (interactive)
+  (set-process-filter (current-buffer-process) 'comint-output-filter))
+
 (defun cape--iex-setup (proc)
   (message "setting up iex autocompletion...")
   (advice-add #'comint-quit-subjob :after #'cape--iex-teardown)
@@ -187,7 +191,7 @@
   (car (last (split-string (concat str "") "\\."))))
 
 (defun cape--iex-format-candidate (expr completion)
-  (let* ((clean-completion (replace-regexp-in-string "\\\\" "" completion nil t))
+  (let* ((clean-completion (cape--iex-clean-up-completion completion))
 	(first-char (substring completion nil 1))
 	(last-char (substring completion -1))
 	(combined (string-merge expr clean-completion)))
@@ -197,6 +201,9 @@
      ((and (equal first-char (downcase first-char))
 	   (not (eq (string-match-p "^[0-9]+$" last-char) nil))) (concat (substring combined nil -2) "("))
      (t combined))))
+
+(defun cape--iex-clean-up-completion (completion)
+  (replace-regexp-in-string "\"\"" "" (replace-regexp-in-string "\\\\" "" (replace-regexp-in-string "\"\"" "" (replace-regexp-in-string "x>" "" completion nil t) nil t) nil t) nil t))
 
 (defun cape-iex ()
   (when-let ((proc (get-buffer-process (current-buffer)))

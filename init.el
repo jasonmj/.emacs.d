@@ -55,6 +55,7 @@
   (emacs-set-key (kbd "s-2") (lambda () (interactive) (call-process-shell-command "osascript -e 'tell Application \"BetterTouchTool\" to trigger_named \"Desktop 2\"'")))
   (emacs-set-key (kbd "s-3") (lambda () (interactive) (call-process-shell-command "osascript -e 'tell Application \"BetterTouchTool\" to trigger_named \"Desktop 3\"'")))
   (emacs-set-key (kbd "s-4") (lambda () (interactive) (call-process-shell-command "osascript -e 'tell Application \"BetterTouchTool\" to trigger_named \"Desktop 4\"'")))
+  (emacs-set-key (kbd "s-5") (lambda () (interactive) (call-process-shell-command "osascript -e 'tell Application \"BetterTouchTool\" to trigger_named \"Desktop 5\"'")))
 
   (emacs-set-key (kbd "C-c f") 'firefox)
   (key-seq-define-global "sf" 'firefox)
@@ -90,10 +91,17 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(alert-default-style 'osx-notifier)
+ '(global-so-long-mode t)
+ '(keycast-header-line-format "%1s%k%c%r ")
+ '(so-long-action 'so-long-minor-mode))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(doom-modeline-bar ((t (:background "DarkGoldenrod1"))))
+ '(eldoc-box-body ((t (:background "#fbf7f0" :foreground "#000000"))))
+ '(eldoc-box-border ((t (:background "#000000"))))
+ '(vertico-posframe-border ((t (:background nil))))
+ '(which-key-posframe-border ((t nil))))

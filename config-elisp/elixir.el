@@ -5,7 +5,7 @@
 	 (path-from-home (replace-regexp-in-string (s-trim (shell-command-to-string "echo $HOME")) "~" full-path nil t))
 	 (path (replace-regexp-in-string root "" path-from-home nil t))
 	 (line-number (number-to-string (line-number-at-pos)))
-	 (cmd (if (string-match "ec2k" (caddr (project-current))) "watch mix espec " "mix test.watch ")))
+	 (cmd (if (string-match "ec2k" (caddr (project-current))) "watch mix espec " "watch mix test ")))
     (kill-new (concat cmd path ":" line-number))))
 (global-set-key (kbd "C-c t l") 'copy-test-line)
 
@@ -15,7 +15,7 @@
 	 (root (project-root (project-current)))
 	 (path-from-home (replace-regexp-in-string (s-trim (shell-command-to-string "echo $HOME")) "~" full-path nil t))
 	 (path (replace-regexp-in-string root "" path-from-home nil t))
-	 (cmd (if (string-match "ec2k" (caddr (project-current))) "watch mix espec " "mix test.watch ")))
+	 (cmd (if (string-match "ec2k" (caddr (project-current))) "watch mix espec " "watch mix test ")))
     (kill-new (concat cmd path))))
 (global-set-key (kbd "C-c t f") 'copy-test-file)
 
@@ -30,7 +30,7 @@
     (concat "^[[:space:]]*\\("
 	    "@moduledoc\\|@behaviour\\|@callback\\|@type\\|@typedoc\\|@doc\\|@spec\\|@impl"
 	    "\\|def\\(\\|p\\|callback\\|delegate\\|impl\\|overridable\\|exception\\|struct\\|guard\\|guardp\\|record\\|recordp\\|macro\\|macrop\\|macrocallback\\|protocol\\)"
-	    "\\|describe\\|feature\\|test\\|setup\\|let\\|it\\|context\\|before\\|schema"
+	    "\\|describe\\|feature\\|test\\|setup\\|let\\|it\\|context\\|before\\|schema\\|scope"
 	    "\\|use\\|alias\\|import\\|require"
 	    "\\)\\([[:space:]]\\|(\\)"))
   (defvar html-outline-regexp "^[[:space:]]*<[^/>]+?\\(>\\|\n\\)")
@@ -69,7 +69,7 @@
 
 (defun flymake-mix-test--output-filter (output)
   (let ((clean-output (s-trim (strip-ansi-chars output))))
-    (if (string-match-p "^Running tests" clean-output)
+    (if (string-match-p "^Excluding tags" clean-output)
 	(progn
 	  (flymake-mix-test--clear-diags)
 	  (let ((buffer (get-buffer (concat "*" (project-name (project-current)) "-shell*"))))
@@ -105,7 +105,7 @@
 			     (details (string-join (cdr (cdr lines)) "\n")))
 			(flymake-mix-test--push-diag full-filepath line-number details))))
 		lines)))
-  (if (string-match-p "0 failures" output) (message "Tests passed: 0 failures"))
+  (if (string-match-p ", 0 failures" output) (alert "Tests passed: 0 failures" :title "mix test"))
   (if (string-match-p "^error:.+" output)
       (let* ((details (progn
 		    (string-match "error:\\(.+\)\\)" output)
