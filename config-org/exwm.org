@@ -51,7 +51,7 @@ Quickly change display configurations with functions that call `xrandr`.
     (defun display-vertical()
       (interactive)
       (start-process-shell-command
-       "xrandr" nil "xrandr --output DP-0 --off --output DP-1 --off --output HDMI-0 --mode 3840x2160 --pos 0x0 --rotate left --output DP-2 --off"))
+       "xrandr" nil "xrandr --output DisplayPort-0 --primary --mode 3840x2160 --pos 0x0 --rotate left --output DisplayPort-1 --off --output DisplayPort-2 --off --output HDMI-A-0 --off"))
     (defun display-horizontal()
       (interactive)
       (start-process-shell-command
@@ -144,12 +144,16 @@ Set the EXWM key bindings to use within X applications.
           ("C-w" . ?\C-c)
           ("C-S-w" . ?\C-w)
           ("C-S-a" . S-home)
+          ("M-U" . C-S-a)
           ("C-e" . end)
           ("C-u" . ?\C-u)
+          ("C-S-u" . C-A)
+          ("S-RET" . C-S-m)
           ("C-S-e" . S-end)
           ("C-k" . (home S-end delete backspace))
           ("C-m" . return)
           ("C-s-k" . C-k)
+          ("C-S-k" . C-k)
           ("C-l" . (?\C-l ?\C-c))
           ;;("C-'" . (\" home \" return))
           ("C-\"" . (\" end \" return))
@@ -186,7 +190,7 @@ Set the EXWM key bindings to use within X applications.
           ("M->" . C-end)))
     (emacs-set-key (kbd "C-'") (lambda () (interactive) (if (eq major-mode 'exwm-mode) (exwm-input--fake-key 'C-k) (insert "'"))))
     (defun exwm-manage-keys-hook ()
-      (exwm-input-set-simulation-keys
+      (exwm-input--set-simulation-keys
        (mapcar (lambda (c) (cons (kbd (car c)) (cdr c))) exwm-input-global-simulation-keys)))
     (add-hook 'exwm-manage-finish-hook 'exwm-manage-keys-hook)
 #+end_src

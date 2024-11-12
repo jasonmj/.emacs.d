@@ -1,3 +1,4 @@
+
 #+TITLE: Buffer Management
 #+PROPERTY: header-args      :tangle "../config-elisp/buffer-management.el"
 * Bufler
@@ -7,6 +8,7 @@ https://github.com/alphapapa/bufler.el
 #+begin_src emacs-lisp
   (use-package bufler
     :ensure t
+    :straight (:type git :host github :repo "alphapapa/bufler.el")
     :custom
     (bufler-filter-buffer-name-regexps '("\\*Compile-Log\\*"
 					 "\\*Backtrace\\*"
@@ -32,9 +34,9 @@ https://github.com/alphapapa/bufler.el
     (load "bufler-workspace-tabs.el")
     (bufler-workspace-workspaces-as-tabs-mode t)
     :hook ((exwm-update-title . my/bufler-workspace-focus-buffer)
-	   (exwm-manage-finish . my/bufler-workspace-focus-buffer)
-	   (exwm-workspace-switch . my/bufler-workspace-focus-buffer)
-	   (kill-buffer .my/bufler-workspace-focus-buffer)))
+  	   (exwm-manage-finish . my/bufler-workspace-focus-buffer)
+  	   (exwm-workspace-switch . my/bufler-workspace-focus-buffer)
+  	   (kill-buffer .my/bufler-workspace-focus-buffer)))
 #+end_src
 * Buffer List
 Easy access to the built-in `list-buffers` display with a key sequence. 

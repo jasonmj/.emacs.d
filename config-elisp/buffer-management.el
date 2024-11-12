@@ -1,20 +1,21 @@
 (use-package bufler
   :ensure t
+  :straight (:type git :host github :repo "alphapapa/bufler.el")
   :custom
   (bufler-filter-buffer-name-regexps '("\\*Compile-Log\\*"
-				       "\\*Backtrace\\*"
-				       "\\*direnv\\*"
-				       "\\*Disabled Command\\*"
-				       "\\*copilot events\\*"
-				       "\\*Org [^z-a]+Output\\*"
-				       "\\*xref\\*"
-				       "\\*xob\\*"
-				       "\\*ednc-log\\*"
-				       "\\*straight-process\\*"
-				       "\\*blamer\\*"
-				       "\\*scratch\\*"
-				       "\\*Messages\\*"
-				       "\\*Warnings\\*"))
+					 "\\*Backtrace\\*"
+					 "\\*direnv\\*"
+					 "\\*Disabled Command\\*"
+					 "\\*copilot events\\*"
+					 "\\*Org [^z-a]+Output\\*"
+					 "\\*xref\\*"
+					 "\\*xob\\*"
+					 "\\*ednc-log\\*"
+					 "\\*straight-process\\*"
+					 "\\*blamer\\*"
+					 "\\*scratch\\*"
+					 "\\*Messages\\*"
+					 "\\*Warnings\\*"))
   :config
   (key-seq-define-global "bf" 'bufler)
   (defun my/bufler-workspace-focus-buffer (&optional buffer)
@@ -25,9 +26,9 @@
   (load "bufler-workspace-tabs.el")
   (bufler-workspace-workspaces-as-tabs-mode t)
   :hook ((exwm-update-title . my/bufler-workspace-focus-buffer)
-	 (exwm-manage-finish . my/bufler-workspace-focus-buffer)
-	 (exwm-workspace-switch . my/bufler-workspace-focus-buffer)
-	 (kill-buffer .my/bufler-workspace-focus-buffer)))
+	   (exwm-manage-finish . my/bufler-workspace-focus-buffer)
+	   (exwm-workspace-switch . my/bufler-workspace-focus-buffer)
+	   (kill-buffer .my/bufler-workspace-focus-buffer)))
 
 (key-seq-define-global "xb" 'list-buffers)
 
@@ -40,14 +41,14 @@
 (global-set-key (kbd "C-w") 'my/kill-this-buffer)
 (key-seq-define-global "gw" 'my/kill-this-buffer)
 (key-seq-define-global "fw" (lambda () (interactive)
-			      (if (eq (length (window-list)) 1)
-				  (my/kill-this-buffer)
-				(kill-buffer-and-window))))
+				(if (eq (length (window-list)) 1)
+				    (my/kill-this-buffer)
+				  (kill-buffer-and-window))))
 
 (defun hs-process-filter (process output)
   (mapcar (lambda (str)
-	    (if (string-match "\"windows\":" str)
-		(setq mac-windows-list (nth 1 (split-string str "36m"))))) (split-string output "")))
+	      (if (string-match "\"windows\":" str)
+		  (setq mac-windows-list (nth 1 (split-string str "36m"))))) (split-string output "")))
 
 (when (eq system-type 'darwin)
   (setq hs-process (make-process :name "hs" :command '("hs") :filter 'hs-process-filter)))
@@ -60,21 +61,21 @@
 
 (defun get-mac-window-list ()
   (let* ((windows-string (get-windows-string))
-	 (json-string windows-string)
-	 (windows-hash-table (gethash "windows" (json-parse-string json-string)))
-	 (window-list '()))
+	   (json-string windows-string)
+	   (windows-hash-table (gethash "windows" (json-parse-string json-string)))
+	   (window-list '()))
     (mapcar (lambda (v)
-	      (let* ((app (gethash "app" v))
-		     (title (gethash "title" v))
-		     (id (gethash "id" v)))
-		(add-to-list 'window-list `(,(concat app " - " title) . ,id))))
-	    windows-hash-table)
+		(let* ((app (gethash "app" v))
+		       (title (gethash "title" v))
+		       (id (gethash "id" v)))
+		  (add-to-list 'window-list `(,(concat app " - " title) . ,id))))
+	      windows-hash-table)
     window-list))
 
 (defun switch-mac-window ()
   (interactive)
   (let* ((window-list (get-mac-window-list))
-	 (window-choice (cdr (assoc (completing-read "Switch window: " window-list) window-list))))
+	   (window-choice (cdr (assoc (completing-read "Switch window: " window-list) window-list))))
     (focus-mac-window window-choice)))
 
 (defun focus-mac-window (window-id)
@@ -90,18 +91,18 @@
 
 (defun get-emacs-buffer-list ()
   (seq-filter 'filter-emacs-buffers-for-hammerspoon
-	  (append `(,(with-current-buffer (buffer-name)))
-		  (cdr (mapcar #'string-trim (mapcar #'buffer-name (delq nil (delete-dups
-									      (flatten-tree (mapcar (lambda (group)
-												      (unless (equal (car group) "\*Special")
-													(mapcar (lambda (buffer-or-buffers)
-														  (let* ((group-buffers (if (eq (type-of buffer-or-buffers) 'buffer) buffer-or-buffers (car (cdr buffer-or-buffers))))
-															 (clean-group-buffers (if (eq (type-of group-buffers) 'buffer)
-																		  group-buffers
-																		(delq nil (delete-dups group-buffers))))
-															 (buffer-list '()))
-														    (if (eq (type-of clean-group-buffers) 'buffer) clean-group-buffers
-														      (mapcar (lambda (item) (if (eq (type-of item) 'buffer) item)) clean-group-buffers)))) (cdr group)))) (bufler-buffers)))))))))))
+	    (append `(,(with-current-buffer (buffer-name)))
+		    (cdr (mapcar #'string-trim (mapcar #'buffer-name (delq nil (delete-dups
+										(flatten-tree (mapcar (lambda (group)
+													(unless (equal (car group) "\*Special")
+													  (mapcar (lambda (buffer-or-buffers)
+														    (let* ((group-buffers (if (eq (type-of buffer-or-buffers) 'buffer) buffer-or-buffers (car (cdr buffer-or-buffers))))
+															   (clean-group-buffers (if (eq (type-of group-buffers) 'buffer)
+																		    group-buffers
+																		  (delq nil (delete-dups group-buffers))))
+															   (buffer-list '()))
+														      (if (eq (type-of clean-group-buffers) 'buffer) clean-group-buffers
+															(mapcar (lambda (item) (if (eq (type-of item) 'buffer) item)) clean-group-buffers)))) (cdr group)))) (bufler-buffers)))))))))))
 
 (defun filter-emacs-buffers-for-hammerspoon (buf)
   (not (string-match-p "magit-process:\\| *server*" (if (bufferp buf) (buffer-name buf) buf))))

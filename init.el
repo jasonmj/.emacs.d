@@ -24,8 +24,8 @@
       focus-follows-mouse nil)
 (unless (eq system-type 'darwin)
   (use-package exwm :ensure t)
-  (require 'exwm-config)
-  (exwm-config-example))
+  (require 'exwm)
+  (exwm-enable))
 
 ;;; Maybe EXWM Set Key
 (defun emacs-set-key (key cmd)

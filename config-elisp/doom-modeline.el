@@ -7,7 +7,7 @@
 
   (doom-modeline-def-segment toggl-timer
     (let* ((description (if (fboundp 'toggl-get-timer) (toggl-get-timer) "No timer")))
-      (when description (propertize (concat description " | ") 'face '(:weight normal)))))
+	(when description (propertize (concat description " | ") 'face '(:weight normal)))))
 
   (doom-modeline-def-modeline 'my-simple-line
     '(bar matches buffer-info remote-host)
