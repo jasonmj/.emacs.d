@@ -86,6 +86,7 @@ hvactest
 hvactests
 hvaczone
 iex
+init
 inputoutputmodule
 inputoutputmodules
 installationevent
@@ -116,6 +117,7 @@ onboarding
 openapi
 params
 photosensor
+photosensors
 phx
 pid
 pids

@@ -63,7 +63,7 @@ https://github.com/casouri/expreg
 #+end_src
 * Flymake
 #+begin_src emacs-lisp
-(key-chord-define-global "-=" 'flymake-show-buffer-diagnostics)
+(key-chord-define-global "-=" 'consult-flymake)
 #+end_src
 * Highlight Matching Parenthesis
 When enabled, any matching parenthesis is highlighted in show-paren-style after show-paren-delay seconds of Emacs idle time.

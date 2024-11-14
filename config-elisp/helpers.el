@@ -67,7 +67,7 @@
 (use-package flymake-cursor
   :ensure t
   :hook (prog-mode . flymake-cursor-mode)
-  :custom (max-mini-window-height 0.5))
+  :custom (max-mini-window-height 0.75))
 
 (use-package helpful
   :ensure t

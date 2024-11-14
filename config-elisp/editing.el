@@ -37,7 +37,7 @@
   :bind (("s-<tab>" . expreg-expand)
 	 ("S-TAB" . expreg-expand)))
 
-(key-chord-define-global "-=" 'flymake-show-buffer-diagnostics)
+(key-chord-define-global "-=" 'consult-flymake)
 
 (show-paren-mode 1)
 
