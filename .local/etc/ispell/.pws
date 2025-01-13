@@ -95,8 +95,11 @@ installationtesthelpers
 installers
 inventorymanagement
 iom
+ioms
 jjohnson
 json
+lightingconnection
+lightingoutputgroup
 lightingzone
 lightingzones
 liveview
@@ -110,6 +113,8 @@ moduledoc
 morehead
 namespace
 nerveshub
+nixos
+nixpkgs
 noresultserror
 nullable
 oban

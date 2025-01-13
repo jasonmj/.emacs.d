@@ -5,7 +5,7 @@
   :config
   (custom-set-faces `(eldoc-box-body ((t (:background ,(face-attribute 'default :background) :foreground ,(face-attribute 'default :foreground))))))
   (custom-set-faces `(eldoc-box-border ((t (:background ,(face-attribute 'default :foreground))))))
-  (advice-add 'eglot--mode-line-format :override (lambda () ""))
+  (eval-after-load 'eglot-managed-mode (pop mode-line-misc-info))
   :custom
   (eglot-menu-string "")
   (eldoc-box-offset '(16 16 40))

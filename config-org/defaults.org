@@ -20,6 +20,7 @@ https://github.com/emacsattic/bury-successful-compilation
 * Default Browser Settings
 Set the default browser to Firefox and use the default browser function for urls. 
 #+begin_src emacs-lisp
+  (setq browse-url-browser-function 'browse-url-default-macosx-browser)
   (setq browse-url-generic-program "firefox"
 	browse-url-browser-function 'browse-url-generic)
 #+end_src

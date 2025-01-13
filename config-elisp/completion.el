@@ -65,13 +65,8 @@
 	 ("M-g k" . consult-global-mark)
 	 ("M-g i" . consult-imenu)
 	 ("M-g I" . consult-imenu-multi)
-	 ;; ("M-s d" . consult-find)
-	 ;; ("M-s D" . consult-locate)
 	 ("s-s" . consult-ripgrep)
-	 ;; ("M-s r" . consult-ripgrep)
 	 ("M-s" . my/consult-line)
-	 ;; ("M-s L" . consult-line-multi)
-	 ;; ("M-s u" . consult-focus-lines)
 	 ("C-x f" . find-file)
 	 ("M-SPC" . project-find-file)
 	 :map minibuffer-local-map
@@ -91,7 +86,7 @@
 			   "\\*elixir-ls" "Flymake log" "Shell command output" "direnv" "\\*scratch" "Shell:"
 			   "\\*Messages" "\\*Warning" "*magit-" "magit-process" "*vterm" "vterm" "^:" ".+-shell*"
 			   "*straight-" "*elfeed-log" "*trace of SMTP session" "\\*Compile-Log" "\\*copilot events"
-			   "*format-all-error" "*Async-" "COMMIT_EDITMSG" "shell: " "\\*ednc-log" "TAGS"
+			   "*format-all-error" "*Async-" "COMMIT_EDITMSG" "shell: " "\\*ednc-log" "TAGS" "\\*gemini"
 			   "*lsp-" "*EGLOT" "*pyls" "*vc" "*citre-ctags*" "*flycheck-posframe-buffer*" "*xob*"))
 
   :config
@@ -125,21 +120,7 @@
 					(consult-buffer)))
   (emacs-set-key (kbd "C-SPC") 'my/buffer-switch)
   (key-seq-define-global "cz" 'execute-extended-command)
-
-  (defun consult-preview-posframe-focus ()
-    ;; (posframe-delete-all)
-    ;; (vertico-posframe--handle-minibuffer-window)
-    ;; (run-with-idle-timer 2 nil (lambda ()
-    ;; 				 (let* ((frame (vertico-posframe--show vertico-posframe--buffer (point)))
-    ;; 					(win (car (window-list frame)))
-    ;; 					(buffer (window-buffer win)))
-    ;; 				   ;; (select-frame-set-input-focus frame)
-    ;; 				   ;; (select-window win)
-    ;; 				   (set-buffer buffer)
-    ;; 				   (switch-to-buffer buffer)
-    ;; 				   )))
-    )
-  (add-hook 'consult-after-jump-hook 'consult-preview-posframe-focus)
+  (key-seq-define-global "cx" 'execute-extended-command)
 
   ;; Configure previews
   (consult-customize consult-recent-file :preview-key nil
@@ -239,7 +220,7 @@ function."
   :bind (:map corfu-map ("C-e" . corfu-complete))
   :init
   (setq corfu-auto-prefix 1
-	corfu-auto-delay 0.025
+	corfu-auto-delay 0.015
 	corfu-auto t
 	corfu-cycle t
 	corfu-quit-no-match t
@@ -387,20 +368,6 @@ function."
    (numbering i :from 1 :to 9)
    (define-key map (kbd (format "s-%d" i)) `(lambda () (interactive) (vertico-indexed-insert ,i))))
 
-  ;; Enable vertico-multiform
-  ;; (vertico-multiform-mode)
-  ;; (define-minor-mode vertico-disabled-mode
-  ;; "Disable vertico."
-  ;; :global t :group 'vertico
-  ;; (cond
-  ;;  (vertico-disabled-mode
-  ;;   (advice-add 'vertico--setup :around #'ignore))
-  ;;  (t
-  ;;   (advice-remove 'vertico--setup #'ignore))))
-  ;; (setq vertico-multiform-commands
-  ;; 	'((consult-project-buffer disabled)
-  ;; 	  (t posframe)))
-
   (defun vertico-buffer--redisplay (win)
     "Redisplay window WIN."
   (when-let (mbwin (active-minibuffer-window))
@@ -424,8 +391,8 @@ function."
 (use-package vertico-quick
   :after vertico
   :bind (:map vertico-map
-	      ("M-i" . vertico-quick-insert)
-	      ("C-'" . vertico-quick-exit)
+	      ("s-SPC" . vertico-quick-exit)
+	      ("<escape>" . vertico-quick-exit)
 	      ("C-o" . vertico-quick-embark))
   :config
   (defun vertico-quick-embark (&optional arg)

@@ -92,9 +92,11 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(alert-default-style 'osx-notifier)
+ '(dimmer-fraction 0.2)
  '(global-so-long-mode t)
  '(keycast-header-line-format "%1s%k%c%r ")
- '(so-long-action 'so-long-minor-mode))
+ '(so-long-action 'so-long-minor-mode)
+ '(so-long-threshold 1000))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

@@ -5,6 +5,7 @@
 
 (use-package bury-successful-compilation :ensure t)
 
+(setq browse-url-browser-function 'browse-url-default-macosx-browser)
 (setq browse-url-generic-program "firefox"
       browse-url-browser-function 'browse-url-generic)
 

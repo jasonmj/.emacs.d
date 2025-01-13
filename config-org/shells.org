@@ -296,7 +296,7 @@ Quickly create a shell with a name or switch to an open shell with completing re
 					shell-buffers))
 	   (buffer-name (completing-read "Shell buffers: " shell-buffer-names)))
       (shell-buffer buffer-name)))
-  (emacs-set-key (kbd "C-`") 'shell-with-name)
+  (emacs-set-key (kbd "C-\\") 'shell-with-name)
 #+end_src
 ** Sticky Shell
 Minor mode to keep track of previous prompt in your shell.
@@ -354,6 +354,16 @@ https://github.com/andyjda/sticky-shell
 	      (overlay-put overlay 'face (plist-get props 'face))
 	      (setq pos (1+ pos))))
 	(message "%s not found" lang-mode))))
+#+end_src
+** Make popped shell fullscreen
+Allows the popper buffer that a shell is in to be made fullscreen
+#+begin_src emacs-lisp
+  (defun popper-shell-fullscreen ()
+    (interactive)
+    (let* ((name (buffer-name)))
+      (delete-window)
+      (switch-to-buffer name)))
+  (emacs-set-key (kbd "C-x c") 'popper-shell-fullscreen)
 #+end_src
 * Vterm
 #+begin_src emacs-lisp

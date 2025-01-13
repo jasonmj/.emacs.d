@@ -264,7 +264,7 @@
 				      shell-buffers))
 	 (buffer-name (completing-read "Shell buffers: " shell-buffer-names)))
     (shell-buffer buffer-name)))
-(emacs-set-key (kbd "C-`") 'shell-with-name)
+(emacs-set-key (kbd "C-\\") 'shell-with-name)
 
 (use-package sticky-shell
   :straight (:type git :host github :repo "andyjda/sticky-shell")
@@ -315,6 +315,13 @@
 	    (overlay-put overlay 'face (plist-get props 'face))
 	    (setq pos (1+ pos))))
       (message "%s not found" lang-mode))))
+
+(defun popper-shell-fullscreen ()
+  (interactive)
+  (let* ((name (buffer-name)))
+    (delete-window)
+    (switch-to-buffer name)))
+(emacs-set-key (kbd "C-x c") 'popper-shell-fullscreen)
 
 (add-to-list 'load-path (concat "/etc/links/vterm/" (string-trim (shell-command-to-string "ls /etc/links/vterm/"))))
 (require 'vterm)

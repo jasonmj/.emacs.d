@@ -17,9 +17,10 @@
   :diminish
   :hook (emacs-startup . gcmh-mode)
   :init
-  (setq gcmh-idle-delay 'auto
-	gcmh-auto-idle-delay-factor 10
-	gcmh-high-cons-threshold #x1000000)) ; 16MB
+  (setq gcmh-idle-delay 'auto  ; default is 15s
+        gcmh-high-cons-threshold (* 32 1024 1024)
+        gcmh-verbose nil
+        gc-cons-percentage 0.2))
 
 (use-package loopy :ensure t :config (require 'loopy-iter))
 (use-package key-chord :ensure t)

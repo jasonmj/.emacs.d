@@ -46,18 +46,20 @@ Easy access to the built-in `list-buffers` display with a key sequence.
 * Kill Buffer
 Efficiently kill buffers and windows. 
 #+begin_src emacs-lisp
-  (defun my/kill-this-buffer (&optional arg)
+  (defun my-kill-this-buffer (&optional arg)
     (interactive "P")
     (pcase arg
       ('4 (call-interactively #'kill-buffer))
       (_ (kill-buffer (current-buffer)))))
-  (global-set-key (kbd "C-x k") 'my/kill-this-buffer)
-  (global-set-key (kbd "C-w") 'my/kill-this-buffer)
-  (key-seq-define-global "gw" 'my/kill-this-buffer)
-  (key-seq-define-global "fw" (lambda () (interactive)
-				(if (eq (length (window-list)) 1)
-				    (my/kill-this-buffer)
-				  (kill-buffer-and-window))))
+  (defun my-kill-this-window ()
+    (interactive)
+    (if (eq (length (window-list)) 1)
+	(my-kill-this-buffer)
+      (kill-buffer-and-window)))
+  (global-set-key (kbd "C-x k") 'my-kill-this-buffer)
+  (global-set-key (kbd "C-w") 'my-kill-this-buffer)
+  (key-seq-define-global "gw" 'my-kill-this-buffer)
+  (key-seq-define-global "fw" 'my-kill-this-window)
 #+end_src
 * MacOS Buffer Switcher
 #+begin_src emacs-lisp
@@ -124,6 +126,10 @@ Efficiently kill buffers and windows.
 
   (defun filter-emacs-buffers-for-hammerspoon (buf)
     (not (string-match-p "magit-process:\\| *server*" (if (bufferp buf) (buffer-name buf) buf))))
+#+end_src
+* Project
+#+begin_src emacs-lisp
+  (emacs-set-key (kbd "M-S-SPC") 'project-switch-project)
 #+end_src
 * Revert Buffer
 Easy access to `revert-buffer` with a key sequence.

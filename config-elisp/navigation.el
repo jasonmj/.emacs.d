@@ -44,13 +44,14 @@
 (eval-after-load 'org #'(define-key org-mode-map (kbd "C-a") 'smarter-move-beginning-of-line))
 
 (key-chord-define-global ".," 'other-window)
+(emacs-set-key (kbd "s-o") 'other-window)
 
 ;;(key-seq-define-global "o0" 'pop-to-mark-command)
-(key-seq-define-global "O)" 'pop-global-mark)
+(key-seq-define-global "O)" 'consult-global-mark)
 
 (use-package popper
   :ensure t
-  :bind (("C-\\"   . popper-cycle))
+  :bind (("C-`"   . 'popper-cycle))
   :custom
   (popper-mode-line t)
   (popper-window-height nil)
@@ -164,14 +165,18 @@
   :bind ("C-S-SPC" . tabgo))
 
 (defun visit-line ()
-  (interactive)
-  (let* ((args (split-string (selection-or-thing-at-point) ":"))
-	 (filename (car args))
-	 (fullpath (concat (project-root (project-current)) filename))
-	 (line (car (cdr args))))
-    (find-file fullpath)
-    (goto-char (point-min))
-    (forward-line (- (string-to-number line) 1))))
+   (interactive)
+   (move-beginning-of-line 1)
+   (set-mark (point))
+   (move-end-of-line 1)
+   ;; TODO: filter out everything in parens
+   (let* ((args (split-string (s-trim (selection-or-thing-at-point)) ":"))
+	  (filename (car args))
+	  (fullpath (concat (project-root (project-current)) filename))
+	  (line (car (cdr args))))
+     (find-file fullpath)
+     (goto-char (point-min))
+     (forward-line (- (string-to-number line) 1))))
 (global-set-key (kbd "C-x i") 'visit-line)
 
 (use-package windmove :ensure t)
