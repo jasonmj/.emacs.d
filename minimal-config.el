@@ -1,6 +1,5 @@
 (defun setup-input-devices()
 	(interactive)
-	(call-process-shell-command "xmodmap ~/.Xmodmap" nil 0)
 	(call-process-shell-command "xinput disable \"SynPS/2 Synaptics TouchPad\"")
 	(call-process-shell-command "xset s 00")
 	(call-process-shell-command "xset -dpms")

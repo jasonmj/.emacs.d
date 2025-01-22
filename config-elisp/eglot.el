@@ -25,6 +25,7 @@
   (read-process-output-max (* 1024 1024))
   :config
   (add-to-list 'exec-path "/Users/jjohnson/git/elixir-lsp/elixir-ls/release/")
+  (add-to-list 'exec-path "/home/jasonmj/git/elixir-lsp/elixir-ls/release/")
   (add-to-list 'exec-path "/Users/jjohnson/git/lexical-lsp/lexical/_build/dev/package/lexical/bin/")
   (add-to-list 'eglot-stay-out-of 'flymake)
   (add-to-list 'eglot-server-programs '(python-mode . ("pyright-langserver" "--stdio")))

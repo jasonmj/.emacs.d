@@ -498,7 +498,7 @@ https://github.com/radian-software/prescient.el
 	  vertico-posframe-min-height 10
 	  vertico-posframe-width 130
 	  vertico-posframe-poshandler #'posframe-poshandler-window-top-center-offset
-	  vertico-posframe-parameters '((alpha . (100 85))
+	  vertico-posframe-parameters '((alpha . 85)
 					(left-fringe . 0)
 					(right-fringe . 0)))
 

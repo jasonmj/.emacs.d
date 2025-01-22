@@ -1,14 +1,5 @@
 #+TITLE: Helpers
 #+PROPERTY: header-args      :tangle "../config-elisp/helpers.el"
-* App Launcher
-Launch application from Emacs.
-
-https://github.com/SebastienWae/app-launcher
-#+begin_src emacs-lisp
-(use-package app-launcher
-  :straight '(app-launcher :host github :repo "SebastienWae/app-launcher")
-  :bind (("C-s-SPC" . app-launcher-run-app)))
-#+end_src
 * Copy File Name
 Copy the current buffer file name to the clipboard.
 #+begin_src emacs-lisp
@@ -145,16 +136,6 @@ This command can exit an interactive command such as query-replace, can clear ou
 #+begin_src emacs-lisp
   (key-seq-define-global "gf" 'keyboard-escape-quit)
 #+end_src
-* Mouse Avoidance Mode
-With mouse avoidance mode set to banish, the behavior will move the mouse to the upper-right corner on any keypress.
-#+begin_src emacs-lisp
-  (mouse-avoidance-mode 'banish)
-  (setq mouse-avoidance-banish-position '((frame-or-window . frame)
-					  (side . right)
-					  (side-pos . 0)
-					  (top-or-bottom . top)
-					  (top-or-bottom-pos . 0)))
-#+end_src
 * Pinentry
 A pinentry for gpg that uses emacsclient to prompt for the passphrase. 
 
@@ -181,7 +162,7 @@ https://github.com/emacs-sideline/sideline
   	  sideline-priority 100                        ; overlays' priority
   	  sideline-delay 5                             ; delay before displaying sideline
   	  sideline-display-backend-name nil))          ; display the backend name
-+end_src
+#+end_src
 ** Sideline Blame
 Show blame messages with sideline.
 
@@ -223,6 +204,18 @@ https://github.com/yanghaoxie/transient-posframe
   (use-package transient-posframe
     :ensure t
     :hook (magit-status-mode . transient-posframe-mode))
+#+end_src
+* Ultra Scroll
+Scroll Emacs like lightning
+https://github.com/jdtsmith/ultra-scroll
+#+begin_src emacs-lisp
+  (use-package ultra-scroll
+    :ensure t
+    :straight (:type git :host github :repo "jdtsmith/ultra-scroll")
+    :init (setq scroll-conservatively 101 ; important!
+		scroll-margin 0)
+    :config
+    (ultra-scroll-mode 1))
 #+end_src
 * Wgrep
 Writable grep buffer and apply the changes to files.

@@ -89,7 +89,32 @@
   (run-with-idle-timer 0.2 nil 'switch-mac-window)
   (get-windows-string))
 
-(emacs-set-key (kbd "C-SPC") 'delayed-switch-mac-window)
+(if (eq system-type 'darwin)
+    (emacs-set-key (kbd "C-SPC") 'delayed-switch-mac-window)
+  (emacs-set-key (kbd "C-SPC") 'consult-project-buffer))
+
+(when (not (eq system-type 'darwin))
+  (setq sxhkd-spy-process (make-process :name "sxhkd-spy"
+				  :buffer nil
+				  :command '("/home/jasonmj/.config/sxhkd/spy")
+				  :connection-type 'pipe))
+  (emacs-set-key (kbd "M-s-f") (lambda () (interactive) (call-process-shell-command "bspc node -f east")))
+  (emacs-set-key (kbd "M-s-b") (lambda () (interactive) (call-process-shell-command "bspc node -f west")))
+  (emacs-set-key (kbd "M-s-n") (lambda () (interactive) (call-process-shell-command "bspc node -f south")))
+  (emacs-set-key (kbd "M-s-p") (lambda () (interactive) (call-process-shell-command "bspc node -f north")))
+  (emacs-set-key (kbd "s-m") (lambda () (interactive) (call-process-shell-command "bspc desktop -l next")))
+  (emacs-set-key (kbd "s-0") (lambda() (interactive) (call-process-shell-command "bspc desktop -f ^10")))
+  (emacs-set-key (kbd "s-1") (lambda() (interactive) (call-process-shell-command "bspc desktop -f ^1")))
+  (emacs-set-key (kbd "s-2") (lambda() (interactive) (call-process-shell-command "bspc desktop -f ^2")))
+  (emacs-set-key (kbd "s-3") (lambda() (interactive) (call-process-shell-command "bspc desktop -f ^3")))
+  (emacs-set-key (kbd "s-4") (lambda() (interactive) (call-process-shell-command "bspc desktop -f ^4")))
+  (emacs-set-key (kbd "s-5") (lambda() (interactive) (call-process-shell-command "bspc desktop -f ^5")))
+  (emacs-set-key (kbd "s-6") (lambda() (interactive) (call-process-shell-command "bspc desktop -f ^6")))
+  (emacs-set-key (kbd "s-7") (lambda() (interactive) (call-process-shell-command "bspc desktop -f ^7")))
+  (emacs-set-key (kbd "s-8") (lambda() (interactive) (call-process-shell-command "bspc desktop -f ^8")))
+  (emacs-set-key (kbd "s-9") (lambda() (interactive) (call-process-shell-command "bspc desktop -f ^9")))
+  (emacs-set-key (kbd "s-w") (lambda() (interactive) (call-process-shell-command "rofi -show window -theme $HOME/git/rofi-collection/nord/nord.rasi")))
+  (emacs-set-key (kbd "C-s-SPC") (lambda() (interactive) (call-process-shell-command "rofi -show drun -theme $HOME/git/rofi-collection/nord/nord.rasi"))))
 
 (defun get-emacs-buffer-list ()
   (seq-filter 'filter-emacs-buffers-for-hammerspoon

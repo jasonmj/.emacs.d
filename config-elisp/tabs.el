@@ -48,7 +48,7 @@
 
   (defun my/tabs-ignore-filter (buffer)
     (let* ((name (buffer-name buffer))
-	   (ignored "\\*scratch\\|vc\\|Messages\\|copilot events\\|Dired log\\|[a-z]-shell\\|magit-process\\|straight-process\\|direnv\\|\\*gemini\\|info\\|Backtrace\\|EGLOT.+\\*"))
+	   (ignored "\\*ednc-log\\|\\*vterm\\|\\*Async-native-compile-log\\|\\*scratch\\|\\straight-process\\|\\*direnv\\|vc\\|Messages\\|copilot events\\|Dired log\\|[a-z]-shell\\|magit-process\\|straight-process\\|direnv\\|\\*gemini\\|info\\|Backtrace\\|EGLOT.+\\*"))
       (not (string-match-p ignored name))))
 
   (defun my/tabs-function (&optional frame)
@@ -105,3 +105,4 @@
     (my-kill-this-buffer))
   (key-seq-define-global "gw" 'my/tab-line-close-tab)
   (defun init-tab-line-function () (setq tab-line-tabs-function 'my/tabs-function)))
+(add-to-list 'after-init-hook 'init-tab-line-function)
