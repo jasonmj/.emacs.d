@@ -17,8 +17,6 @@
   (update-modalka-mode-line))
 (key-seq-define-global "ii" 'toggle-modalka)
 (emacs-set-key (kbd "s-i") 'toggle-modalka)
-(emacs-set-key (kbd "<delete>") 'toggle-modalka)
-(emacs-set-key (kbd "<print>") 'toggle-modalka)
 
 (defun update-modalka-mode-line()
   (if (bound-and-true-p modalka-mode)
@@ -27,8 +25,7 @@
         (setq doom-modeline-bar-width 6))
     (progn
       (custom-set-faces '(doom-modeline-bar ((t (:background "DarkGoldenrod1")))))
-      (setq doom-modeline-bar-width 6)))
-  (unless (eq system-type 'darwin) (exwm-layout--refresh)))
+      (setq doom-modeline-bar-width 6))))
 
 (defun modalka-exwm-click()
   (interactive)

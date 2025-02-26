@@ -118,8 +118,9 @@
 
 (defun cape--iex-bootstrap-filter (proc output)
   (let ((lines (split-string output "\n")))
-    (mapcar (lambda (line) (if (cape--iex-starts-with-iex line) (cape--iex-setup proc))) lines)
-    (comint-output-filter proc output)))
+    ;; (mapcar (lambda (line) (if (cape--iex-starts-with-iex line) (cape--iex-setup proc))) lines)
+    (comint-output-filter proc output))
+  )
 
 (defun cape--iex-output-filter (proc output)
   (with-current-buffer (get-buffer-create "*tmp*") (insert (ansi-color-filter-apply output)))

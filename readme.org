@@ -10,7 +10,6 @@ This is a literate Emacs configuration broken down into multiple org-mode files 
 ***** [[./config-org/dired.org][Dired]]
 ***** [[./config-org/doom-modeline.org][Doom Modeline]]
 ***** [[./config-org/editing.org][Editing]]
-***** [[./config-org/ednc.org][EDNC]]
 ***** [[./config-org/eglot.org][Eglot]]
 ***** [[./config-org/elixir.org][Elixir]]
 ***** [[./config-org/exwm.org][EXWM]]

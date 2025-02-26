@@ -1,8 +1,8 @@
 (use-package magit
-  :ensure t
+  :defer t
   :bind (("C-c g" . magit)
-	 :map magit-mode-map
-	 ("<C-tab>" . tab-line-switch-to-next-tab))
+	   :map magit-mode-map
+	   ("<C-tab>" . tab-line-switch-to-next-tab))
   :chords ("mg" . magit)
   :custom
   (magit-commit-show-diff nil)

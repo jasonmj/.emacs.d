@@ -32,12 +32,12 @@
   ;; Move lines first
   (when (/= arg 1)
     (let ((line-move-visual nil))
-      (forward-line (1- arg))))
+	(forward-line (1- arg))))
 
   (let ((orig-point (point)))
     (back-to-indentation)
     (when (= orig-point (point))
-      (move-beginning-of-line 1))))
+	(move-beginning-of-line 1))))
 
 ;; remap C-a to `smarter-move-beginning-of-line'
 (global-set-key [remap move-beginning-of-line] 'smarter-move-beginning-of-line)
@@ -74,7 +74,7 @@
   The file-system is searched for existing directories but the
   returned paths don't have to exist."
   (when-let* ((path-segments (split-string file "/"))
-	      (positions (related-files-recipe--seq-positions path-segments remove-directory)))
+		(positions (related-files-recipe--seq-positions path-segments remove-directory)))
     (cl-loop
      for position in positions
      for candidate = (string-join (related-files-recipe--seq-remove-at-position path-segments position) "/")
@@ -82,31 +82,31 @@
 
 (defun replace-directory-in-path (file remove-directory add-directory)
   (let* ((without-removed (remove-directory-from-path file remove-directory))
-	 (with-added (if without-removed
-			 (related-files-recipe--add-directory-to-path (car without-removed) add-directory))))
+	   (with-added (if without-removed
+			   (related-files-recipe--add-directory-to-path (car without-removed) add-directory))))
     (if with-added
-	(car with-added)
-      "")))
+	  (car with-added)
+	"")))
 
 (defun test-from-module (file)
   (concat (file-name-sans-extension (replace-directory-in-path file "lib" "test")) "_test.exs"))
 
 (defun module-from-test (file)
   (let* ((replaced (replace-directory-in-path file "test" "lib"))
-	 (without-suffix (if (> (length replaced) 0) (substring (file-name-sans-extension replaced) 0 -5))))
+	   (without-suffix (if (> (length replaced) 0) (substring (file-name-sans-extension replaced) 0 -5))))
     (if without-suffix
-	(concat without-suffix ".ex")
-      file)))
+	  (concat without-suffix ".ex")
+	file)))
 
 (defun spec-from-module (file)
   (concat (file-name-sans-extension (replace-directory-in-path file "lib" "spec")) "_spec.exs"))
 
 (defun module-from-spec (file)
   (let* ((replaced (replace-directory-in-path file "spec" "lib"))
-	 (without-suffix (if (> (length replaced) 0) (substring (file-name-sans-extension replaced) 0 -5))))
+	   (without-suffix (if (> (length replaced) 0) (substring (file-name-sans-extension replaced) 0 -5))))
     (if without-suffix
-	(concat without-suffix ".ex")
-      file)))
+	  (concat without-suffix ".ex")
+	file)))
 
 (defun my/related-files-jumper (file)
   (list
@@ -127,9 +127,9 @@
   (let ((initial-pos (point)))
     (expreg-expand)
     (let ((new-pos (cdr (car (region-bounds)))))
-      (if (eq initial-pos new-pos)
-	  (progn (goto-char new-pos) (forward-char 1))
-	(goto-char new-pos))))
+	(if (eq initial-pos new-pos)
+	    (progn (goto-char new-pos) (forward-char 1))
+	  (goto-char new-pos))))
     (deactivate-mark))
 (global-set-key (kbd "C-s-f") 'forward-node)
 
@@ -138,9 +138,9 @@
   (let ((initial-pos (point)))
     (expreg-expand)
     (let ((new-pos (car (car (region-bounds)))))
-      (if (eq initial-pos new-pos)
-	  (progn (backward-char 1) (backward-node))
-	(goto-char new-pos))))
+	(if (eq initial-pos new-pos)
+	    (progn (backward-char 1) (backward-node))
+	  (goto-char new-pos))))
   (deactivate-mark))
 (global-set-key (kbd "C-s-b") 'backward-node)
 
@@ -149,9 +149,9 @@
   (let ((initial-pos (point)))
     (expreg-expand)
     (let ((new-pos (car (car (region-bounds)))))
-      (if (eq initial-pos new-pos)
-	  (up-node)
-	(goto-char new-pos))))
+	(if (eq initial-pos new-pos)
+	    (up-node)
+	  (goto-char new-pos))))
   (deactivate-mark))
 (global-set-key (kbd "C-s-p") 'up-node)
 
@@ -171,24 +171,43 @@
    (move-end-of-line 1)
    ;; TODO: filter out everything in parens
    (let* ((args (split-string (s-trim (selection-or-thing-at-point)) ":"))
-	  (filename (car args))
-	  (fullpath (concat (project-root (project-current)) filename))
-	  (line (car (cdr args))))
+	    (filename (string-replace "└─ " "" (car args)))
+	    (fullpath (concat (project-root (project-current)) filename))
+	    (line (car (cdr args))))
      (find-file fullpath)
      (goto-char (point-min))
      (forward-line (- (string-to-number line) 1))))
 (global-set-key (kbd "C-x i") 'visit-line)
 
 (use-package windmove :ensure t)
-(emacs-set-key (kbd "s-b") 'windmove-left)
-(emacs-set-key (kbd "s-f") 'windmove-right)
-(emacs-set-key (kbd "s-p") 'windmove-up)
-(emacs-set-key (kbd "s-n") 'windmove-down)
+(emacs-set-key (kbd "s-b") (lambda () (interactive) (my-windmove 'left)))
+(emacs-set-key (kbd "s-f") (lambda () (interactive) (my-windmove 'right)))
+(emacs-set-key (kbd "s-p") (lambda () (interactive) (my-windmove 'up)))
+(emacs-set-key (kbd "s-n") (lambda () (interactive) (my-windmove 'down)))
 (emacs-set-key (kbd "C-1") 'delete-other-windows)
 (emacs-set-key (kbd "C-2") (lambda () (interactive) (split-window-below)
-				  (run-with-idle-timer 0.15 nil (lambda() (interactive) (windmove-down)))))
+			     (run-with-idle-timer 0.15 nil (lambda() (interactive) (windmove-down)))))
 (emacs-set-key (kbd "C-3") (lambda () (interactive) (split-window-right) (windmove-right)))
 (emacs-set-key (kbd "<C-escape>") 'delete-window)
+
+(defun my-windmove (dir)
+  "Handle cases when windmove-{left,right,up,down} fails due to no window in direction DIR.
+DIR should be one of 'left, 'right, 'up, or 'down."
+  (condition-case err
+      (pcase dir
+	('left (windmove-left))
+	('right (windmove-right))
+	('up (windmove-up))
+	('down (windmove-down)))
+    (error
+     ;; Here you can specify what should happen when movement fails
+     (when (not (eq system-type 'darwin))
+       (pcase dir
+	 ('left (call-process-shell-command "hyprctl dispatch movefocus l"))
+	 ('right (call-process-shell-command "hyprctl dispatch movefocus r"))
+	 ('up (call-process-shell-command "hyprctl dispatch movefocus u"))
+	 ('down (call-process-shell-command "hyprctl dispatch movefocus d")))
+       ))))
 
 (winner-mode 1)
 (emacs-set-key (kbd "s-z") 'winner-undo)

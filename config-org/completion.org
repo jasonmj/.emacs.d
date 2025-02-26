@@ -329,12 +329,13 @@ Dynamic abbreviations let you write just a few characters of words you've writte
      :map embark-region-map
      ("O" . syntax-overlay-region)
      ("W" . consult-web-search))
-    :custom (prefix-help-command . #'embark-prefix-help-command)
     :config
     (add-to-list 'display-buffer-alist
 		 '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
 		   nil
-		   (window-parameters (mode-line-format . none)))))
+		   (window-parameters (mode-line-format . none))))
+    :init
+    (setq prefix-help-command #'embark-prefix-help-command))
 #+end_src
 ** Embark Consult
 #+begin_src emacs-lisp
@@ -498,7 +499,7 @@ https://github.com/radian-software/prescient.el
 	  vertico-posframe-min-height 10
 	  vertico-posframe-width 130
 	  vertico-posframe-poshandler #'posframe-poshandler-window-top-center-offset
-	  vertico-posframe-parameters '((alpha . 85)
+	  vertico-posframe-parameters '((alpha-background . 85)
 					(left-fringe . 0)
 					(right-fringe . 0)))
 

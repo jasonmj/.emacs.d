@@ -6,7 +6,7 @@ Magit is a complete text-based user interface to Git.
 https://magit.vc
 #+begin_src emacs-lisp
   (use-package magit
-    :ensure t
+    :defer t
     :bind (("C-c g" . magit)
 	   :map magit-mode-map
 	   ("<C-tab>" . tab-line-switch-to-next-tab))

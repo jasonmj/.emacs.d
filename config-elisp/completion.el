@@ -4,38 +4,38 @@
     :hook (shell-mode . (lambda () (define-key shell-mode-map (kbd "C-r") 'cape-history)))
     :config
     (setq dabbrev-upcase-means-case-search t
-	  dabbrev-check-all-buffers nil
-	  dabbrev-check-other-buffers nil
-	  cape-dabbrev-min-length 0)
+	    dabbrev-check-all-buffers nil
+	    dabbrev-check-other-buffers nil
+	    cape-dabbrev-min-length 0)
     (defun cape-history (&optional interactive)
-      "Complete from Eshell, Comint or minibuffer history.
-       See also `consult-history' for a more flexible variant based on
-       `completing-read'.  If INTERACTIVE is nil the function acts like a Capf."
-      (interactive (list t))
-      (if interactive
-	  (cape-interactive #'cape-history)
-	(let (history bol)
-	  (cond
-	   ((derived-mode-p 'eshell-mode)
-	    (setq history eshell-history-ring
-		  bol (save-excursion (eshell-bol) (point))))
-	   ((derived-mode-p 'comint-mode)
-	    (setq history comint-input-ring
-	      bol (save-excursion (comint-bol) (point))))
-	   ((and (minibufferp) (not (eq minibuffer-history-variable t)))
-	    (setq history (symbol-value minibuffer-history-variable)
-		  bol (line-beginning-position))))
-	  (when (ring-p history)
-	    (setq history (ring-elements history)))
-	  (when history
-	    `(,bol ,(point)
-		   ,(cape--properties-table (delete-dups history) :sort nil)
-		   ,@cape--history-properties)))))
+	"Complete from Eshell, Comint or minibuffer history.
+	 See also `consult-history' for a more flexible variant based on
+	 `completing-read'.  If INTERACTIVE is nil the function acts like a Capf."
+	(interactive (list t))
+	(if interactive
+	    (cape-interactive #'cape-history)
+	  (let (history bol)
+	    (cond
+	     ((derived-mode-p 'eshell-mode)
+	      (setq history eshell-history-ring
+		    bol (save-excursion (eshell-bol) (point))))
+	     ((derived-mode-p 'comint-mode)
+	      (setq history comint-input-ring
+		bol (save-excursion (comint-bol) (point))))
+	     ((and (minibufferp) (not (eq minibuffer-history-variable t)))
+	      (setq history (symbol-value minibuffer-history-variable)
+		    bol (line-beginning-position))))
+	    (when (ring-p history)
+	      (setq history (ring-elements history)))
+	    (when history
+	      `(,bol ,(point)
+		     ,(cape--properties-table (delete-dups history) :sort nil)
+		     ,@cape--history-properties)))))
     (add-hook 'shell-mode-hook (lambda ()
-				 (setq-local completion-at-point-functions
-					     (list (cape-capf-buster #'cape-history)
-						   #'cape-dabbrev
-						   #'cape-file))))
+				   (setq-local completion-at-point-functions
+					       (list (cape-capf-buster #'cape-history)
+						     #'cape-dabbrev
+						     #'cape-file))))
     ;; (add-hook 'eglot-managed-mode-hook (lambda ()
     ;;     				 (add-to-list 'completion-at-point-functions #'cape-dabbrev)))
 
@@ -53,25 +53,25 @@
 (use-package consult
   :ensure t
   :bind (("C-c h" . consult-history)
-	 ("C-c l" . consult-theme)
-	 ("C-;" . consult-recent-file)
-	 ("s-SPC" . consult-buffer)
-	 ("C-x B" . consult-bookmark)
-	 ("C-SPC" . consult-project-buffer)
-	 ("M-y" . consult-yank-pop)
-	 ("M-g g" . consult-goto-line)
-	 ("M-g o" . consult-outline)
-	 ("M-g m" . consult-mark)
-	 ("M-g k" . consult-global-mark)
-	 ("M-g i" . consult-imenu)
-	 ("M-g I" . consult-imenu-multi)
-	 ("s-s" . consult-ripgrep)
-	 ("M-s" . my/consult-line)
-	 ("C-x f" . find-file)
-	 ("M-SPC" . project-find-file)
-	 :map minibuffer-local-map
-	 ("M-s" . consult-history)
-	 ("M-r" . consult-history))
+	   ("C-c l" . consult-theme)
+	   ("C-;" . consult-recent-file)
+	   ("s-SPC" . consult-buffer)
+	   ("C-x B" . consult-bookmark)
+	   ("C-SPC" . consult-project-buffer)
+	   ("M-y" . consult-yank-pop)
+	   ("M-g g" . consult-goto-line)
+	   ("M-g o" . consult-outline)
+	   ("M-g m" . consult-mark)
+	   ("M-g k" . consult-global-mark)
+	   ("M-g i" . consult-imenu)
+	   ("M-g I" . consult-imenu-multi)
+	   ("s-s" . consult-ripgrep)
+	   ("M-s" . my/consult-line)
+	   ("C-x f" . find-file)
+	   ("M-SPC" . project-find-file)
+	   :map minibuffer-local-map
+	   ("M-s" . consult-history)
+	   ("M-r" . consult-history))
 
   ;; Enable automatic preview at point in the *Completions* buffer. This is
   ;; relevant when you use the default completion UI.
@@ -83,11 +83,11 @@
   (consult-line-start-from-top t)
   (consult-preview-key 'any)
   (consult-buffer-filter '("^ " "\\` " "\\*Echo Area" "\\*Minibuf" "\\*Quail Completions" "\\*Backtrace"
-			   "\\*elixir-ls" "Flymake log" "Shell command output" "direnv" "\\*scratch" "Shell:"
-			   "\\*Messages" "\\*Warning" "*magit-" "magit-process" "*vterm" "vterm" "^:" ".+-shell*"
-			   "*straight-" "*elfeed-log" "*trace of SMTP session" "\\*Compile-Log" "\\*copilot events"
-			   "*format-all-error" "*Async-" "COMMIT_EDITMSG" "shell: " "\\*ednc-log" "TAGS" "\\*gemini"
-			   "*lsp-" "*EGLOT" "*pyls" "*vc" "*citre-ctags*" "*flycheck-posframe-buffer*" "*xob*"))
+			     "\\*elixir-ls" "Flymake log" "Shell command output" "direnv" "\\*scratch" "Shell:"
+			     "\\*Messages" "\\*Warning" "*magit-" "magit-process" "*vterm" "vterm" "^:" ".+-shell*"
+			     "*straight-" "*elfeed-log" "*trace of SMTP session" "\\*Compile-Log" "\\*copilot events"
+			     "*format-all-error" "*Async-" "COMMIT_EDITMSG" "shell: " "\\*ednc-log" "TAGS" "\\*gemini"
+			     "*lsp-" "*EGLOT" "*pyls" "*vc" "*citre-ctags*" "*flycheck-posframe-buffer*" "*xob*"))
 
   :config
   ;; Consult-yank-pop
@@ -98,12 +98,12 @@
   (defun my/consult-yank-pop (orig-fun &rest args)
     (interactive "p")
     (if (equal major-mode 'exwm-mode)
-	(let ((inhibit-read-only t))
-	  (cl-letf (((symbol-function 'insert-for-yank)
-		     (lambda (str) (kill-new str)
-		       (exwm-input--fake-key ?\C-v))))
-	    (apply orig-fun args)))
-      (apply orig-fun args)))
+	  (let ((inhibit-read-only t))
+	    (cl-letf (((symbol-function 'insert-for-yank)
+		       (lambda (str) (kill-new str)
+			 (exwm-input--fake-key ?\C-v))))
+	      (apply orig-fun args)))
+	(apply orig-fun args)))
   (advice-add 'consult-yank-pop :around #'my/consult-yank-pop)
 
   ;; Find File
@@ -114,21 +114,21 @@
 
   ;; Switch buffer
   (defun my/buffer-switch ()
-				      (interactive)
-				      (if (project-current)
-					  (consult-project-buffer)
-					(consult-buffer)))
+					(interactive)
+					(if (project-current)
+					    (consult-project-buffer)
+					  (consult-buffer)))
   (emacs-set-key (kbd "C-SPC") 'my/buffer-switch)
   (key-seq-define-global "cz" 'execute-extended-command)
   (key-seq-define-global "cx" 'execute-extended-command)
 
   ;; Configure previews
   (consult-customize consult-recent-file :preview-key nil
-		     consult-theme :preview-key nil
-		     consult-project-buffer :preview-key nil
-		     ;; consult-ripgrep :preview-key nil
-		     ;; consult-buffer :preview-key nil
-		     my/buffer-switch :preview-key nil))
+		       consult-theme :preview-key nil
+		       consult-project-buffer :preview-key nil
+		       ;; consult-ripgrep :preview-key nil
+		       ;; consult-buffer :preview-key nil
+		       my/buffer-switch :preview-key nil))
 
 (defun consult-line-at-point ()
   (interactive)
@@ -172,13 +172,13 @@ actual list of candidates is later updated by the \:success
 function."
   (let (candidates)
     (request
-      url
-      :sync t
-      :headers '(("User-Agent" . "Emacs"))
-      :parser parser
-      :error #'consult-web--handle-error
-      :success (cl-function (lambda (&key data &allow-other-keys)
-			      (setq candidates data))))
+	url
+	:sync t
+	:headers '(("User-Agent" . "Emacs"))
+	:parser parser
+	:error #'consult-web--handle-error
+	:success (cl-function (lambda (&key data &allow-other-keys)
+				(setq candidates data))))
     candidates))
 
 (defun consult-web--format-candidate (text url)
@@ -192,22 +192,22 @@ function."
    (concat "https://duckduckgo.com/html/?q=" (url-hexify-string string))
    (lambda ()
      (mapcar
-      (lambda (a)
-	(let* ((href (assoc-default 'href (dom-attributes a))))
-	  (consult-web--format-candidate
-	   (dom-texts a)
-	   ;; DDG sometimes appends "&rut...", which I can only guess is an
-	   ;; anti-bot measure. See https://github.com/mnewt/counsel-web/issues/3.
-	   (substring href (string-match "http" href) (string-match "&rut=" href)))))
-      (dom-by-class (libxml-parse-html-region (point-min) (point-max)) "result__a")))
+	(lambda (a)
+	  (let* ((href (assoc-default 'href (dom-attributes a))))
+	    (consult-web--format-candidate
+	     (dom-texts a)
+	     ;; DDG sometimes appends "&rut...", which I can only guess is an
+	     ;; anti-bot measure. See https://github.com/mnewt/counsel-web/issues/3.
+	     (substring href (string-match "http" href) (string-match "&rut=" href)))))
+	(dom-by-class (libxml-parse-html-region (point-min) (point-max)) "result__a")))
    "Searching DuckDuckGo..."))
 
 (defun consult-web-search ()
   "Search the web with Consult."
   (interactive)
   (let* ((string (read-string "Web Search: " nil nil))
-	 (results (consult-web-search--duckduckgo string))
-	 (selection (completing-read "Results: " results)))
+	   (results (consult-web-search--duckduckgo string))
+	   (selection (completing-read "Results: " results)))
     (browse-url (car (cdr (split-string selection "\n"))))))
 
 (defun consult-web-thing-at-point ()
@@ -220,12 +220,12 @@ function."
   :bind (:map corfu-map ("C-e" . corfu-complete))
   :init
   (setq corfu-auto-prefix 1
-	corfu-auto-delay 0.015
-	corfu-auto t
-	corfu-cycle t
-	corfu-quit-no-match t
-	corfu-preselect 'first
-	corfu-scroll-margin 5)
+	  corfu-auto-delay 0.015
+	  corfu-auto t
+	  corfu-cycle t
+	  corfu-quit-no-match t
+	  corfu-preselect 'first
+	  corfu-scroll-margin 5)
   (corfu-indexed-mode 1)
   (corfu-history-mode 1)
   (savehist-mode t)
@@ -236,29 +236,29 @@ function."
   (cl-defmethod corfu--affixate :around (cands &context (corfu-indexed-mode (eql t)))
     (setq cands (cdr (cl-call-next-method cands)))
     (let* ((space #(" " 0 1 (face (:height 0.5 :inherit corfu-indexed))))
-	   (width (if (length> cands (- 10 corfu-indexed-start)) 2 1))
-	   (fmt (concat space
-			(propertize (format "%%%ds" width)
-				    'face 'corfu-indexed)
-			space))
-	   (align
-	    (propertize (make-string width ?\s)
-			'display
-			`(space :align-to (+ left ,(1+ width))))))
-      (cl-loop for cand in cands for index from corfu-indexed-start do
-	       (setf (cadr cand)
-		     (concat
-		      (propertize " " 'display (format fmt index))
-		      (cadr cand)
-		      align)))
-      (cons t cands)))
+	     (width (if (length> cands (- 10 corfu-indexed-start)) 2 1))
+	     (fmt (concat space
+			  (propertize (format "%%%ds" width)
+				      'face 'corfu-indexed)
+			  space))
+	     (align
+	      (propertize (make-string width ?\s)
+			  'display
+			  `(space :align-to (+ left ,(1+ width))))))
+	(cl-loop for cand in cands for index from corfu-indexed-start do
+		 (setf (cadr cand)
+		       (concat
+			(propertize " " 'display (format fmt index))
+			(cadr cand)
+			align)))
+	(cons t cands)))
 
   ;; Completion in the minibuffer
   (defun corfu-move-to-minibuffer ()
     (interactive)
     (let ((completion-extra-properties corfu--extra)
-	  completion-cycle-threshold completion-cycling)
-      (apply #'consult-completion-in-region completion-in-region--data)))
+	    completion-cycle-threshold completion-cycling)
+	(apply #'consult-completion-in-region completion-in-region--data)))
 
   ;; Insert indexed candidate without needing to press enter
   (defun corfu-indexed-insert (i)
@@ -287,7 +287,7 @@ function."
 
 (use-package dabbrev
   :bind (("M-/" . dabbrev-completion)
-	 ("C-M-/" . dabbrev-expand))
+	   ("C-M-/" . dabbrev-expand))
   :custom (dabbrev-ignored-buffer-regexps '("\\.\\(?:pdf\\|jpe?g\\|png\\)\\'")))
 
 (use-package embark
@@ -300,12 +300,13 @@ function."
    :map embark-region-map
    ("O" . syntax-overlay-region)
    ("W" . consult-web-search))
-  :custom (prefix-help-command . #'embark-prefix-help-command)
   :config
   (add-to-list 'display-buffer-alist
-	       '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
-		 nil
-		 (window-parameters (mode-line-format . none)))))
+		 '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+		   nil
+		   (window-parameters (mode-line-format . none))))
+  :init
+  (setq prefix-help-command #'embark-prefix-help-command))
 
 (use-package embark-consult
   :ensure t
@@ -372,28 +373,28 @@ function."
     "Redisplay window WIN."
   (when-let (mbwin (active-minibuffer-window))
     (when (eq (window-buffer mbwin) (current-buffer))
-      (unless (eq win mbwin)
-	(setq-local truncate-lines (< (window-point win)
-				      (* 0.8 (window-width win))))
-	(set-window-point win (point))
-	(set-window-hscroll win 0))
-      (when (and vertico-buffer-hide-prompt
-		 (not (frame-root-window-p mbwin)))
-	(window-resize mbwin (- (window-pixel-height mbwin)) nil nil 'pixelwise)
-	(set-window-vscroll mbwin 100))
-      (let ((old cursor-in-non-selected-windows)
-	    (new (and (eq (selected-window) mbwin)
-		      (if (memq cursor-type '(nil t)) 'hbar cursor-type))))
-	(unless (eq new old)
-	  (setq-local cursor-in-non-selected-windows new)
-	  (force-mode-line-update t)))))))
+	(unless (eq win mbwin)
+	  (setq-local truncate-lines (< (window-point win)
+					(* 0.8 (window-width win))))
+	  (set-window-point win (point))
+	  (set-window-hscroll win 0))
+	(when (and vertico-buffer-hide-prompt
+		   (not (frame-root-window-p mbwin)))
+	  (window-resize mbwin (- (window-pixel-height mbwin)) nil nil 'pixelwise)
+	  (set-window-vscroll mbwin 100))
+	(let ((old cursor-in-non-selected-windows)
+	      (new (and (eq (selected-window) mbwin)
+			(if (memq cursor-type '(nil t)) 'hbar cursor-type))))
+	  (unless (eq new old)
+	    (setq-local cursor-in-non-selected-windows new)
+	    (force-mode-line-update t)))))))
 
 (use-package vertico-quick
   :after vertico
   :bind (:map vertico-map
-	      ("s-SPC" . vertico-quick-exit)
-	      ("<escape>" . vertico-quick-exit)
-	      ("C-o" . vertico-quick-embark))
+		("s-SPC" . vertico-quick-exit)
+		("<escape>" . vertico-quick-exit)
+		("C-o" . vertico-quick-embark))
   :config
   (defun vertico-quick-embark (&optional arg)
     "Embark on candidate using quick keys."
@@ -424,46 +425,46 @@ function."
   :init (vertico-posframe-mode 1)
   :config
   (setq vertico-posframe-border-width 12
-	vertico-posframe-hide-minibuffer t
-	vertico-posframe-min-width 110
-	vertico-posframe-height nil
-	vertico-posframe-min-height 10
-	vertico-posframe-width 130
-	vertico-posframe-poshandler #'posframe-poshandler-window-top-center-offset
-	vertico-posframe-parameters '((alpha . 85)
-				      (left-fringe . 0)
-				      (right-fringe . 0)))
+	  vertico-posframe-hide-minibuffer t
+	  vertico-posframe-min-width 110
+	  vertico-posframe-height nil
+	  vertico-posframe-min-height 10
+	  vertico-posframe-width 130
+	  vertico-posframe-poshandler #'posframe-poshandler-window-top-center-offset
+	  vertico-posframe-parameters '((alpha-background . 85)
+					(left-fringe . 0)
+					(right-fringe . 0)))
 
   (custom-set-faces `(vertico-posframe-border ((t (:background nil)))))
 
   (defun posframe-poshandler-window-top-center-offset (info)
     "Posframe's position handler.
 
-       Get a position which let posframe stay onto current window's
-       top center.  The structure of INFO can be found in docstring of
-       `posframe-show'."
+	 Get a position which let posframe stay onto current window's
+	 top center.  The structure of INFO can be found in docstring of
+	 `posframe-show'."
     (setq-local tab-line-format nil)
     (let* ((window-left (plist-get info :parent-window-left))
-	   (window-top (plist-get info :parent-window-top))
-	   (window-width (plist-get info :parent-window-width))
-	   (posframe-width (plist-get info :posframe-width)))
-      (cons (+ window-left (/ (- window-width posframe-width) 2))
-	    (+ window-top 128))))
+	     (window-top (plist-get info :parent-window-top))
+	     (window-width (plist-get info :parent-window-width))
+	     (posframe-width (plist-get info :posframe-width)))
+	(cons (+ window-left (/ (- window-width posframe-width) 2))
+	      (+ window-top 128))))
   (defun vertico-posframe--handle-minibuffer-window ()
-      "Handle minibuffer window."
-      (let ((show-minibuffer-p (vertico-posframe--show-minibuffer-p))
-	    (minibuffer-window (active-minibuffer-window)))
-	(setq-local max-mini-window-height 1)
-	;; Let minibuffer-window's height = 1
-	(when-let* ((win (active-minibuffer-window))
-		    ((not (frame-root-window-p win))))
-	  (window-resize minibuffer-window
-			 (- (window-pixel-height minibuffer-window))
-			 nil nil 'pixelwise))
-	;; Hide the context showed in minibuffer-window.
-	(set-window-vscroll minibuffer-window 100)
-	(when show-minibuffer-p
-	  (set-window-vscroll minibuffer-window 0)))))
+	"Handle minibuffer window."
+	(let ((show-minibuffer-p (vertico-posframe--show-minibuffer-p))
+	      (minibuffer-window (active-minibuffer-window)))
+	  (setq-local max-mini-window-height 1)
+	  ;; Let minibuffer-window's height = 1
+	  (when-let* ((win (active-minibuffer-window))
+		      ((not (frame-root-window-p win))))
+	    (window-resize minibuffer-window
+			   (- (window-pixel-height minibuffer-window))
+			   nil nil 'pixelwise))
+	  ;; Hide the context showed in minibuffer-window.
+	  (set-window-vscroll minibuffer-window 100)
+	  (when show-minibuffer-p
+	    (set-window-vscroll minibuffer-window 0)))))
 
 (use-package yasnippet
   :ensure t

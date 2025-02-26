@@ -105,7 +105,7 @@
 			     (details (string-join (cdr (cdr lines)) "\n")))
 			(flymake-mix-test--push-diag full-filepath line-number details))))
 		lines)))
-  (if (string-match-p ", 0 failures" output) (alert "Tests passed: 0 failures" :title "mix test"))
+  (if (string-match-p ", 0 failures" output) (alert "Tests passed: 0 failures" :title "mix test" :severity 'trivial))
   (if (string-match-p "^error:.+" output)
       (let* ((details (progn
 		    (string-match "error:\\(.+\)\\)" output)
@@ -119,7 +119,8 @@
 	(if (and details line-number)
 	    (progn
 	      (flymake-mix-test--push-diag full-filepath line-number (s-trim details))
-	      (run-with-idle-timer 1 nil (lambda () (flymake-mix-test--goto-error))))))))
+	      ;; (run-with-idle-timer 1 nil (lambda () (flymake-mix-test--goto-error)))
+	      )))))
 
 (defun flymake-mix-test--goto-error ()
   (let* ((diag (car flymake-mix-test-diags))

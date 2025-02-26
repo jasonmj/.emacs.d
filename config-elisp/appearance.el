@@ -1,8 +1,16 @@
+(defun setup-frame-appearance (frame) (interactive)
+	 (set-face-attribute 'default nil :font "Iosevka 13")
+	 (use-package fira-code-mode
+	   :ensure t
+	   :config (fira-code-mode-set-font)
+	   :hook prog-mode))
+(add-hook 'after-make-frame-functions 'setup-frame-appearance)
+
 (use-package circadian
   :ensure t
   :custom
   (circadian-themes '(("7:00"  . modus-operandi-tinted)
-		      ("17:30" . modus-vivendi-tinted)))
+			("17:30" . modus-vivendi-tinted)))
   :hook (after-init . circadian-setup))
 
 (use-package emacs
@@ -14,11 +22,12 @@
   :config (setq fancy-battery-show-percentage t))
 
 (use-package fira-code-mode
+  :if (display-graphic-p)
   :ensure t
   :config (fira-code-mode-set-font)
   :hook prog-mode)
 
-(set-face-attribute 'default nil :font "Iosevka 17")
+(set-face-attribute 'default nil :font "Iosevka 15")
 
 (setq-default truncate-lines -1)
 

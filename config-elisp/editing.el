@@ -55,7 +55,7 @@
   :bind (("M-s-p" . evil-numbers/inc-at-pt)
 	 ("M-s-n" . evil-numbers/dec-at-pt)))
 
-(use-package indent-bars
+(defun load-indent-bars (frame) (use-package indent-bars
   :ensure t
   :straight (indent-bars :type git :host github :repo "jdtsmith/indent-bars")
   :config
@@ -64,10 +64,11 @@
     (indent-bars-setup))
   (defun my/minibuffer-exit ()
     (run-with-idle-timer 0.05 nil (lambda ()
-                                   (if (and (derived-mode-p 'prog-mode) (not indent-bars-mode)) 
-                                       (my/indent-bars-init)))))
+				   (if (and (derived-mode-p 'prog-mode) (not indent-bars-mode))
+				       (my/indent-bars-init)))))
   (add-hook 'minibuffer-exit-hook 'my/minibuffer-exit)
-  :hook (prog-mode . (lambda () (setq indent-tabs-mode nil) (indent-bars-mode))))'
+  :hook (prog-mode . (lambda () (setq indent-tabs-mode nil) (indent-bars-mode)))))
+(add-hook 'after-make-frame-functions 'load-indent-bars)
 
 (defun kill-ring-clear () (interactive) (setq kill-ring nil))
 

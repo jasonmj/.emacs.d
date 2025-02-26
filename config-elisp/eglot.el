@@ -15,29 +15,16 @@
   (eldoc-box-cleanup-interval 1))
 
 (use-package eglot
-  :hook ((elixir-ts-mode . eglot-ensure)
-	 (elixir-ts-mode-hook . eglot-ensure)
-	 (c-mode . eglot-ensure)
-	 (eglot--managed-mode . manually-activate-flymake)
-	 (python-mode . eglot-ensure))
+  :defer t
   :custom
   (eglot-extend-to-xref t)
   (read-process-output-max (* 1024 1024))
+  :hook ((elixir-ts-mode . eglot-ensure)
+	 (elixir-ts-mode-hook . eglot-ensure)
+	 (eglot--managed-mode . manually-activate-flymake))
   :config
-  (add-to-list 'exec-path "/Users/jjohnson/git/elixir-lsp/elixir-ls/release/")
-  (add-to-list 'exec-path "/home/jasonmj/git/elixir-lsp/elixir-ls/release/")
-  (add-to-list 'exec-path "/Users/jjohnson/git/lexical-lsp/lexical/_build/dev/package/lexical/bin/")
-  (add-to-list 'eglot-stay-out-of 'flymake)
-  (add-to-list 'eglot-server-programs '(python-mode . ("pyright-langserver" "--stdio")))
-  (add-to-list 'eglot-server-programs `((elixir-ts-mode heex-ts-mode) . ,(eglot-alternatives '("language_server.sh" "start_lexical.sh"))))
-  (push :documentHighlightProvider eglot-ignored-server-capabilities)
-  (push :codeActionProvider eglot-ignored-server-capabilities)
-  ;; (add-to-list 'exec-path "/Users/jjohnson/.nix-profile/bin/")
-  ;; (with-eval-after-load 'eglot
-  ;;   (add-to-list 'eglot-server-programs
-  ;;       	 `((elixir-ts-mode heex-ts-mode elixir-mode) .
-  ;;       	   ("nextls" "--stdio=true" :initializationOptions (:experimental (:completions (:enable t)))))))
- )
+  (add-to-list 'exec-path "~/git/lexical-lsp/lexical/bin/")
+  (add-to-list 'eglot-stay-out-of 'flymake))
 
 (defun manually-activate-flymake ()
   (add-hook 'flymake-diagnostic-functions #'eglot-flymake-backend nil t)

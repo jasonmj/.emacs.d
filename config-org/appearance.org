@@ -1,5 +1,15 @@
 #+TITLE: Appearance
 #+PROPERTY: header-args      :tangle "../config-elisp/appearance.el"
+* Appearance
+#+begin_src emacs-lisp
+  (defun setup-frame-appearance (frame) (interactive)
+	 (set-face-attribute 'default nil :font "Iosevka 13")
+	 (use-package fira-code-mode
+	   :ensure t
+	   :config (fira-code-mode-set-font)
+	   :hook prog-mode))
+  (add-hook 'after-make-frame-functions 'setup-frame-appearance)
+#+end_src
 * Circadian
 Theme-switching for Emacs based on daytime.
 
@@ -34,6 +44,7 @@ Emacs minor mode for Fira Code ligatures using prettify-symbols.
 https://github.com/jming422/fira-code-mode
 #+begin_src emacs-lisp
   (use-package fira-code-mode
+    :if (display-graphic-p)
     :ensure t
     :config (fira-code-mode-set-font)
     :hook prog-mode)
@@ -41,7 +52,7 @@ https://github.com/jming422/fira-code-mode
 * Font Face
 Set the default face font attribute. 
 #+begin_src emacs-lisp
-  (set-face-attribute 'default nil :font "Iosevka 17")
+  (set-face-attribute 'default nil :font "Iosevka 15")
 #+end_src
 * Line Truncation
 Never truncate lines by default. 

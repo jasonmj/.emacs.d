@@ -2,16 +2,9 @@
   :ensure t
   :custom (doom-modeline-icon nil)
   :config
-  (doom-modeline-def-segment exwm-workspace
-    (if (eq system-type 'darwin) (propertize "") (propertize (concat " [" (number-to-string exwm-workspace-current-index) "]") 'face '(:weight bold))))
-
-  (doom-modeline-def-segment toggl-timer
-    (let* ((description (if (fboundp 'toggl-get-timer) (toggl-get-timer) "No timer")))
-	(when description (propertize (concat description " | ") 'face '(:weight normal)))))
-
   (doom-modeline-def-modeline 'my-simple-line
     '(bar matches buffer-info remote-host)
-    '(misc-info exwm-workspace major-mode process vcs))
+    '(misc-info major-mode process vcs))
 
   (defun setup-custom-doom-modeline ()
     (doom-modeline-set-modeline 'my-simple-line 'default))

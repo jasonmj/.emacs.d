@@ -23,8 +23,6 @@
   (update-modalka-mode-line))
 (key-seq-define-global "ii" 'toggle-modalka)
 (emacs-set-key (kbd "s-i") 'toggle-modalka)
-(emacs-set-key (kbd "<delete>") 'toggle-modalka)
-(emacs-set-key (kbd "<print>") 'toggle-modalka)
 #+end_src
 * Update Mode Line Indication
 #+begin_src emacs-lisp
@@ -35,8 +33,7 @@
         (setq doom-modeline-bar-width 6))
     (progn
       (custom-set-faces '(doom-modeline-bar ((t (:background "DarkGoldenrod1")))))
-      (setq doom-modeline-bar-width 6)))
-  (unless (eq system-type 'darwin) (exwm-layout--refresh)))
+      (setq doom-modeline-bar-width 6))))
 #+end_src
 * Define EXWM Keys
 #+begin_src emacs-lisp

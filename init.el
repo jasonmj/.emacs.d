@@ -5,6 +5,7 @@
 (menu-bar-mode -1)
 (scroll-bar-mode -1)
 (tool-bar-mode -1)
+(toggle-debug-on-error)
 
 ;;; Add Package and Archives
 (require 'package)
@@ -20,18 +21,14 @@
 ;;; Load Minimal Config
 (load-file "~/.emacs.d/minimal-config.el")
 
-(setq mouse-autoselect-window nil
-      focus-follows-mouse nil)
-(unless (eq system-type 'darwin)
-  (use-package exwm :ensure t)
-  (require 'exwm)
-  (exwm-enable))
+;;; Start the Emacs server
+(require 'server)
+(or (server-running-p)
+    (server-start))
 
 ;;; Maybe EXWM Set Key
 (defun emacs-set-key (key cmd)
-  (if (eq system-type 'darwin)
-      (global-set-key key cmd)
-    (exwm-input-set-key key cmd)))
+  (global-set-key key cmd))
 
 ;;; MacOS Customizations
 (when (eq system-type 'darwin)
@@ -79,11 +76,15 @@
   (load bootstrap-file nil 'nomessage))
 (setq package-enable-at-startup nil)
 
+;;; Project
+(straight-use-package 'project)
+
 ;;; Set the Config File
 (defun load-directory (dir)
       (let ((load-it (lambda (f) (load-file (concat (file-name-as-directory dir) f)))))
 	(mapc load-it (directory-files dir nil "\\.el$"))))
 (load-directory "~/.emacs.d/config-elisp/")
+(toggle-debug-on-error)
 
 ;;; Emacs Generated Custom Variables
 (custom-set-variables
@@ -95,8 +96,11 @@
  '(dimmer-fraction 0.2)
  '(global-so-long-mode t)
  '(keycast-header-line-format "%1s%k%c%r ")
+ '(safe-local-variable-values '((eval add-to-list 'vc-directory-exclusion-list "docs")))
  '(so-long-action 'so-long-minor-mode)
  '(so-long-threshold 1000))
+ '(global-so-long-mode t)
+ '(so-long-action 'so-long-minor-mode)
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -105,5 +109,4 @@
  '(doom-modeline-bar ((t (:background "DarkGoldenrod1"))))
  '(eldoc-box-body ((t (:background "#fbf7f0" :foreground "#000000"))))
  '(eldoc-box-border ((t (:background "#000000"))))
- '(vertico-posframe-border ((t (:background nil))))
  '(which-key-posframe-border ((t nil))))
