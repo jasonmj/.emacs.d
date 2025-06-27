@@ -18,7 +18,7 @@
 (use-package drag-stuff
   :ensure t
   :bind (("M-p" . drag-stuff-up)
-	 ("M-n" . drag-stuff-down)))
+	   ("M-n" . drag-stuff-down)))
 
 (defun duplicate-line ()
   (interactive)
@@ -35,7 +35,7 @@
 (use-package expreg
   :ensure t
   :bind (("s-<tab>" . expreg-expand)
-	 ("S-TAB" . expreg-expand)))
+	   ("S-TAB" . expreg-expand)))
 
 (key-chord-define-global "-=" 'consult-flymake)
 
@@ -44,7 +44,7 @@
 (use-package hungry-delete
   :ensure t
   :hook ((org-mode . hungry-delete-mode)
-	 (prog-mode . hungry-delete-mode)))
+	   (prog-mode . hungry-delete-mode)))
 
 (use-package iedit
   :ensure t
@@ -53,7 +53,7 @@
 (use-package evil-numbers
   :ensure t
   :bind (("M-s-p" . evil-numbers/inc-at-pt)
-	 ("M-s-n" . evil-numbers/dec-at-pt)))
+	   ("M-s-n" . evil-numbers/dec-at-pt)))
 
 (defun load-indent-bars (frame) (use-package indent-bars
   :ensure t
@@ -64,10 +64,11 @@
     (indent-bars-setup))
   (defun my/minibuffer-exit ()
     (run-with-idle-timer 0.05 nil (lambda ()
-				   (if (and (derived-mode-p 'prog-mode) (not indent-bars-mode))
-				       (my/indent-bars-init)))))
+				     (if (and (derived-mode-p 'prog-mode) (not indent-bars-mode))
+					 (my/indent-bars-init)))))
   (add-hook 'minibuffer-exit-hook 'my/minibuffer-exit)
   :hook (prog-mode . (lambda () (setq indent-tabs-mode nil) (indent-bars-mode)))))
+(when (eq system-type 'darwin) (load-indent-bars (selected-frame)))
 (add-hook 'after-make-frame-functions 'load-indent-bars)
 
 (defun kill-ring-clear () (interactive) (setq kill-ring nil))
@@ -106,7 +107,7 @@ This command does not push text to `kill-ring'."
 (use-package outline
   :hook ((elixir-ts-mode . outline-minor-mode))
   :bind (("C-<return>" . outline-cycle)
-	 ("C-S-<return>" . my/outline-cycle-buffer))
+         ("C-S-<return>" . my/outline-cycle-buffer))
   :config (setq outline-blank-line t)
   (set-display-table-slot
    standard-display-table
@@ -114,8 +115,8 @@ This command does not push text to `kill-ring'."
    (let ((face-offset (* (face-id 'shadow) (lsh 1 22))))
      (vconcat (mapcar (lambda (c) (+ face-offset c)) " ⏵"))))
   (defun my/outline-cycle-buffer () (interactive)
-	 (if (eq outline--cycle-buffer-state 'show-all) (setq outline--cycle-buffer-state 'top-level))
-	 (outline-cycle-buffer)))
+	   (if (eq outline--cycle-buffer-state 'show-all) (setq outline--cycle-buffer-state 'top-level))
+	   (outline-cycle-buffer)))
 
 (use-package rainbow-delimiters
   :ensure t
@@ -135,8 +136,8 @@ This command does not push text to `kill-ring'."
   :ensure t
   :config (setq ispell-personal-dictionary "~/.emacs.d/.local/etc/ispell/.pws")
   :hook ((prog-mode . spell-fu-mode)
-	 (org-mode . spell-fu-mode)
-	 (markdown-mode . spell-fu-mode)))
+	   (org-mode . spell-fu-mode)
+	   (markdown-mode . spell-fu-mode)))
 
 (use-package emacs
   :hook ((prog-mode minibuffer-setup shell-mode) . subword-mode))
@@ -160,10 +161,23 @@ This command does not push text to `kill-ring'."
 
 (global-set-key (kbd "C-x t t") 'toggle-true-false)
 
+(use-package treesit-fold
+  :straight (treesit-fold :type git :host github :repo "emacs-tree-sitter/treesit-fold")
+  :bind (("M-S-<return>" . (lambda () (interactive) (end-of-line) (treesit-fold-toggle) (beginning-of-line)))))
+
+(use-package savefold
+  :straight (savefold :type git :host github :repo "jcfk/savefold.el")
+  :init
+  (setq savefold-backends '(outline org hideshow treesit-fold))
+  (setq savefold-directory (locate-user-emacs-file "savefold"))  ;; default
+
+  :config
+  (savefold-mode 1))
+
 (use-package undo-fu
   :ensure t
   :bind (("C-z" . undo-fu-only-undo)
-	 ("C-S-z" . undo-fu-only-redo)))
+	   ("C-S-z" . undo-fu-only-redo)))
 (use-package undo-fu-session
   :ensure t
   :hook (after-init . global-undo-fu-session-mode)
@@ -178,7 +192,7 @@ This command does not push text to `kill-ring'."
 
 (use-package emacs
   :bind (("M-u" . upcase-char)
-	 ("M-l" . downcase-dwim)))
+	   ("M-l" . downcase-dwim)))
 
 (use-package window-stool
   :ensure t

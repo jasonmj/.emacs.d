@@ -1,63 +1,64 @@
 (defun copy-test-line ()
   (interactive)
   (let* ((full-path (buffer-file-name))
-	 (root (project-root (project-current)))
-	 (path-from-home (replace-regexp-in-string (s-trim (shell-command-to-string "echo $HOME")) "~" full-path nil t))
-	 (path (replace-regexp-in-string root "" path-from-home nil t))
-	 (line-number (number-to-string (line-number-at-pos)))
-	 (cmd (if (string-match "ec2k" (caddr (project-current))) "watch mix espec " "watch mix test ")))
+	   (root (project-root (project-current)))
+	   (path-from-home (replace-regexp-in-string (s-trim (shell-command-to-string "echo $HOME")) "~" full-path nil t))
+	   (path (replace-regexp-in-string root "" path-from-home nil t))
+	   (line-number (number-to-string (line-number-at-pos)))
+	   (cmd (if (string-match "ec2k" (caddr (project-current))) "watch mix espec " "watch mix test ")))
     (kill-new (concat cmd path ":" line-number))))
 (global-set-key (kbd "C-c t l") 'copy-test-line)
 
 (defun copy-test-file ()
   (interactive)
   (let* ((full-path (buffer-file-name))
-	 (root (project-root (project-current)))
-	 (path-from-home (replace-regexp-in-string (s-trim (shell-command-to-string "echo $HOME")) "~" full-path nil t))
-	 (path (replace-regexp-in-string root "" path-from-home nil t))
-	 (cmd (if (string-match "ec2k" (caddr (project-current))) "watch mix espec " "watch mix test ")))
+	   (root (project-root (project-current)))
+	   (path-from-home (replace-regexp-in-string (s-trim (shell-command-to-string "echo $HOME")) "~" full-path nil t))
+	   (path (replace-regexp-in-string root "" path-from-home nil t))
+	   (cmd (if (string-match "ec2k" (caddr (project-current))) "watch mix espec " "watch mix test ")))
     (kill-new (concat cmd path))))
 (global-set-key (kbd "C-c t f") 'copy-test-file)
 
 (use-package elixir-mode :ensure t)
+(use-package heex-ts-mode :ensure t)
 (use-package elixir-ts-mode
   :ensure t
   :bind (:map elixir-ts-mode-map
-	      ("C-s" . (lambda () (interactive) (eglot-format) (run-with-idle-timer 0.1 nil (lambda () (save-buffer)))))
-	      ("M-RET" . (lambda () (interactive) (newline) (insert "|> ") (indent-for-tab-command))))
+		("C-s" . (lambda () (interactive) (eglot-format) (run-with-idle-timer 0.1 nil (lambda () (save-buffer)))))
+		("M-RET" . (lambda () (interactive) (newline) (insert "|> ") (indent-for-tab-command))))
   :config
   (defvar elixir-outline-regexp
     (concat "^[[:space:]]*\\("
-	    "@moduledoc\\|@behaviour\\|@callback\\|@type\\|@typedoc\\|@doc\\|@spec\\|@impl"
-	    "\\|def\\(\\|p\\|callback\\|delegate\\|impl\\|overridable\\|exception\\|struct\\|guard\\|guardp\\|record\\|recordp\\|macro\\|macrop\\|macrocallback\\|protocol\\)"
-	    "\\|describe\\|feature\\|test\\|setup\\|let\\|it\\|context\\|before\\|schema\\|scope"
-	    "\\|use\\|alias\\|import\\|require"
-	    "\\)\\([[:space:]]\\|(\\)"))
+	      "@moduledoc\\|@behaviour\\|@callback\\|@type\\|@typedoc\\|@doc\\|@spec\\|@impl"
+	      "\\|def\\(\\|p\\|callback\\|delegate\\|impl\\|overridable\\|exception\\|struct\\|guard\\|guardp\\|record\\|recordp\\|macro\\|macrop\\|macrocallback\\|protocol\\)"
+	      "\\|describe\\|feature\\|test\\|setup\\|let\\|it\\|context\\|before\\|schema\\|scope"
+	      "\\|use\\|alias\\|import\\|require"
+	      "\\)\\([[:space:]]\\|(\\)"))
   (defvar html-outline-regexp "^[[:space:]]*<[^/>]+?\\(>\\|\n\\)")
   :hook ((elixir-ts-mode . (lambda () (setq-local outline-regexp elixir-outline-regexp)))
-	 (elixir-ts-mode . (lambda ()
-			     (unless (eq system-type 'darwin)
-			       (setq indent-tabs-mode nil)
-			       (indent-bars-mode t)
-			       (setq indent-tabs-mode t))))
-	 (heex-ts-mode . (lambda () (setq-local outline-regexp html-outline-regexp)))
-	 (heex-ts-mode . hungry-delete-mode)
-	 (heex-ts-mode . display-line-numbers-mode))
+	   (elixir-ts-mode . (lambda ()
+			       (unless (eq system-type 'darwin)
+				 (setq indent-tabs-mode nil)
+				 (indent-bars-mode t)
+				 (setq indent-tabs-mode t))))
+	   (heex-ts-mode . (lambda () (setq-local outline-regexp html-outline-regexp)))
+	   (heex-ts-mode . hungry-delete-mode)
+	   (heex-ts-mode . display-line-numbers-mode))
   :mode (("\\.ex\\'" . elixir-ts-mode)
-	 ("\\.exs\\'" . elixir-ts-mode)))
+	   ("\\.exs\\'" . elixir-ts-mode)))
 
 (defun format-elixir-region (beg end)
   "Formats the selected region (if any) with Elixir's `Code.format_string!/1`"
   (interactive "r")
   (let* ((column-indent (- beg (point-at-bol)))
-	 (region-contents (buffer-substring beg end))
-	 (snippet_1 (replace-regexp-in-string "\"" "\\\"" region-contents nil t))
-	 (snippet_2 (replace-regexp-in-string "\\(#.+<.+>\\)" ":elixir_data" snippet_1 nil t))
-	 (command (concat
-		   "cd ~/ && mix run --no-mix-exs -e 'Code.format_string!(\""
-		   snippet_2
-		   "\") |> IO.iodata_to_binary() |> IO.puts()'"))
-	 (result (string-trim (shell-command-to-string command))))
+	   (region-contents (buffer-substring beg end))
+	   (snippet_1 (replace-regexp-in-string "\"" "\\\"" region-contents nil t))
+	   (snippet_2 (replace-regexp-in-string "\\(#.+<.+>\\)" ":elixir_data" snippet_1 nil t))
+	   (command (concat
+		     "cd ~/ && mix run --no-mix-exs -e 'Code.format_string!(\""
+		     snippet_2
+		     "\") |> IO.iodata_to_binary() |> IO.puts()'"))
+	   (result (string-trim (shell-command-to-string command))))
     (kill-region beg end)
     (insert result)
     (set-mark (point))
@@ -70,11 +71,11 @@
 (defun flymake-mix-test--output-filter (output)
   (let ((clean-output (s-trim (strip-ansi-chars output))))
     (if (string-match-p "^Excluding tags" clean-output)
-	(progn
-	  (flymake-mix-test--clear-diags)
-	  (let ((buffer (get-buffer (concat "*" (project-name (project-current)) "-shell*"))))
-	    (when buffer
-	      (with-current-buffer buffer (clear-shell-buffer-to-last-prompt) (deactivate-mark))))))
+	  (progn
+	    (flymake-mix-test--clear-diags)
+	    (let ((buffer (get-buffer (concat "*" (project-name (project-current)) "-shell*"))))
+	      (when buffer
+		(with-current-buffer buffer (clear-shell-buffer-to-last-prompt) (deactivate-mark))))))
     (flymake-mix-test--process-output clean-output))
   nil)
 
@@ -83,67 +84,67 @@
     (setq flymake-mix-test-diags '())
     (setq flymake-list-only-diagnostics '())
     (mapcar (lambda (diag)
-	      (let* ((locus (flymake--diag-locus diag))
-		     (locus-buffer (get-buffer (car (last (string-split locus "/"))))))
-		(when locus-buffer
-		  (with-current-buffer locus-buffer
-		    (funcall flymake-mix-test--current-flymake-report-fn '() :region (cons (point-min) (point-max)))
-		    (flymake--run-backend 'flymake-mix-test-backend)
-		    (setq flymake-mix-test-diags '())
-		    (setq flymake-list-only-diagnostics '())
-		    (flymake-start)))))
-	    diags)))
+		(let* ((locus (flymake--diag-locus diag))
+		       (locus-buffer (get-buffer (car (last (string-split locus "/"))))))
+		  (when locus-buffer
+		    (with-current-buffer locus-buffer
+		      (funcall flymake-mix-test--current-flymake-report-fn '() :region (cons (point-min) (point-max)))
+		      (flymake--run-backend 'flymake-mix-test-backend)
+		      (setq flymake-mix-test-diags '())
+		      (setq flymake-list-only-diagnostics '())
+		      (flymake-start)))))
+	      diags)))
 
 (defun flymake-mix-test--process-output (output)
   (if (string-match-p "[0-9]+\) test" output)
-      (let* ((lines (split-string (escape-parens clean-output) "\n")))
-	(mapcar (lambda (line)
-		  (if (string-match-p "[:blank:][test/].+ test$" line)
-		      (let* ((file (s-trim (car (split-string line ":"))))
-			     (full-filepath (concat (project-root (project-current)) file))
-			     (line-number (string-to-number (nth 1 (split-string line ":"))))
-			     (details (string-join (cdr (cdr lines)) "\n")))
-			(flymake-mix-test--push-diag full-filepath line-number details))))
-		lines)))
+	(let* ((lines (split-string (escape-parens clean-output) "\n")))
+	  (mapcar (lambda (line)
+		    (if (string-match-p "[:blank:][test/].+ test$" line)
+			(let* ((file (s-trim (car (split-string line ":"))))
+			       (full-filepath (concat (project-root (project-current)) file))
+			       (line-number (string-to-number (nth 1 (split-string line ":"))))
+			       (details (string-join (cdr (cdr lines)) "\n")))
+			  (flymake-mix-test--push-diag full-filepath line-number details))))
+		  lines)))
   (if (string-match-p ", 0 failures" output) (alert "Tests passed: 0 failures" :title "mix test" :severity 'trivial))
   (if (string-match-p "^error:.+" output)
-      (let* ((details (progn
-		    (string-match "error:\\(.+\)\\)" output)
-		    (match-string-no-properties 1 output)))
-	     (reference (progn
-		    (string-match "\\(.+:[0-9]+\\):" output)
-		    (match-string-no-properties 1 output)))
-	     (file (s-trim (car (string-split reference ":"))))
-	     (full-filepath (concat (project-root (project-current)) file))
-	     (line-number (string-to-number (car (last (string-split reference ":"))))))
-	(if (and details line-number)
-	    (progn
-	      (flymake-mix-test--push-diag full-filepath line-number (s-trim details))
-	      ;; (run-with-idle-timer 1 nil (lambda () (flymake-mix-test--goto-error)))
-	      )))))
+	(let* ((details (progn
+		      (string-match "error:\\(.+\)\\)" output)
+		      (match-string-no-properties 1 output)))
+	       (reference (progn
+		      (string-match "\\(.+:[0-9]+\\):" output)
+		      (match-string-no-properties 1 output)))
+	       (file (s-trim (car (string-split reference ":"))))
+	       (full-filepath (concat (project-root (project-current)) file))
+	       (line-number (string-to-number (car (last (string-split reference ":"))))))
+	  (if (and details line-number)
+	      (progn
+		(flymake-mix-test--push-diag full-filepath line-number (s-trim details))
+		;; (run-with-idle-timer 1 nil (lambda () (flymake-mix-test--goto-error)))
+		)))))
 
 (defun flymake-mix-test--goto-error ()
   (let* ((diag (car flymake-mix-test-diags))
-	 (file (flymake--diag-locus diag))
-	 (file-name (car (last (string-split file "/"))))
-	 (buffer (get-buffer file-name)))
+	   (file (flymake--diag-locus diag))
+	   (file-name (car (last (string-split file "/"))))
+	   (buffer (get-buffer file-name)))
     (if diag
-	(with-current-buffer buffer
-	  (let ((pos (flymake-diagnostic-beg diag)))
-	    (if (and buffer pos)
-		(progn
-		  (switch-to-buffer buffer)
-		  (goto-char pos))))))))
+	  (with-current-buffer buffer
+	    (let ((pos (flymake-diagnostic-beg diag)))
+	      (if (and buffer pos)
+		  (progn
+		    (switch-to-buffer buffer)
+		    (goto-char pos))))))))
 
 (defun flymake-mix-test--push-diag (file line msg)
   (let* ((buffer (get-buffer (car (last (split-string file "/"))))))
     (when buffer
-      (let* ((reg (flymake-diag-region buffer line))
-	     (beg (car reg))
-	     (end (cdr reg)))
-	(with-current-buffer buffer
-	  (push (flymake-make-diagnostic file beg end :error msg) flymake-mix-test-diags)
-	  (flymake-mix-test--report-to-flymake flymake-mix-test-diags))))))
+	(let* ((reg (flymake-diag-region buffer line))
+	       (beg (car reg))
+	       (end (cdr reg)))
+	  (with-current-buffer buffer
+	    (push (flymake-make-diagnostic file beg end :error msg) flymake-mix-test-diags)
+	    (flymake-mix-test--report-to-flymake flymake-mix-test-diags))))))
 
 (defun flymake-mix-test--report-to-flymake (diags)
   (save-restriction
@@ -161,7 +162,7 @@
 
 (defun escape-parens (str)
   (let* ((start (replace-regexp-in-string "[\(]" "" str nil t))
-	 (finish (replace-regexp-in-string "[\)]" "" start nil t)))
+	   (finish (replace-regexp-in-string "[\)]" "" start nil t)))
     finish))
 
 (add-hook 'elixir-ts-mode-hook 'flymake-mix-test--setup)

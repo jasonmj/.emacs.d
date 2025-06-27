@@ -96,7 +96,7 @@ https://github.com/wbolster/emacs-direnv
 #+begin_src emacs-lisp
   (use-package direnv
     :ensure t
-    :hook (after-init . direnv-mode))
+    :config (direnv-mode))
 #+end_src
 * Dired Single
 Provides a way to reuse the current dired buffer to visit another directory (rather than creating a new buffer for the new directory).

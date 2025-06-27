@@ -21,7 +21,7 @@
       (when (equal major-mode 'exwm-mode) (setq exwm-input-line-mode-passthrough t))
       (modalka-mode 1)))
   (update-modalka-mode-line))
-(key-seq-define-global "ii" 'toggle-modalka)
+(key-chord-define-global "ii" 'toggle-modalka)
 (emacs-set-key (kbd "s-i") 'toggle-modalka)
 #+end_src
 * Update Mode Line Indication
@@ -88,7 +88,7 @@
                (exwm-input--fake-key ?\C-c)))
     (define-key modalka-mode-map (kbd "<M-right>") (lambda () (interactive) (exwm-input--fake-key 'M-right)))
     (define-key modalka-mode-map (kbd "<M-left>") (lambda () (interactive) (exwm-input--fake-key 'M-left)))
-    (define-key modalka-mode-map (kbd "<return>") (lambda () (interactive) (exwm-input--fake-key 'return)))
+    ;; (define-key modalka-mode-map (kbd "<return>") (lambda () (interactive) (exwm-input--fake-key 'return)))
     (define-key modalka-mode-map (kbd "<backspace>") (lambda () (interactive) (exwm-input--fake-key 'backspace)))
     (define-key modalka-mode-map (kbd "<S-backspace>") (lambda () (interactive) (exwm-input--fake-key 'C-backspace)))
     ;;(define-key modalka-mode-map (kbd "<M-tab>") 'centaur-tabs-forward-group)
@@ -229,7 +229,7 @@
     (modalka-define-kbd "<left>" "C-b")
     (modalka-define-kbd "<down>" "C-n")
     (modalka-define-kbd "<up>" "C-p")
-    (modalka-define-kbd "<return>" "RET")
+    ;; (modalka-define-kbd "<return>" "RET")
     (define-key modalka-mode-map (kbd "C-w") nil))
 #+end_src
 * Automatically Enable Modalka

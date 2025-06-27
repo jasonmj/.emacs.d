@@ -51,12 +51,13 @@ Efficiently kill buffers and windows.
   (defun my-kill-this-window ()
     (interactive)
     (if (eq (length (window-list)) 1)
-	(my-kill-this-buffer)
+  	(my-kill-this-buffer)
       (kill-buffer-and-window)))
   (global-set-key (kbd "C-x k") 'my-kill-this-buffer)
   (global-set-key (kbd "C-w") 'my-kill-this-buffer)
   (key-seq-define-global "gw" 'my-kill-this-buffer)
   (key-seq-define-global "fw" 'my-kill-this-window)
+  (key-chord-define-global "fw" 'my-kill-this-window)
 #+end_src
 * MacOS Buffer Switcher
 #+begin_src emacs-lisp
@@ -105,34 +106,6 @@ Efficiently kill buffers and windows.
   (if (eq system-type 'darwin)
       (emacs-set-key (kbd "C-SPC") 'delayed-switch-mac-window)
     (emacs-set-key (kbd "C-SPC") 'consult-project-buffer))
-#+end_src
-* BSPWM
-#+begin_src emacs-lisp
-  (when (not (eq system-type 'darwin))
-    ;; Workspaces
-    (emacs-set-key (kbd "s-0") (lambda() (interactive) (call-process-shell-command "hyprctl dispatch workspace 10")))
-    (emacs-set-key (kbd "s-1") (lambda() (interactive) (call-process-shell-command "hyprctl dispatch workspace 1")))
-    (emacs-set-key (kbd "s-2") (lambda() (interactive) (call-process-shell-command "hyprctl dispatch workspace 2")))
-    (emacs-set-key (kbd "s-3") (lambda() (interactive) (call-process-shell-command "hyprctl dispatch workspace 3")))
-    (emacs-set-key (kbd "s-4") (lambda() (interactive) (call-process-shell-command "hyprctl dispatch workspace 4")))
-    (emacs-set-key (kbd "s-5") (lambda() (interactive) (call-process-shell-command "hyprctl dispatch workspace 5")))
-    (emacs-set-key (kbd "s-6") (lambda() (interactive) (call-process-shell-command "hyprctl dispatch workspace 6")))
-    (emacs-set-key (kbd "s-7") (lambda() (interactive) (call-process-shell-command "hyprctl dispatch workspace 7")))
-    (emacs-set-key (kbd "s-8") (lambda() (interactive) (call-process-shell-command "hyprctl dispatch workspace 8")))
-    (emacs-set-key (kbd "s-9") (lambda() (interactive) (call-process-shell-command "hyprctl dispatch workspace 9")))
-
-    ;; Move to workspace
-    (emacs-set-key (kbd "C-s-0") (lambda() (interactive) (call-process-shell-command "hyprctl dispatch movetoworkspace 10")))
-    (emacs-set-key (kbd "C-s-1") (lambda() (interactive) (call-process-shell-command "hyprctl dispatch movetoworkspace 1")))
-    (emacs-set-key (kbd "C-s-2") (lambda() (interactive) (call-process-shell-command "hyprctl dispatch movetoworkspace 2")))
-    (emacs-set-key (kbd "C-s-3") (lambda() (interactive) (call-process-shell-command "hyprctl dispatch movetoworkspace 3")))
-    (emacs-set-key (kbd "C-s-4") (lambda() (interactive) (call-process-shell-command "hyprctl dispatch movetoworkspace 4")))
-    (emacs-set-key (kbd "C-s-5") (lambda() (interactive) (call-process-shell-command "hyprctl dispatch movetoworkspace 5")))
-    (emacs-set-key (kbd "C-s-6") (lambda() (interactive) (call-process-shell-command "hyprctl dispatch movetoworkspace 6")))
-    (emacs-set-key (kbd "C-s-7") (lambda() (interactive) (call-process-shell-command "hyprctl dispatch movetoworkspace 7")))
-    (emacs-set-key (kbd "C-s-8") (lambda() (interactive) (call-process-shell-command "hyprctl dispatch movetoworkspace 8")))
-    (emacs-set-key (kbd "C-s-9") (lambda() (interactive) (call-process-shell-command "hyprctl dispatch movetoworkspace 9")))
-    )
 #+end_src
 * Emacs Buffer List for Hammerspoon
 #+begin_src emacs-lisp
@@ -186,4 +159,32 @@ Increase and decrease text scale. Reset `centered-cursor-mode` afterwards.
   (global-set-key (kbd "C-=") 'my/text-scale-increase)
   (global-set-key (kbd "C-+") 'my/text-scale-increase)
   (global-set-key (kbd "C--") 'my/text-scale-decrease)
+#+end_src
+* Workspaces
+#+begin_src emacs-lisp
+  (when (not (eq system-type 'darwin))
+    ;; Workspaces
+    (emacs-set-key (kbd "s-0") (lambda() (interactive) (call-process-shell-command "hyprctl dispatch workspace 10")))
+    (emacs-set-key (kbd "s-1") (lambda() (interactive) (call-process-shell-command "hyprctl dispatch workspace 1")))
+    (emacs-set-key (kbd "s-2") (lambda() (interactive) (call-process-shell-command "hyprctl dispatch workspace 2")))
+    (emacs-set-key (kbd "s-3") (lambda() (interactive) (call-process-shell-command "hyprctl dispatch workspace 3")))
+    (emacs-set-key (kbd "s-4") (lambda() (interactive) (call-process-shell-command "hyprctl dispatch workspace 4")))
+    (emacs-set-key (kbd "s-5") (lambda() (interactive) (call-process-shell-command "hyprctl dispatch workspace 5")))
+    (emacs-set-key (kbd "s-6") (lambda() (interactive) (call-process-shell-command "hyprctl dispatch workspace 6")))
+    (emacs-set-key (kbd "s-7") (lambda() (interactive) (call-process-shell-command "hyprctl dispatch workspace 7")))
+    (emacs-set-key (kbd "s-8") (lambda() (interactive) (call-process-shell-command "hyprctl dispatch workspace 8")))
+    (emacs-set-key (kbd "s-9") (lambda() (interactive) (call-process-shell-command "hyprctl dispatch workspace 9")))
+
+    ;; Move to workspace
+    (emacs-set-key (kbd "C-s-0") (lambda() (interactive) (call-process-shell-command "hyprctl dispatch movetoworkspace 10")))
+    (emacs-set-key (kbd "C-s-1") (lambda() (interactive) (call-process-shell-command "hyprctl dispatch movetoworkspace 1")))
+    (emacs-set-key (kbd "C-s-2") (lambda() (interactive) (call-process-shell-command "hyprctl dispatch movetoworkspace 2")))
+    (emacs-set-key (kbd "C-s-3") (lambda() (interactive) (call-process-shell-command "hyprctl dispatch movetoworkspace 3")))
+    (emacs-set-key (kbd "C-s-4") (lambda() (interactive) (call-process-shell-command "hyprctl dispatch movetoworkspace 4")))
+    (emacs-set-key (kbd "C-s-5") (lambda() (interactive) (call-process-shell-command "hyprctl dispatch movetoworkspace 5")))
+    (emacs-set-key (kbd "C-s-6") (lambda() (interactive) (call-process-shell-command "hyprctl dispatch movetoworkspace 6")))
+    (emacs-set-key (kbd "C-s-7") (lambda() (interactive) (call-process-shell-command "hyprctl dispatch movetoworkspace 7")))
+    (emacs-set-key (kbd "C-s-8") (lambda() (interactive) (call-process-shell-command "hyprctl dispatch movetoworkspace 8")))
+    (emacs-set-key (kbd "C-s-9") (lambda() (interactive) (call-process-shell-command "hyprctl dispatch movetoworkspace 9")))
+    )
 #+end_src

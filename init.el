@@ -92,13 +92,21 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(aidermacs-editor-model "sonnet")
  '(alert-default-style 'osx-notifier)
+ '(copilot-chat-model "gpt-4o")
  '(dimmer-fraction 0.2)
+ '(emigo-prompt-symbol "> ")
  '(global-so-long-mode t)
  '(keycast-header-line-format "%1s%k%c%r ")
+ '(minimap-window-location 'right)
+ '(olivetti-body-width 120)
  '(safe-local-variable-values '((eval add-to-list 'vc-directory-exclusion-list "docs")))
  '(so-long-action 'so-long-minor-mode)
- '(so-long-threshold 1000))
+ '(so-long-threshold 1000)
+ '(treesit-fold-line-count-show t)
+ '(zoom-ignored-buffer-names '("*MINIMAP*"))
+ '(zoom-mode t nil (zoom)))
  '(global-so-long-mode t)
  '(so-long-action 'so-long-minor-mode)
 (custom-set-faces
@@ -109,4 +117,5 @@
  '(doom-modeline-bar ((t (:background "DarkGoldenrod1"))))
  '(eldoc-box-body ((t (:background "#fbf7f0" :foreground "#000000"))))
  '(eldoc-box-border ((t (:background "#000000"))))
+ '(vertico-posframe-border ((t (:background nil))))
  '(which-key-posframe-border ((t nil))))

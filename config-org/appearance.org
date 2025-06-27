@@ -25,8 +25,10 @@ https://github.com/GuidoSchmidt/circadian.el
 * Cursor
 Set the cursor to use a horizontal bar.
 #+begin_src emacs-lisp
-  (use-package emacs
-    :init (setq-default cursor-type 'hbar))
+    (use-package emacs
+      :init
+      (blink-cursor-mode 0)
+      (setq-default cursor-type 'hbar))
 #+end_src
 * Fancy Battery
 Display battery in Emacs Mode line.

@@ -155,6 +155,7 @@ elixir-ts-mode
 (in "IO.inspect(" p ")")
 (lin "IO.inspect(" p ", label: \"" p "\")")
 (k "key: key" :post (mc-edit-next))
+(op "open_browser(view" p ")")
 
 ;; Local Variables:
 ;; mode: lisp-data

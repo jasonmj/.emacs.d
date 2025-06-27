@@ -14,7 +14,9 @@
   :hook (after-init . circadian-setup))
 
 (use-package emacs
-  :init (setq-default cursor-type 'hbar))
+  :init
+  (blink-cursor-mode 0)
+  (setq-default cursor-type 'hbar))
 
 (use-package fancy-battery
   :ensure t

@@ -26,10 +26,10 @@
 	      (setq history (symbol-value minibuffer-history-variable)
 		    bol (line-beginning-position))))
 	    (when (ring-p history)
-	      (setq history (ring-elements history)))
+	      (setq history (delete-dups (ring-elements history))))
 	    (when history
 	      `(,bol ,(point)
-		     ,(cape--properties-table (delete-dups history) :sort nil)
+		     ,history
 		     ,@cape--history-properties)))))
     (add-hook 'shell-mode-hook (lambda ()
 				   (setq-local completion-at-point-functions
@@ -83,6 +83,7 @@
   (consult-line-start-from-top t)
   (consult-preview-key 'any)
   (consult-buffer-filter '("^ " "\\` " "\\*Echo Area" "\\*Minibuf" "\\*Quail Completions" "\\*Backtrace"
+                           "\\*tidewave""\\*Mcp" "\\*filesystem events" "\\*gptel"
 			     "\\*elixir-ls" "Flymake log" "Shell command output" "direnv" "\\*scratch" "Shell:"
 			     "\\*Messages" "\\*Warning" "*magit-" "magit-process" "*vterm" "vterm" "^:" ".+-shell*"
 			     "*straight-" "*elfeed-log" "*trace of SMTP session" "\\*Compile-Log" "\\*copilot events"
@@ -111,6 +112,7 @@
 
   ;; Consult Mark
   (key-seq-define-global "o0" 'consult-mark)
+  (key-chord-define-global "o0" 'consult-mark)
 
   ;; Switch buffer
   (defun my/buffer-switch ()
@@ -123,18 +125,14 @@
   (key-seq-define-global "cx" 'execute-extended-command)
 
   ;; Configure previews
-  (consult-customize consult-recent-file :preview-key nil
-		       consult-theme :preview-key nil
-		       consult-project-buffer :preview-key nil
-		       ;; consult-ripgrep :preview-key nil
-		       ;; consult-buffer :preview-key nil
-		       my/buffer-switch :preview-key nil))
+  (consult-customize consult-theme :preview-key nil
+		     consult-project-buffer :preview-key nil))
 
 (defun consult-line-at-point ()
   (interactive)
   (my/consult-line (selection-or-thing-at-point)))
-(key-seq-define-global "vf" 'consult-line-at-point)
-(key-seq-define-global "vd" 'consult-line-at-point)
+(key-chord-define-global "vf" 'consult-line-at-point)
+(key-chord-define-global "vd" 'consult-line-at-point)
 
 (defun consult-ripgrep-at-point ()
   (interactive)
@@ -217,10 +215,15 @@ function."
 
 (use-package corfu
   :ensure t
-  :bind (:map corfu-map ("C-e" . corfu-complete))
+  :bind (:map corfu-map
+              ("C-e" . corfu-complete)
+              ("<tab>" . corfu-complete))
+  :config
+  (unbind-key "RET" corfu-mode-map)
+  (unbind-key "C-m" corfu-mode-map)
   :init
   (setq corfu-auto-prefix 1
-	  corfu-auto-delay 0.015
+	  corfu-auto-delay 0
 	  corfu-auto t
 	  corfu-cycle t
 	  corfu-quit-no-match t
@@ -431,7 +434,7 @@ function."
 	  vertico-posframe-min-height 10
 	  vertico-posframe-width 130
 	  vertico-posframe-poshandler #'posframe-poshandler-window-top-center-offset
-	  vertico-posframe-parameters '((alpha-background . 85)
+	  vertico-posframe-parameters '((alpha . 85)
 					(left-fringe . 0)
 					(right-fringe . 0)))
 

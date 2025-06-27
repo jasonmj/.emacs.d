@@ -25,6 +25,7 @@ commissioningfactories
 config
 controllerchannel
 controllerinfo
+controllernetworkconfigurations
 controllernetworkconnectivity
 controllerprotocol
 controllersessionevent
@@ -45,6 +46,7 @@ developmenttoggles
 deviceconnectivityevent
 devicedata
 devicemanager
+dhcp
 doorsensor
 doorsensors
 ductprobe
@@ -85,6 +87,7 @@ hvacs
 hvactest
 hvactests
 hvaczone
+iccid
 iex
 init
 inputoutputmodule
@@ -99,11 +102,13 @@ ioms
 jasonmj
 jjohnson
 json
+lifecycle
 lightingconnection
 lightingoutputgroup
 lightingzone
 lightingzones
 liveview
+liveviews
 lorem
 macos
 meterreading
@@ -114,6 +119,7 @@ moduledoc
 morehead
 namespace
 nerveshub
+netmask
 nixos
 nixpkgs
 noresultserror

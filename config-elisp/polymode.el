@@ -17,7 +17,7 @@
     :head-mode 'host
     :tail-mode 'host)
   (define-innermode poly-markdown-elixir-innermode
-    :mode 'elixir-ts-mode
+    :mode 'elixir-mode
     :head-matcher "```elixir"
     :tail-matcher "```"
     :head-mode 'host

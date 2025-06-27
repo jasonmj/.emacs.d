@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: Open Browser
+# key: op
+# --
+$0open_browser(view${1:})

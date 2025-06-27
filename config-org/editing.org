@@ -113,10 +113,11 @@ https://github.com/jdtsmith/indent-bars
       (indent-bars-setup))
     (defun my/minibuffer-exit ()
       (run-with-idle-timer 0.05 nil (lambda ()
-				     (if (and (derived-mode-p 'prog-mode) (not indent-bars-mode))
-					 (my/indent-bars-init)))))
+  				     (if (and (derived-mode-p 'prog-mode) (not indent-bars-mode))
+  					 (my/indent-bars-init)))))
     (add-hook 'minibuffer-exit-hook 'my/minibuffer-exit)
     :hook (prog-mode . (lambda () (setq indent-tabs-mode nil) (indent-bars-mode)))))
+  (when (eq system-type 'darwin) (load-indent-bars (selected-frame)))
   (add-hook 'after-make-frame-functions 'load-indent-bars)
 #+end_src
 * Kill Ring Clear
@@ -172,7 +173,7 @@ A minor mode for cycling outlines with selective display.
   (use-package outline
     :hook ((elixir-ts-mode . outline-minor-mode))
     :bind (("C-<return>" . outline-cycle)
-	   ("C-S-<return>" . my/outline-cycle-buffer))
+           ("C-S-<return>" . my/outline-cycle-buffer))
     :config (setq outline-blank-line t)
     (set-display-table-slot
      standard-display-table
@@ -257,6 +258,21 @@ Quickly toggle booleans.
     (insert opposite)))
 
 (global-set-key (kbd "C-x t t") 'toggle-true-false)
+#+end_src
+* Treesit Fold
+#+begin_src emacs-lisp
+  (use-package treesit-fold
+    :straight (treesit-fold :type git :host github :repo "emacs-tree-sitter/treesit-fold")
+    :bind (("M-S-<return>" . (lambda () (interactive) (end-of-line) (treesit-fold-toggle) (beginning-of-line)))))
+
+  (use-package savefold
+    :straight (savefold :type git :host github :repo "jcfk/savefold.el")
+    :init
+    (setq savefold-backends '(outline org hideshow treesit-fold))
+    (setq savefold-directory (locate-user-emacs-file "savefold"))  ;; default
+
+    :config
+    (savefold-mode 1))
 #+end_src
 * Undo Fu
 #+begin_src emacs-lisp

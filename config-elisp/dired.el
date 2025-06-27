@@ -72,7 +72,7 @@
 
 (use-package direnv
   :ensure t
-  :hook (after-init . direnv-mode))
+  :config (direnv-mode))
 
 (use-package dired-single
   :ensure t

@@ -31,31 +31,32 @@ Major mode for editing Elixir, powered by tree-sitter.
 https://github.com/wkirschbaum/elixir-ts-mode
 #+begin_src emacs-lisp
   (use-package elixir-mode :ensure t)
+  (use-package heex-ts-mode :ensure t)
   (use-package elixir-ts-mode
     :ensure t
     :bind (:map elixir-ts-mode-map
-		("C-s" . (lambda () (interactive) (eglot-format) (run-with-idle-timer 0.1 nil (lambda () (save-buffer)))))
-		("M-RET" . (lambda () (interactive) (newline) (insert "|> ") (indent-for-tab-command))))
+  		("C-s" . (lambda () (interactive) (eglot-format) (run-with-idle-timer 0.1 nil (lambda () (save-buffer)))))
+  		("M-RET" . (lambda () (interactive) (newline) (insert "|> ") (indent-for-tab-command))))
     :config
     (defvar elixir-outline-regexp
       (concat "^[[:space:]]*\\("
-	      "@moduledoc\\|@behaviour\\|@callback\\|@type\\|@typedoc\\|@doc\\|@spec\\|@impl"
-	      "\\|def\\(\\|p\\|callback\\|delegate\\|impl\\|overridable\\|exception\\|struct\\|guard\\|guardp\\|record\\|recordp\\|macro\\|macrop\\|macrocallback\\|protocol\\)"
-	      "\\|describe\\|feature\\|test\\|setup\\|let\\|it\\|context\\|before\\|schema\\|scope"
-	      "\\|use\\|alias\\|import\\|require"
-	      "\\)\\([[:space:]]\\|(\\)"))
+  	      "@moduledoc\\|@behaviour\\|@callback\\|@type\\|@typedoc\\|@doc\\|@spec\\|@impl"
+  	      "\\|def\\(\\|p\\|callback\\|delegate\\|impl\\|overridable\\|exception\\|struct\\|guard\\|guardp\\|record\\|recordp\\|macro\\|macrop\\|macrocallback\\|protocol\\)"
+  	      "\\|describe\\|feature\\|test\\|setup\\|let\\|it\\|context\\|before\\|schema\\|scope"
+  	      "\\|use\\|alias\\|import\\|require"
+  	      "\\)\\([[:space:]]\\|(\\)"))
     (defvar html-outline-regexp "^[[:space:]]*<[^/>]+?\\(>\\|\n\\)")
     :hook ((elixir-ts-mode . (lambda () (setq-local outline-regexp elixir-outline-regexp)))
-	   (elixir-ts-mode . (lambda ()
-			       (unless (eq system-type 'darwin)
-				 (setq indent-tabs-mode nil)
-				 (indent-bars-mode t)
-				 (setq indent-tabs-mode t))))
-	   (heex-ts-mode . (lambda () (setq-local outline-regexp html-outline-regexp)))
-	   (heex-ts-mode . hungry-delete-mode)
-	   (heex-ts-mode . display-line-numbers-mode))
+  	   (elixir-ts-mode . (lambda ()
+  			       (unless (eq system-type 'darwin)
+  				 (setq indent-tabs-mode nil)
+  				 (indent-bars-mode t)
+  				 (setq indent-tabs-mode t))))
+  	   (heex-ts-mode . (lambda () (setq-local outline-regexp html-outline-regexp)))
+  	   (heex-ts-mode . hungry-delete-mode)
+  	   (heex-ts-mode . display-line-numbers-mode))
     :mode (("\\.ex\\'" . elixir-ts-mode)
-	   ("\\.exs\\'" . elixir-ts-mode)))
+  	   ("\\.exs\\'" . elixir-ts-mode)))
 #+end_src
 * Format Elixir Region
 #+begin_src emacs-lisp

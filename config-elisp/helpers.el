@@ -54,6 +54,7 @@
   :config
   (defun expand-and-fold-this ()
     (interactive)
+    (end-of-line)
     (expreg-expand)
     (fold-this
      (car (car (region-bounds)))

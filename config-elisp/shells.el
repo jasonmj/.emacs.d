@@ -86,12 +86,16 @@
 	 (delete-region 1 (pos-bol))
 	 (end-of-line)
 	 (deactivate-mark))
+
+  (defun maybe-setup-project-shell ()
+    (if (project-current) (gptel-tool--send-to-project-shell "nix-shell")))
   (defvar shell-outline-regexp ".*\\([0-9]+\) test\\)\\([[:space:]]\\|(\\)")
   :hook ((shell-mode . (lambda ()
 			   (setq-local outline-regexp shell-outline-regexp)
 			   (compilation-shell-minor-mode)
 			   (run-with-idle-timer 0.5 nil 'pcomplete-shell-setup)
-			   (run-with-idle-timer 0.5 nil 'bash-completion-setup)))))
+			   (run-with-idle-timer 0.5 nil 'bash-completion-setup)
+                           (maybe-setup-project-shell)))))
 
 (defun clean-compilation-filename (filename)
   (string-trim
@@ -118,7 +122,7 @@
 
 (defun cape--iex-bootstrap-filter (proc output)
   (let ((lines (split-string output "\n")))
-    ;; (mapcar (lambda (line) (if (cape--iex-starts-with-iex line) (cape--iex-setup proc))) lines)
+    (mapcar (lambda (line) (if (cape--iex-starts-with-iex line) (cape--iex-setup proc))) lines)
     (comint-output-filter proc output))
   )
 
