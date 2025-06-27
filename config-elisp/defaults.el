@@ -7,7 +7,7 @@
 
 (setq browse-url-browser-function 'browse-url-default-macosx-browser)
 (setq browse-url-generic-program "firefox"
-      browse-url-browser-function 'browse-url-generic)
+	browse-url-browser-function 'browse-url-generic)
 
 (setq delete-by-moving-to-trash t)
 
@@ -55,7 +55,7 @@
 (setq epg-gpg-program "gpg2")
 (setq epa-pinentry-mode 'loopback)
 (setq auth-sources '((:source "~/.authinfo.gpg")))
-(pinentry-start)
+(if (eq system-type 'darwin) (pinentry-start))
 
 (require 'tramp)
 (setq tramp-default-method "ssh")

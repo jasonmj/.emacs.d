@@ -1,16 +1,16 @@
 (use-package eshell
   :bind (:map eshell-mode-map
-	      ("C-l" . eshell-clear)
-	      ("<M-tab>" . tab-bar-switch-to-next-tab))
+		("C-l" . eshell-clear)
+		("<M-tab>" . tab-bar-switch-to-next-tab))
   :config
   (require 'em-smart)
   (require 'em-tramp)
   (defun eshell-clear ()
     (interactive)
     (let ((eshell-buffer-maximum-lines 0))
-      (eshell-truncate-buffer)
-      (previous-line)
-      (delete-char 1)))
+	(eshell-truncate-buffer)
+	(previous-line)
+	(delete-char 1)))
   (add-hook 'completion-at-point-functions 'pcomplete-completions-at-point nil t)
   :custom 
   (eshell-banner-message "")
@@ -22,18 +22,18 @@
   (eshell-smart-space-goes-to-end t)
   (eshell-history-size 10000)
   :hook ((eshell-mode-hook . (lambda ()
-			       (setq eshell-prefer-lisp-functions t
-				     password-cache t
-				     password-cache-expiry 900)
-			       (setq-local truncate-lines -1)
-			       (setenv "TERM" "xterm-256color")))))
+				 (setq eshell-prefer-lisp-functions t
+				       password-cache t
+				       password-cache-expiry 900)
+				 (setq-local truncate-lines -1)
+				 (setenv "TERM" "xterm-256color")))))
 
 (use-package eshell-prompt-extras :ensure t
   :config
   (with-eval-after-load "esh-opt"
     (autoload 'epe-theme-lambda "eshell-prompt-extras")
     (setq eshell-highlight-prompt nil
-	  eshell-prompt-function 'epe-theme-lambda)))
+	    eshell-prompt-function 'epe-theme-lambda)))
 
 (use-package eshell-syntax-highlighting
   :ensure t
@@ -42,23 +42,23 @@
 
 (defun eshell-buffer (buffer-name)
   (let* ((eshell-buffer-exists (member buffer-name
-				       (mapcar (lambda (buf)
-						 (buffer-name buf))
-					       (buffer-list)))))
+					 (mapcar (lambda (buf)
+						   (buffer-name buf))
+						 (buffer-list)))))
     (if eshell-buffer-exists
-	(switch-to-buffer buffer-name)
-      (progn
-	(eshell 99)
-	(rename-buffer (concat "Eshell: <" buffer-name ">"))))))
+	  (switch-to-buffer buffer-name)
+	(progn
+	  (eshell 99)
+	  (rename-buffer (concat "Eshell: <" buffer-name ">"))))))
 
 (defun eshell-with-name ()
   (interactive)
   (let* ((eshell-buffers (seq-filter (lambda (buf) (eq (with-current-buffer buf major-mode) 'eshell-mode))
-				     (buffer-list)))
-	 (eshell-buffer-names (mapcar (lambda (buf)
-					(buffer-name buf))
-				      eshell-buffers))
-	 (buffer-name (completing-read "Eshell buffers: " eshell-buffer-names)))
+				       (buffer-list)))
+	   (eshell-buffer-names (mapcar (lambda (buf)
+					  (buffer-name buf))
+					eshell-buffers))
+	   (buffer-name (completing-read "Eshell buffers: " eshell-buffer-names)))
     (eshell-buffer buffer-name)))
 (emacs-set-key (kbd "M-`") 'eshell-with-name)
 
@@ -69,40 +69,40 @@
   :custom
   (eshell-output-filter-functions (remove 'eshell-handle-ansi-color eshell-output-filter-functions))
   :hook ((eshell-mode . (lambda () (setenv "TERM" "xterm-256color")))
-	 (eshell-before-prompt . (lambda () (setq xterm-color-preserve-properties t)))))
+	   (eshell-before-prompt . (lambda () (setq xterm-color-preserve-properties t)))))
 
 (use-package shell
   :bind (:map shell-mode-map
-	      ("C-l" . clear-shell-buffer)
-	      ("C-1" . popper-shell-fullscreen)
-	      ("C-d" . hungry-delete-forward))
+		("C-l" . clear-shell-buffer)
+		("C-1" . popper-shell-fullscreen)
+		("C-d" . hungry-delete-forward))
   :custom (shell-file-name (if (eq system-type 'darwin) "/opt/homebrew/bin/bash" "/run/current-system/sw/bin/bash"))
   :config
   (defun clear-shell-buffer () (interactive)
-       (erase-buffer)
-       (comint-send-input)
-       (deactivate-mark)
-       (sleep-for 0.05)
-       (delete-region 1 (pos-bol))
-       (end-of-line)
-       (deactivate-mark))
+	 (erase-buffer)
+	 (comint-send-input)
+	 (deactivate-mark)
+	 (sleep-for 0.05)
+	 (delete-region 1 (pos-bol))
+	 (end-of-line)
+	 (deactivate-mark))
   (defvar shell-outline-regexp ".*\\([0-9]+\) test\\)\\([[:space:]]\\|(\\)")
   :hook ((shell-mode . (lambda ()
-			 (setq-local outline-regexp shell-outline-regexp)
-			 (compilation-shell-minor-mode)
-			 (run-with-idle-timer 0.5 nil 'pcomplete-shell-setup)
-			 (run-with-idle-timer 0.5 nil 'bash-completion-setup)))))
+			   (setq-local outline-regexp shell-outline-regexp)
+			   (compilation-shell-minor-mode)
+			   (run-with-idle-timer 0.5 nil 'pcomplete-shell-setup)
+			   (run-with-idle-timer 0.5 nil 'bash-completion-setup)))))
 
 (defun clean-compilation-filename (filename)
   (string-trim
-       (replace-regexp-in-string "\\(\*\* \\|┃\\)" ""
-			     (replace-regexp-in-string "\([^\"]+?\)" ""
-						       (string-trim filename)))))
+	 (replace-regexp-in-string "\\(\*\* \\|┃\\)" ""
+			       (replace-regexp-in-string "\([^\"]+?\)" ""
+							 (string-trim filename)))))
 (defun compilation-find-file-fixer (orig-fun marker filename &rest args)
   (message (clean-compilation-filename filename))
   (apply orig-fun marker
-	 (clean-compilation-filename filename)
-	 args))
+	   (clean-compilation-filename filename)
+	   args))
 (advice-add 'compilation-find-file :around #'compilation-find-file-fixer)
 
 (defun return-to-shell-mode () (interactive) (with-current-buffer (current-buffer) (shell-mode)))
@@ -128,10 +128,10 @@
 
 (defun cape--iex-maybe-restore-output-filter (proc output)
   (mapcar (lambda (line)
-	    (if (cape--iex-starts-with-iex line)
-		(set-process-filter proc 'comint-output-filter)
-	      nil))
-	  (string-split output "\n")))
+	      (if (cape--iex-starts-with-iex line)
+		  (set-process-filter proc 'comint-output-filter)
+		nil))
+	    (string-split output "\n")))
 
 (defun cape--iex-restore-output-filter ()
   (interactive)
@@ -152,7 +152,7 @@
 
 (defun cape--iex-autocomplete (proc expr)
   (let* ((suffix "\" |> String.to_charlist() |> Enum.reverse() |> IEx.Autocomplete.expand(self()) |> (case do: ({:yes, [], x} -> Enum.map(x, &to_string/1); {:yes, x, _} -> [to_string(x)]; _ -> to_string(nil);))\n")
-	 (cmd (concat "\"" expr suffix)))
+	   (cmd (concat "\"" expr suffix)))
     (set-process-filter proc 'cape--iex-output-filter)
     (process-send-string proc cmd)
     (sleep-for 0.1)
@@ -160,18 +160,18 @@
 
 (defun cape--iex-build-completions (buffer-str)
   (let* ((separator (if (eq system-type 'darwin) "\n" "\n"))
-	 (strs (butlast (split-string buffer-str separator)))
-	 (str (if (eq (length strs) 1) (car strs) (string-join (cdr strs))))
-	 (substr (if (< (length str) 4) str (substring str 2 -2)))
-	 (completions (delete-dups (split-string substr "\", \"")))
-	 (cands (mapcar (lambda (completion)
-			  (if (length= completion 0) nil (cape--iex-format-candidate expr completion))) completions)))
+	   (strs (butlast (split-string buffer-str separator)))
+	   (str (if (eq (length strs) 1) (car strs) (string-join (cdr strs))))
+	   (substr (if (< (length str) 4) str (substring str 2 -2)))
+	   (completions (delete-dups (split-string substr "\", \"")))
+	   (cands (mapcar (lambda (completion)
+			    (if (length= completion 0) nil (cape--iex-format-candidate expr completion))) completions)))
     (prescient-sort cands)))
 
 (defun cape--iex-get-candidate-annotation (str)
   (let* ((last-char (substring str -1))
-	(last-node (cape--iex-last-node str))
-	(last-node-first-char (if (length< last-node 1) "" (substring last-node nil 1))))
+	  (last-node (cape--iex-last-node str))
+	  (last-node-first-char (if (length< last-node 1) "" (substring last-node nil 1))))
     (cond
      ((equal last-node-first-char (upcase last-node-first-char)) "alias")
      ((equal last-node-first-char (downcase last-node-first-char)) "function")
@@ -179,8 +179,8 @@
 
 (defun cape--iex-get-candidate-kind (str)
   (let* ((last-char (substring str -1))
-	(last-node (cape--iex-last-node str))
-	(last-node-first-char (if (length< last-node 1) "" (substring last-node nil 1))))
+	  (last-node (cape--iex-last-node str))
+	  (last-node-first-char (if (length< last-node 1) "" (substring last-node nil 1))))
     (cond
      ((equal last-node-first-char (upcase last-node-first-char)) 'snippet)
      ((equal last-node-first-char (downcase last-node-first-char)) 'function)
@@ -194,14 +194,14 @@
 
 (defun cape--iex-format-candidate (expr completion)
   (let* ((clean-completion (cape--iex-clean-up-completion completion))
-	(first-char (substring completion nil 1))
-	(last-char (substring completion -1))
-	(combined (string-merge expr clean-completion)))
+	  (first-char (substring completion nil 1))
+	  (last-char (substring completion -1))
+	  (combined (string-merge expr clean-completion)))
     (cond
      ((equal completion ".") (concat expr clean-completion))
      ((equal first-char (upcase first-char)) (concat combined "."))
      ((and (equal first-char (downcase first-char))
-	   (not (eq (string-match-p "^[0-9]+$" last-char) nil))) (concat (substring combined nil -2) "("))
+	     (not (eq (string-match-p "^[0-9]+$" last-char) nil))) (concat (substring combined nil -2) "("))
      (t combined))))
 
 (defun cape--iex-clean-up-completion (completion)
@@ -209,33 +209,33 @@
 
 (defun cape-iex ()
   (when-let ((proc (get-buffer-process (current-buffer)))
-	     (start (process-mark proc))
-	     (end (point))
-	     (expr (buffer-substring-no-properties start end)))
+	       (start (process-mark proc))
+	       (end (point))
+	       (expr (buffer-substring-no-properties start end)))
     `(,start ,end
-	  ,(completion-table-dynamic
-	   (lambda (_)
-	     (when-let ((proc (get-buffer-process (current-buffer)))
-			(expr (buffer-substring-no-properties (process-mark proc) (point)))
-			(result (while-no-input (cape--iex-autocomplete proc expr))))
-	       (when (get-buffer "*tmp*") (kill-buffer "*tmp*"))
-	       (and (consp result) result))))
-	  :exclusive 'no
-	  :company-kind cape--iex-get-candidate-kind
-	  :annotation-function (lambda (s) (concat " " (cape--iex-get-candidate-annotation s))))))
+	    ,(completion-table-dynamic
+	     (lambda (_)
+	       (when-let ((proc (get-buffer-process (current-buffer)))
+			  (expr (buffer-substring-no-properties (process-mark proc) (point)))
+			  (result (while-no-input (cape--iex-autocomplete proc expr))))
+		 (when (get-buffer "*tmp*") (kill-buffer "*tmp*"))
+		 (and (consp result) result))))
+	    :exclusive 'no
+	    :company-kind cape--iex-get-candidate-kind
+	    :annotation-function (lambda (s) (concat " " (cape--iex-get-candidate-annotation s))))))
 
 (defun string-merge (str1 str2)
   (let* ((first-node (cape--iex-first-node str1))
-	 (last-node (cape--iex-last-node str1))
-	 (last-char (substring str1 -1 nil))
-	 (zipped (-zip-pair (split-string str2 "") (split-string last-node "")))
-	 (combined (concat str1 (substring str2 (- (length zipped) 2)))))
+	   (last-node (cape--iex-last-node str1))
+	   (last-char (substring str1 -1 nil))
+	   (zipped (-zip-pair (split-string str2 "") (split-string last-node "")))
+	   (combined (concat str1 (substring str2 (- (length zipped) 2)))))
     (cond
      ((and (equal first-node last-node)
-	   (not (equal str1 str2))
-	   (string-match-p (regexp-quote str1) str2)) str2)
+	     (not (equal str1 str2))
+	     (string-match-p (regexp-quote str1) str2)) str2)
      ((and (equal first-node last-node)
-	   (not (equal str1 str2))) (concat str1 str2))
+	     (not (equal str1 str2))) (concat str1 str2))
      ((equal last-char ".") (concat str1 str2))
      ((not (string-match-p (regexp-quote last-node) str2)) (concat str1 str2))
      (t combined))))
@@ -249,22 +249,22 @@
 
 (defun shell-buffer (buffer-name)
   (let* ((shell-buffer-exists (member buffer-name
-				      (mapcar (lambda (buf) (buffer-name buf))
-					      (buffer-list)))))
+					(mapcar (lambda (buf) (buffer-name buf))
+						(buffer-list)))))
     (if shell-buffer-exists
-	(switch-to-buffer buffer-name)
-      (progn
-	(shell "tmp")
-	(rename-buffer (concat "Shell: <" buffer-name ">"))))))
+	  (switch-to-buffer buffer-name)
+	(progn
+	  (shell "tmp")
+	  (rename-buffer (concat "Shell: <" buffer-name ">"))))))
 
 (defun shell-with-name ()
   (interactive)
   (let* ((shell-buffers (seq-filter (lambda (buf) (eq (with-current-buffer buf major-mode) 'shell-mode))
-				     (buffer-list)))
-	 (shell-buffer-names (mapcar (lambda (buf)
-					(buffer-name buf))
-				      shell-buffers))
-	 (buffer-name (completing-read "Shell buffers: " shell-buffer-names)))
+				       (buffer-list)))
+	   (shell-buffer-names (mapcar (lambda (buf)
+					  (buffer-name buf))
+					shell-buffers))
+	   (buffer-name (completing-read "Shell buffers: " shell-buffer-names)))
     (shell-buffer buffer-name)))
 (emacs-set-key (kbd "C-\\") 'shell-with-name)
 
@@ -273,50 +273,50 @@
   :hook (shell-mode . sticky-shell-mode)
   :config
   (defun clear-shell-buffer-to-last-prompt () (interactive)
-       (end-of-buffer)
-       (set-mark (point))
-       (comint-previous-prompt 1)
-       (end-of-line)
-       (forward-char)
-       (delete-active-region))
+	 (end-of-buffer)
+	 (set-mark (point))
+	 (comint-previous-prompt 1)
+	 (end-of-line)
+	 (forward-char)
+	 (delete-active-region))
   :bind (:map shell-mode-map
-	      ("C-S-l" . clear-shell-buffer-to-last-prompt)))
+		("C-S-l" . clear-shell-buffer-to-last-prompt)))
 
 (defun syntax-overlay-region ()
   (interactive)
   (unless (region-active-p)
     (user-error "No region active"))
   (let* ((lang-mode 'elixir-mode)
-	 (body-start (region-beginning))
-	 (body-end (region-end))
-	 (string (buffer-substring-no-properties body-start body-end))
-	 (buf (current-buffer))
-	 (pos 0)
-	 (props)
-	 (overlay)
-	 (propertized-text))
+	   (body-start (region-beginning))
+	   (body-end (region-end))
+	   (string (buffer-substring-no-properties body-start body-end))
+	   (buf (current-buffer))
+	   (pos 0)
+	   (props)
+	   (overlay)
+	   (propertized-text))
     (if (fboundp lang-mode)
-	(progn
-	  (setq propertized-text
-		(with-current-buffer
-		    (get-buffer-create
-		     (format " *fontification:%s*" lang-mode))
-		  (let ((inhibit-modification-hooks nil)
-			(inhibit-message t))
-		    (erase-buffer)
-		    ;; Additional space ensures property change.
-		    (insert string " ")
-		    (funcall lang-mode)
-		    (font-lock-ensure))
-		  (buffer-string)))
-	  (while (< pos (length propertized-text))
-	    (setq props (text-properties-at pos propertized-text))
-	    (setq overlay (make-overlay (+ body-start pos)
-					(+ body-start (1+ pos))
-					buf))
-	    (overlay-put overlay 'face (plist-get props 'face))
-	    (setq pos (1+ pos))))
-      (message "%s not found" lang-mode))))
+	  (progn
+	    (setq propertized-text
+		  (with-current-buffer
+		      (get-buffer-create
+		       (format " *fontification:%s*" lang-mode))
+		    (let ((inhibit-modification-hooks nil)
+			  (inhibit-message t))
+		      (erase-buffer)
+		      ;; Additional space ensures property change.
+		      (insert string " ")
+		      (funcall lang-mode)
+		      (font-lock-ensure))
+		    (buffer-string)))
+	    (while (< pos (length propertized-text))
+	      (setq props (text-properties-at pos propertized-text))
+	      (setq overlay (make-overlay (+ body-start pos)
+					  (+ body-start (1+ pos))
+					  buf))
+	      (overlay-put overlay 'face (plist-get props 'face))
+	      (setq pos (1+ pos))))
+	(message "%s not found" lang-mode))))
 
 (defun popper-shell-fullscreen ()
   (interactive)
@@ -325,6 +325,7 @@
     (switch-to-buffer name)))
 (emacs-set-key (kbd "C-x c") 'popper-shell-fullscreen)
 
+(add-to-list 'load-path (concat "~/.local/vterm/" (string-trim (shell-command-to-string "ls ~/.local/vterm/"))))
 (add-to-list 'load-path (concat "/etc/links/vterm/" (string-trim (shell-command-to-string "ls /etc/links/vterm/"))))
 (require 'vterm)
 (setq vterm-module-cmake-args "-DUSE_SYSTEM_LIBVTERM=yes")

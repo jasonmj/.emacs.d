@@ -105,14 +105,15 @@ https://codeberg.org/amano.kenji/dired-single
 #+begin_src emacs-lisp
   (use-package dired-single
     :ensure t
+    :straight (:type git :host codeberg :repo "amano.kenji/dired-single")
     :after dired
     :bind (:map dired-mode-map
-		("^" . (lambda nil (interactive) (dired-single-buffer "..")))
-		("[" . (lambda nil (interactive) (dired-single-buffer "..")))
-		("]" . dired-single-buffer)
-		([return] . dired-single-buffer)
-		([?\r] . dired-single-buffer)
-		([mouse-1] . dired-single-buffer-mouse))
+  	      ("^" . (lambda nil (interactive) (dired-single-buffer "..")))
+  	      ("[" . (lambda nil (interactive) (dired-single-buffer "..")))
+  	      ("]" . dired-single-buffer)
+  	      ([return] . dired-single-buffer)
+  	      ([?\r] . dired-single-buffer)
+  	      ([mouse-1] . dired-single-buffer-mouse))
     :init (set (make-local-variable 'mouse-1-click-follows-link) nil))
 #+end_src
 * Dotfile Visibility

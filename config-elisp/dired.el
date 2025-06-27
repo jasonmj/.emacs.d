@@ -1,10 +1,10 @@
 (use-package dired
   :bind (("s-d" . (lambda () (interactive) (dired "~/downloads")))
-	 :map dired-mode-map
-	 ("C-c C-p" . wdired-change-to-wdired-mode))
+	   :map dired-mode-map
+	   ("C-c C-p" . wdired-change-to-wdired-mode))
   :config
   (if (eq system-type 'darwin)
-      (setq dired-listing-switches "-al")
+	(setq dired-listing-switches "-al")
     (setq dired-listing-switches "-l -A -h -v --group-directories-first"))
   :custom
   (dired-recursive-deletes 'always)
@@ -12,7 +12,7 @@
   (dired-dwim-target t)
   (dired-auto-revert-buffer t)
   :hook ((dired-mode . auto-revert-mode)
-	 (dired-mode . dired-hide-details-mode)))
+	   (dired-mode . dired-hide-details-mode)))
 
 (use-package all-the-icons-dired
   :ensure t
@@ -21,21 +21,21 @@
     "Display the icons of files in a dired buffer."
     (all-the-icons-dired--remove-all-overlays)
     (unless (file-remote-p default-directory)
-      (save-excursion
-	(goto-char (point-min))
-	(while (not (eobp))
-	  (when (dired-move-to-filename nil)
-	    (let ((file (dired-get-filename 'relative 'noerror)))
-	      (when file
-		(let ((icon (if (file-directory-p file)
-				(all-the-icons-icon-for-dir file
-							    :face 'all-the-icons-dired-dir-face
-							    :v-adjust all-the-icons-dired-v-adjust)
-			      (all-the-icons-icon-for-file file :v-adjust all-the-icons-dired-v-adjust))))
-		  (if (member file '("." ".."))
-		      (all-the-icons-dired--add-overlay (point) "  \t")
-		    (all-the-icons-dired--add-overlay (point) (concat icon "\t")))))))
-	  (forward-line 1)))))
+	(save-excursion
+	  (goto-char (point-min))
+	  (while (not (eobp))
+	    (when (dired-move-to-filename nil)
+	      (let ((file (dired-get-filename 'relative 'noerror)))
+		(when file
+		  (let ((icon (if (file-directory-p file)
+				  (all-the-icons-icon-for-dir file
+							      :face 'all-the-icons-dired-dir-face
+							      :v-adjust all-the-icons-dired-v-adjust)
+				(all-the-icons-icon-for-file file :v-adjust all-the-icons-dired-v-adjust))))
+		    (if (member file '("." ".."))
+			(all-the-icons-dired--add-overlay (point) "  \t")
+		      (all-the-icons-dired--add-overlay (point) (concat icon "\t")))))))
+	    (forward-line 1)))))
   :hook
   (dired-mode . all-the-icons-dired-mode))
 
@@ -51,13 +51,13 @@
   "Present a list of recently used directories and open the selected one in dired"
   (interactive)
   (let ((recent-dirs
-	 (delete-dups
-	  (mapcar (lambda (file)
-		    (if (file-directory-p file) file (file-name-directory file)))
-		  recentf-list))))
+	   (delete-dups
+	    (mapcar (lambda (file)
+		      (if (file-directory-p file) file (file-name-directory file)))
+		    recentf-list))))
 
     (let ((dir (completing-read "Recent directory: " recent-dirs)))
-      (dired dir))))
+	(dired dir))))
 (emacs-set-key (kbd "C-x d") 'dired-recent-dirs)
 
 (use-package dired-x
@@ -76,6 +76,7 @@
 
 (use-package dired-single
   :ensure t
+  :straight (:type git :host codeberg :repo "amano.kenji/dired-single")
   :after dired
   :bind (:map dired-mode-map
 	      ("^" . (lambda nil (interactive) (dired-single-buffer "..")))
@@ -99,8 +100,8 @@
   :ensure t
   :after dired
   :bind (:map dired-mode-map
-	      ("<tab>" . (lambda () (interactive) (dired-subtree-toggle) (revert-buffer)))
-	      ("<backtab>" . dired-subtree-cycle)))
+		("<tab>" . (lambda () (interactive) (dired-subtree-toggle) (revert-buffer)))
+		("<backtab>" . dired-subtree-cycle)))
 
 (eval-after-load "dired-aux"
   '(add-to-list 'dired-compress-file-suffixes '("\\.zip\\'" ".zip" "unzip")))

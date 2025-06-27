@@ -1,14 +1,14 @@
-(defun setup-input-devices()
-	(interactive)
-	(call-process-shell-command "xinput disable \"SynPS/2 Synaptics TouchPad\"")
-	(call-process-shell-command "xset s 00")
-	(call-process-shell-command "xset -dpms")
-	(call-process-shell-command "xinput --set-button-map \"TPPS/2 Elan TrackPoint\" 3 2 1")
-  (call-process-shell-command "nvidia-settings --assign CurrentMetaMode=\"nvidia-auto-select +0+0 { ForceFullCompositionPipeline = On }\""))
+;; (defun setup-input-devices()
+;; 	(interactive)
+;; 	(call-process-shell-command "xinput disable \"SynPS/2 Synaptics TouchPad\"")
+;; 	(call-process-shell-command "xset s 00")
+;; 	(call-process-shell-command "xset -dpms")
+;; 	(call-process-shell-command "xinput --set-button-map \"TPPS/2 Elan TrackPoint\" 3 2 1")
+;;   (call-process-shell-command "nvidia-settings --assign CurrentMetaMode=\"nvidia-auto-select +0+0 { ForceFullCompositionPipeline = On }\""))
 
-(unless (eq system-type 'darwin)
-  (setup-input-devices)
-  (call-process-shell-command "xsetroot -cursor_name left_ptr"))
+;;(unless (eq system-type 'darwin)
+  ;;(setup-input-devices)
+  ;;(call-process-shell-command "xsetroot -cursor_name left_ptr"))
 
 ;; Garbage Collection Magic Hack
 (use-package gcmh

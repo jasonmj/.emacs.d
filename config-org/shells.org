@@ -369,6 +369,7 @@ Allows the popper buffer that a shell is in to be made fullscreen
 #+end_src
 * Vterm
 #+begin_src emacs-lisp
+(add-to-list 'load-path (concat "~/.local/vterm/" (string-trim (shell-command-to-string "ls ~/.local/vterm/"))))
 (add-to-list 'load-path (concat "/etc/links/vterm/" (string-trim (shell-command-to-string "ls /etc/links/vterm/"))))
 (require 'vterm)
 (setq vterm-module-cmake-args "-DUSE_SYSTEM_LIBVTERM=yes")

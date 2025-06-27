@@ -150,18 +150,19 @@ Show information on the side.
 
 https://github.com/emacs-sideline/sideline
 #+begin_src emacs-lisp
-    (use-package sideline
-      :ensure t
-      :init
-      (setq sideline-backends-left-skip-current-line t   ; don't display on current line (left)
-  	  sideline-backends-right-skip-current-line t  ; don't display on current line (right)
-  	  sideline-order-left 'down                    ; or 'up
-  	  sideline-order-right 'up                     ; or 'down
-  	  sideline-format-left "%s   "                 ; format for left alignment
-  	  sideline-format-right "   %s"                ; format for right alignment
-  	  sideline-priority 100                        ; overlays' priority
-  	  sideline-delay 5                             ; delay before displaying sideline
-  	  sideline-display-backend-name nil))          ; display the backend name
+  (use-package sideline
+    :ensure t
+    :straight (:type git :host github :repo "emacs-sideline/sideline")
+    :init
+    (setq sideline-backends-left-skip-current-line t   ; don't display on current line (left)
+  	sideline-backends-right-skip-current-line t  ; don't display on current line (right)
+  	sideline-order-left 'down                    ; or 'up
+  	sideline-order-right 'up                     ; or 'down
+  	sideline-format-left "%s   "                 ; format for left alignment
+  	sideline-format-right "   %s"                ; format for right alignment
+  	sideline-priority 100                        ; overlays' priority
+  	sideline-delay 5                             ; delay before displaying sideline
+  	sideline-display-backend-name nil))          ; display the backend name
 #+end_src
 ** Sideline Blame
 Show blame messages with sideline.

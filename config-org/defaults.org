@@ -118,7 +118,7 @@ Configure GPG and Pinentry for managing secrets. Use `~/.authinfo.gpg` for stora
   (setq epg-gpg-program "gpg2")
   (setq epa-pinentry-mode 'loopback)
   (setq auth-sources '((:source "~/.authinfo.gpg")))
-  (pinentry-start)
+  (if (eq system-type 'darwin) (pinentry-start))
 #+end_src
 * Tramp
 Configure tramp to use smart defaults for remote connections. 

@@ -2,13 +2,13 @@
     "Copy the current buffer file name to the clipboard."
     (interactive)
     (let ((filename (if (equal major-mode 'dired-mode)
-			default-directory
-		      (buffer-file-name))))
-      (if filename
-	  (progn
-	    (kill-new filename)
-	    (message "Copied '%s'" filename))
-	(warn "Current buffer is not attached to a file!"))))
+			  default-directory
+			(buffer-file-name))))
+	(if filename
+	    (progn
+	      (kill-new filename)
+	      (message "Copied '%s'" filename))
+	  (warn "Current buffer is not attached to a file!"))))
 
 (use-package devdocs
   :ensure t
@@ -31,9 +31,9 @@
   :config
   (add-to-list 'copilot-major-mode-alist '("elixir-ts" . "elixir"))
   :bind (:map copilot-mode-map
-	      ("TAB" . multi-tab)
-	      ("C-c c" . copilot-accept-completion)
-	      ("C-c C-c" . copilot-accept-completion)))
+		("TAB" . multi-tab)
+		("C-c c" . copilot-accept-completion)
+		("C-c C-c" . copilot-accept-completion)))
 
 (defun multi-tab ()
   (interactive)
@@ -46,8 +46,8 @@
   (grip-preview-use-webkit nil)
   (grip-github-user "jasonmj")
   (grip-github-password (auth-source-pick-first-password
-			 :host "api.github.com"
-			 :user "jasonmj^grip")))
+			   :host "api.github.com"
+			   :user "jasonmj^grip")))
 
 (use-package fold-this
   :ensure t
@@ -88,16 +88,17 @@
 
 (use-package sideline
   :ensure t
+  :straight (:type git :host github :repo "emacs-sideline/sideline")
   :init
   (setq sideline-backends-left-skip-current-line t   ; don't display on current line (left)
-      sideline-backends-right-skip-current-line t  ; don't display on current line (right)
-      sideline-order-left 'down                    ; or 'up
-      sideline-order-right 'up                     ; or 'down
-      sideline-format-left "%s   "                 ; format for left alignment
-      sideline-format-right "   %s"                ; format for right alignment
-      sideline-priority 100                        ; overlays' priority
-      sideline-delay 5                             ; delay before displaying sideline
-      sideline-display-backend-name nil))          ; display the backend name
+	sideline-backends-right-skip-current-line t  ; don't display on current line (right)
+	sideline-order-left 'down                    ; or 'up
+	sideline-order-right 'up                     ; or 'down
+	sideline-format-left "%s   "                 ; format for left alignment
+	sideline-format-right "   %s"                ; format for right alignment
+	sideline-priority 100                        ; overlays' priority
+	sideline-delay 5                             ; delay before displaying sideline
+	sideline-display-backend-name nil))          ; display the backend name
 
 (use-package sideline-blame
   :ensure t
@@ -115,7 +116,7 @@
 
 (use-package tramp
   :config (put 'tramp-remote-path '(tramp-own-remote-path) nil)
-	  (add-to-list 'tramp-remote-path "~/.asdf/shims/"))
+	    (add-to-list 'tramp-remote-path "~/.asdf/shims/"))
 
 (use-package transient-posframe
   :ensure t
@@ -125,7 +126,7 @@
   :ensure t
   :straight (:type git :host github :repo "jdtsmith/ultra-scroll")
   :init (setq scroll-conservatively 101 ; important!
-	      scroll-margin 0)
+		scroll-margin 0)
   :config
   (ultra-scroll-mode 1))
 
