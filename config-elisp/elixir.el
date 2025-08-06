@@ -47,6 +47,10 @@
   :mode (("\\.ex\\'" . elixir-ts-mode)
 	   ("\\.exs\\'" . elixir-ts-mode)))
 
+(use-package ex_tra
+  :bind (("C-c t t" . ex_tra))
+  :straight (ex_tra :type git :host github :repo "jasonmj/ex_tra" :files ("emacs/**")))
+
 (defun format-elixir-region (beg end)
   "Formats the selected region (if any) with Elixir's `Code.format_string!/1`"
   (interactive "r")
@@ -75,7 +79,8 @@
 	    (flymake-mix-test--clear-diags)
 	    (let ((buffer (get-buffer (concat "*" (project-name (project-current)) "-shell*"))))
 	      (when buffer
-		(with-current-buffer buffer (clear-shell-buffer-to-last-prompt) (deactivate-mark))))))
+		 (with-current-buffer buffer (clear-shell-buffer-to-last-prompt) (deactivate-mark))
+                ))))
     (flymake-mix-test--process-output clean-output))
   nil)
 

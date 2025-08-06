@@ -1,19 +1,19 @@
 (use-package org
   :demand t
   :bind (:map org-mode-map
-	      ("<C-return>" . org-cycle)
-	      ("C-k" . my/org-kill-line)
-	      ("<C-tab>" . nil)
-	      ("C-," . org-select-line-and-copy)
-	      ("C-s-p" . org-up-element)
-	      ("M-p" . org-metaup)
-	      ("M-P" . drag-stuff-up)
-	      ("M-n" . org-metadown)
-	      ("M-N" . drag-stuff-down)
-	      ("M-RET" . org-create-headline)
-	      ("S-TAB" . expreg-expand)
-	      ("<s-return>" . org-open-at-point)
-	      ("C-o" . (lambda () (interactive) (org-beginning-of-line) (org-open-line 1))))
+		("<C-return>" . org-cycle)
+		("C-k" . my/org-kill-line)
+		("<C-tab>" . nil)
+		("C-," . org-select-line-and-copy)
+		("C-s-p" . org-up-element)
+		("M-p" . org-metaup)
+		("M-P" . drag-stuff-up)
+		("M-n" . org-metadown)
+		("M-N" . drag-stuff-down)
+		("M-RET" . org-create-headline)
+		("S-TAB" . expreg-expand)
+		("<s-return>" . org-open-at-point)
+		("C-o" . (lambda () (interactive) (org-beginning-of-line) (org-open-line 1))))
   :config
   (defun my/org-kill-line ()
     (interactive)
@@ -32,6 +32,7 @@
     (set-mark-command nil)
     (org-end-of-line)
     (copy-keep-highlight (region-beginning) (region-end)))
+  (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
   :custom
   (org-startup-folded t)
   (org-todo-keyword-faces

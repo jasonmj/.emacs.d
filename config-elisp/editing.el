@@ -194,10 +194,10 @@ This command does not push text to `kill-ring'."
   :bind (("M-u" . upcase-char)
 	   ("M-l" . downcase-dwim)))
 
-(use-package window-stool
-  :ensure t
-  :straight (:type git :host github :repo "jaszhe/window-stool")
-  :hook prog-mode)
+;; (use-package window-stool
+;;   :ensure t
+;;   :straight (:type git :host github :repo "jaszhe/window-stool")
+;;   :hook prog-mode)
 
 (use-package ws-butler
   :ensure t

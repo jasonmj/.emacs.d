@@ -171,7 +171,7 @@
    (move-end-of-line 1)
    ;; TODO: filter out everything in parens
    (let* ((args (split-string (s-trim (selection-or-thing-at-point)) ":"))
-	    (filename (string-replace "└─ " "" (car args)))
+	    (filename (replace-regexp-in-string "^(\[^)]*\)\s+" "" (string-replace "└─ " "" (car args))))
 	    (fullpath (concat (project-root (project-current)) filename))
 	    (line (car (cdr args))))
      (find-file fullpath)
@@ -219,6 +219,17 @@ DIR should be one of 'left, 'right, 'up, or 'down."
   :preface
   (setq zoom-size '(0.618 . 0.618))
   :config
+  (defun my/vertical-split-p ()
+    "Return non-nil if the frame only has vertical splits (windows side by side)."
+    (let* ((windows (window-list))
+           (edges (mapcar #'window-edges windows)))
+      ;; If all windows share the same top/bottom (y) coordinates, then it's a purely vertical split.
+      (and (> (length windows) 1)
+           (apply #'= (mapcar (lambda (e) (nth 1 e)) edges)) ; all have the same top
+           (apply #'= (mapcar (lambda (e) (nth 3 e)) edges)))))
+
+  (custom-set-variables '(zoom-ignore-predicates '(my/vertical-split-p)))
+
   (defun my/work-around-zoom-issue ()
     (message "reloading zoom-mode")
     (load "zoom.el")

@@ -208,7 +208,7 @@
   (modalka-define-kbd "Y" "M-y")
   (modalka-define-kbd "z" "C-+")
   (modalka-define-kbd "Z" "C--")
-  (modalka-define-kbd "<backspace>" "<C-backspace>")
+  (modalka-define-kbd "<S-backspace>" "<C-backspace>")
   (define-key modalka-mode-map (kbd "SPC") (lambda () (interactive) (toggle-modalka) (insert-char 32 1)))
   (modalka-define-kbd "<escape>" "C-.")
   (modalka-define-kbd "<backtab>" "<C-S-return>")

@@ -88,10 +88,13 @@
 	 (deactivate-mark))
 
   (defun maybe-setup-project-shell ()
-    (if (project-current) (gptel-tool--send-to-project-shell "nix-shell")))
+    (if (and (project-current) (file-exists-p "shell.nix")) (send-to-project-shell "echo \"Starting nix-shell...\" && nix-shell")))
   (defvar shell-outline-regexp ".*\\([0-9]+\) test\\)\\([[:space:]]\\|(\\)")
   :hook ((shell-mode . (lambda ()
-			   (setq-local outline-regexp shell-outline-regexp)
+                         (set-process-query-on-exit-flag (get-buffer-process (current-buffer)) nil)
+			 (setq-local outline-regexp shell-outline-regexp)
+                         (local-set-key "<return>" 'comint-send-input)
+                         (local-set-key "C-e" 'move-end-of-line)
 			   (compilation-shell-minor-mode)
 			   (run-with-idle-timer 0.5 nil 'pcomplete-shell-setup)
 			   (run-with-idle-timer 0.5 nil 'bash-completion-setup)
@@ -99,9 +102,11 @@
 
 (defun clean-compilation-filename (filename)
   (string-trim
-	 (replace-regexp-in-string "\\(\*\* \\|┃\\)" ""
-			       (replace-regexp-in-string "\([^\"]+?\)" ""
-							 (string-trim filename)))))
+   (replace-regexp-in-string "\\(\*\* \\|┃\\)" ""
+     (replace-regexp-in-string "\([^\"]+?\)" ""
+       (replace-regexp-in-string "^([a-zA-Z0-9]+)" ""
+                                 (string-trim filename))))))
+
 (defun compilation-find-file-fixer (orig-fun marker filename &rest args)
   (message (clean-compilation-filename filename))
   (apply orig-fun marker
@@ -271,6 +276,20 @@
 	   (buffer-name (completing-read "Shell buffers: " shell-buffer-names)))
     (shell-buffer buffer-name)))
 (emacs-set-key (kbd "C-\\") 'shell-with-name)
+
+(defun send-to-project-shell (command)
+    "Send COMMAND to the shell buffer for the current project."
+    (let* ((project (project-current t))
+           (default-directory (if project (project-root project) default-directory))
+           (shell-buf (or (get-buffer "*shell*")
+                          (and (fboundp 'project-shell) (get-buffer (format "*shell*<%s>" (project-name project)))))))
+      (unless (and shell-buf (buffer-live-p shell-buf))
+        (setq shell-buf (if (fboundp 'project-shell)
+                            (project-shell)
+                          (shell "*shell*"))))
+      (with-current-buffer shell-buf
+        (goto-char (point-max))
+        (comint-send-string shell-buf (concat command "\n")))))
 
 (use-package sticky-shell
   :straight (:type git :host github :repo "andyjda/sticky-shell")

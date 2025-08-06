@@ -107,6 +107,7 @@ lightingconnection
 lightingoutputgroup
 lightingzone
 lightingzones
+livecomponent
 liveview
 liveviews
 lorem
@@ -160,6 +161,7 @@ sensorsform
 setpoint
 setpoints
 setq
+simplecache
 siteaddress
 sitedata
 src

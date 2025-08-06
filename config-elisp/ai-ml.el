@@ -19,11 +19,195 @@
   :hook (comint-mode . (lambda () (if (string-match-p "*aidermacs" (buffer-name))
                                  (progn (corfu-mode -1) (olivetti-mode 1))))))
 
+;;; llm-utils.el --- LLM helper utilities for project navigation
+
+(require 'json)
+(require 'xref)
+(require 'project)
+(require 'subr-x)
+
+(defun llm-project-diff (&optional detail file)
+  "Return a summary of unstaged and staged changes, or full unified diff.
+
+DETAIL:
+  nil/'summary': per-file added/removed summary (default)
+  'full: full unified diff output (optionally for FILE or list of FILES)
+FILE:
+  Optional filename (string) or list of filenames to limit the diff scope."
+  (interactive)
+  (let* ((detail (or detail 'summary))
+         (file-args
+          (cond
+           ((null file) "")
+           ((listp file) (mapconcat #'shell-quote-argument file " "))
+           ((stringp file) (shell-quote-argument file))
+           (t "")))
+         (diff-cmd (concat "git diff --unified=0 --no-color " file-args))
+         (raw-diff (shell-command-to-string diff-cmd)))
+    (if (eq detail 'full)
+        ;; Full diff output (as string)
+        raw-diff
+      ;; Summary only (default): per-file line count
+      (let* ((lines (split-string raw-diff "\n" t))
+             (result '())
+             (cur-file nil)
+             (add 0)
+             (rm 0))
+        (dolist (l lines)
+          (cond
+           ;; Detect new file diff header
+           ((string-match "^diff --git a/\\([^ ]+\\) b/\\([^ ]+\\)" l)
+            ;; Push previous file's counts if any
+            (when cur-file
+              (push (list :file cur-file :added add :removed rm) result))
+            (setq cur-file (match-string 2 l))
+            (setq add 0 rm 0))
+           ;; Added lines (ignore index/meta lines)
+           ((and cur-file (string-prefix-p "+" l) (not (string-prefix-p "+++" l)))
+            (cl-incf add))
+           ;; Removed lines (ignore index/meta lines)
+           ((and cur-file (string-prefix-p "-" l) (not (string-prefix-p "---" l)))
+            (cl-incf rm))))
+        ;; Push last file
+        (when cur-file
+          (push (list :file cur-file :added add :removed rm) result))
+        (require 'json)
+        (json-encode (or (nreverse result) []))))))
+
+
+(defun llm-project-root ()
+  "Return the root directory of the current project."
+  (if-let ((proj (project-current)))
+      (project-root proj)
+    default-directory))
+
+(defun llm-directory-tree (&optional dir max-depth)
+  "Return a simple nested list representing the directory tree under DIR up to MAX-DEPTH.
+If MAX-DEPTH is nil, default to 2. Only directory names are returned, as JSON."
+  (let* ((dir (or dir (llm-project-root)))
+         (max-depth (or max-depth 2)))
+    (with-temp-buffer
+      (let ((default-directory dir))
+        (call-process "find" nil t nil "." "-type" "d" "-print"))
+      (let ((dirs (split-string (buffer-string) "\n" t)))
+        (json-encode (llm--simple-dir-tree dirs max-depth))))))
+
+(defun llm--simple-dir-tree (dirs max-depth)
+  "Return a nested structure with only directory names, no files or metadata.
+Example: '((src (lib)) (test)) for src/lib and test dirs (DEPTH=2)."
+  (let ((tree ()))
+    (dolist (d dirs)
+      (let* ((parts (seq-take (split-string (string-remove-prefix "./" d) "/") max-depth))
+             (node tree))
+        (cl-labels
+            ((insert-path (parts node)
+               (if (null parts)
+                   node
+                 (let* ((head (car parts))
+                        (child (assoc head node)))
+                   (unless child
+                     (setq child (cons head nil))
+                     (push child node))
+                   (setcdr child (insert-path (cdr parts) (cdr child)))
+                   node))))
+          (setq tree (insert-path parts tree)))))
+    ;; clean output: turn '((a (b ()))) -> {"a": {"b": {}}}
+    (cl-labels ((alist-to-hash (alist)
+                  (let ((tbl (make-hash-table :test #'equal)))
+                    (dolist (item alist)
+                      (if (consp item)
+                          (puthash (car item) (alist-to-hash (cdr item)) tbl)
+                        (puthash item (make-hash-table) tbl)))
+                    tbl)))
+      (let ((ht (alist-to-hash tree)))
+        (json-read-from-string (json-encode ht))))))
+
+
+(defun llm-file-preview (file &optional n)
+  "Return the first N lines of FILE as a string (default 15).
+Warn if N exceeds 40. Trailing whitespace and newlines are stripped."
+  (let* ((n (or n 15))
+         (n (if (stringp n) (string-to-number n) n)))
+    (when (> n 40)
+      (unless (y-or-n-p (format "Preview %d lines? This may use many tokens. Continue? " n))
+        (user-error "Aborted preview of large file segment")))
+    (with-temp-buffer
+      (insert-file-contents file nil 0 10000)
+      (goto-char (point-min))
+      (let ((content (buffer-substring-no-properties
+                      (point-min)
+                      (progn (forward-line n) (point)))))
+        (string-trim-right content)))))
+
+(defun llm-code-outline (file-or-buffer)
+  "Return a code outline for FILE-OR-BUFFER using imenu only.
+
+  If FILE-OR-BUFFER is a buffer, use it directly. Otherwise, open the file in a temporary buffer.
+
+  Returns a processed alist representing the code outline suitable for LLM consumption."
+  (let ((buf (cond
+              ((bufferp file-or-buffer) file-or-buffer)
+              ((stringp file-or-buffer) (find-file-noselect file-or-buffer))
+              (t (error "Expected buffer or filename string"))))
+        outline)
+    (with-current-buffer buf
+      ;; Refresh imenu index
+      (condition-case err
+          (imenu--make-index-alist)
+        (error
+         (message "Error building imenu indices: %s" err)
+         (setq imenu--index-alist nil)))
+      (setq outline (llm--flatten-imenu-alist imenu--index-alist)))
+    outline))
+
+(defun llm--flatten-imenu-alist (alist)
+  "Flatten the nested imenu ALIST into a clean list of (NAME . POSITION)."
+  (cl-labels ((flatten (list)
+                (apply #'append
+                       (mapcar (lambda (item)
+                                 (cond
+                                  ((imenu--subalist-p item)
+                                   (flatten (cdr item)))
+                                  ((and (consp item) (stringp (car item)))
+                                   (list item))
+                                  (t nil)))
+                               list))))
+    (flatten alist)))
+
+(defun llm-symbol-search (symbol)
+  "Search for the given SYMBOL references in the project using ripgrep.
+
+  SYMBOL can be a string or a symbol. If it is a true symbol (not a string),
+  it is converted to a string representation for the search.
+  If it is a list or vector, the first string element is used as the search string.
+
+  Returns the raw ripgrep output as a string suitable for LLM consumption."
+  (let* ((query
+          (cond
+           ((and (or (listp symbol) (vectorp symbol)) (not (stringp symbol)))
+            (let ((first-str (car (seq-filter #'stringp (if (vectorp symbol) (append symbol nil) symbol)))))
+              (or first-str (error "List or vector did not contain a string element"))))
+           ((stringp symbol) symbol)
+           ((symbolp symbol) (symbol-name symbol))
+           (t (error "Expected string, symbol, list, or vector, got: %s" symbol))))
+         (project-root (llm-project-root))
+         (default-directory project-root)
+         (rg-cmd (format "rg --json --max-count 30 '%s'" query)))
+    (shell-command-to-string rg-cmd)))
+
+(provide 'llm-utils)
+    ;;; llm-utils.el ends here
+
 (use-package gptel
   :straight (:type git :host github :repo "karthink/gptel")
   :bind (("C-x g" . gptel-menu))
   :after direnv
   :config
+  (require 'llm-utils)
+
+  (setq gptel-display-buffer-action
+      '((display-buffer-in-side-window)
+        (side . right)))
   (defun read-file-as-string (file-path)
     (with-temp-buffer (insert-file-contents file-path)
                       (buffer-string)))
@@ -31,7 +215,7 @@
   (defun gptel-tool--open-file (file-name)
     "Open FILE-NAME using `find-file'."
     (if (file-exists-p file-name)
-        (progn (find-file file-name) (gptel-add))
+        (progn (find-file file-name) (gptel-add-file file-name))
       (format "File not found: %s" file-name)))
 
   (defvar gptel-tool-open-file-fn
@@ -106,7 +290,7 @@
     '(message buffer-name list-buffers gptel-add-elisp-function-to-whitelist current-time-string)
     "List of symbols for whitelisted elisp function calls.")
 
- ;;; Utility to add a function to the gptel elisp whitelist
+     ;;; Utility to add a function to the gptel elisp whitelist
   (defun gptel-add-elisp-function-to-whitelist (fn-name)
     "Add FN-NAME (a string function name or symbol) to `gptel-elisp-function-whitelist' if not present. Prompts interactively if called with M-x. Always accepts a string or symbol, converts to symbol."
     (interactive
@@ -117,32 +301,47 @@
         (message "Added %s to gptel-elisp-function-whitelist" sym)))
     (symbol-name (if (symbolp fn-name) fn-name (intern fn-name))))
 
-
   (defun gptel-tool--call-elisp (function-name args)
-    "Call a whitelisted Emacs Lisp FUNCTION-NAME (string, symbol, or 1-element vector) with ARGS. Prompts to whitelist new functions."
-    (let* ((sym (cond
-                 ((symbolp function-name) function-name)
-                 ((and (vectorp function-name)
-                       (= (length function-name) 1))
-                  (aref function-name 0))
-                 ((stringp function-name) (intern function-name))
-                 ((listp function-name)
-                  (intern (format "%s" (car function-name))))
-                 (t (error "Unsupported function-name format: %S" function-name)))))
-      (if (memq sym gptel-elisp-function-whitelist)
-          (condition-case err
-              (prin1-to-string (apply sym args))
-            (error (format "Function call failed: %s" err)))
-        (when (yes-or-no-p (format "Add %s to elisp whitelist? " sym))
-          (push sym gptel-elisp-function-whitelist)
-          (prin1-to-string (apply sym args))))))
+    "Call a whitelisted Emacs Lisp FUNCTION-NAME (string, symbol, vector, or list) with ARGS.
+Unwraps nested 1-element vectors or lists for FUNCTION-NAME.
+ARGS should be a list of strings; also unwrap nested vectors/lists in args elements.
+If an argument is a character, convert it to a string."
+    (cl-labels
+        ((unwrap (x)
+           (cond
+            ((and (vectorp x) (= (length x) 1)) (unwrap (aref x 0)))
+            ((and (listp x) (= (length x) 1)) (unwrap (car x)))
+            (t x)))
+         (unwrap-args (args-list)
+           (mapcar (lambda (arg)
+                     (let ((val (unwrap arg)))
+                       (if (characterp val)
+                           (char-to-string val)
+                         (if (stringp val)
+                             val
+                           (prin1-to-string val)))))
+                   args-list)))
+      (let* ((sym (cond
+                   ((symbolp function-name) function-name)
+                   ((stringp function-name) (intern function-name))
+                   ((vectorp function-name) (unwrap function-name))
+                   ((listp function-name) (unwrap function-name))
+                   (t (error "Unsupported function-name format: %S" function-name))))
+             (unwrapped-args (unwrap-args (or args '()))))
+        (if (memq sym gptel-elisp-function-whitelist)
+            (condition-case err
+                (prin1-to-string (apply sym unwrapped-args))
+              (error (format "Function call failed: %s" err)))
+          (when (yes-or-no-p (format "Add %s to elisp whitelist? " sym))
+            (push sym gptel-elisp-function-whitelist)
+            (prin1-to-string (apply sym unwrapped-args)))))))
 
 
   (defvar gptel-tool-call-elisp-fn
     (gptel-make-tool
      :name "call_elisp_function"
      :function (lambda (function-name &optional args)
-                 (gptel-tool--call-elisp function-name (or args nil)))
+                 (gptel-tool--call-elisp function-name (or args '())))
      :description "Call a whitelisted Emacs Lisp function with arguments and return result as string."
      :args (list '(:name "function-name"
                          :type string
@@ -157,6 +356,7 @@
 
   (defun my/setup-gptel-buffer ()
     (olivetti-mode)
+    (spell-fu-mode -1)
     (corfu-mode -1))
 
   (defun gptel-project-shell-tool (command)
@@ -171,26 +371,25 @@
     
     (setq gptel-backend (gptel-make-openai "LM-Studio"
                           :protocol "http"
-                          :host "localhost:1234"
+                          ;; :host "localhost:1234"
+                          :host "100.81.198.29:1234"
                           :stream t
                           :models '(lmstudio))
           gptel-model 'lmstudio)
 
-    (setq gptel-model   'mistralai/mistral-small-3.2-24b-instruct:free
-          gptel-backend (gptel-make-openai "OpenRouter"
+    (setq gptel-backend (gptel-make-openai "OpenRouter"
                           :host "openrouter.ai"
                           :endpoint "/api/v1/chat/completions"
                           :stream nil
                           :key (getenv "OPENROUTER_API_KEY")
-                          :models '(deepseek/deepseek-r1-0528:free
-                                    mistralai/mistral-small-3.2-24b-instruct:free)))
+                          :models '(deepseek/deepseek-r1-0528:free)))
 
     (setq gptel-backend (gptel-make-openai "GitHub"
-                                 :host "models.inference.ai.azure.com"
-                                 :endpoint "/chat/completions"
-                                 :stream t
-                                 :key (getenv "GITHUB_MODELS_TOKEN")
-                                 :models '(gpt-4.1)))
+                          :host "models.inference.ai.azure.com"
+                          :endpoint "/chat/completions"
+                          :stream t
+                          :key (getenv "GITHUB_MODELS_TOKEN")
+                          :models '(gpt-4.1)))
 
     (setq gptel-default-mode 'org-mode)
     (setq gptel-prompt-prefix-alist '((markdown-mode . "### ") (org-mode . "* ") (text-mode . "### ")))

@@ -306,10 +306,10 @@ Emacs package that provides code context/breadcrumbs similar to context.vim and 
 
 https://github.com/JasZhe/window-stool
 #+begin_src emacs-lisp
-  (use-package window-stool
-    :ensure t
-    :straight (:type git :host github :repo "jaszhe/window-stool")
-    :hook prog-mode)
+  ;; (use-package window-stool
+  ;;   :ensure t
+  ;;   :straight (:type git :host github :repo "jaszhe/window-stool")
+  ;;   :hook prog-mode)
 #+end_src
 * WS Butler Mode
 Unobtrusively trim extraneous white-space *ONLY* in lines edited. 
