@@ -95,8 +95,8 @@ https://github.com/minad/consult
     (consult-line-start-from-top t)
     (consult-preview-key 'any)
     (consult-buffer-filter '("^ " "\\` " "\\*Echo Area" "\\*Minibuf" "\\*Quail Completions" "\\*Backtrace"
-                             "\\*tidewave""\\*Mcp" "\\*filesystem events" "\\*gptel"
-  			     "\\*elixir-ls" "Flymake log" "Shell command output" "direnv" "\\*scratch" "Shell:"
+                             "\\*tidewave""\\*Mcp" "\\*filesystem events" "\\*gptel" "\\*opencode-serve*" "\\*OpenCode Sessions"
+  			     "\\*elixir-ls" "Flymake log" "Shell command output" "direnv" "\\*scratch" "Shell:" "^acp-client-stderr"
   			     "\\*Messages" "\\*Warning" "*magit-" "magit-process" "*vterm" "vterm" "^:" ".+-shell*"
   			     "*straight-" "*elfeed-log" "*trace of SMTP session" "\\*Compile-Log" "\\*copilot events"
   			     "*format-all-error" "*Async-" "COMMIT_EDITMSG" "shell: " "\\*ednc-log" "TAGS" "\\*gemini"
@@ -241,13 +241,12 @@ https://github.com/minad/corfu
     :ensure t
     :bind (:map corfu-map
                 ("C-e" . corfu-complete)
+                ("<return>" . nil)
+                ("C-m" . corfu-insert)
                 ("<tab>" . corfu-complete))
-    :config
-    (unbind-key "RET" corfu-mode-map)
-    (unbind-key "C-m" corfu-mode-map)
     :init
     (setq corfu-auto-prefix 1
-  	  corfu-auto-delay 0
+  	  corfu-auto-delay 0.1
   	  corfu-auto t
   	  corfu-cycle t
   	  corfu-quit-no-match t
@@ -493,10 +492,9 @@ https://github.com/radian-software/prescient.el
 #+begin_src emacs-lisp
   (use-package vertico-posframe
     :ensure t
-    :init (vertico-posframe-mode 1)
+    :init (progn (vertico-posframe-mode 1) (setq vertico-posframe-border-width 12) (custom-set-faces '(vertico-posframe-border ((t ())))))
     :config
-    (setq vertico-posframe-border-width 12
-	  vertico-posframe-hide-minibuffer t
+    (setq vertico-posframe-hide-minibuffer t
 	  vertico-posframe-min-width 110
 	  vertico-posframe-height nil
 	  vertico-posframe-min-height 10
@@ -505,8 +503,6 @@ https://github.com/radian-software/prescient.el
 	  vertico-posframe-parameters '((alpha . 85)
 					(left-fringe . 0)
 					(right-fringe . 0)))
-
-    (custom-set-faces `(vertico-posframe-border ((t (:background nil)))))
 
     (defun posframe-poshandler-window-top-center-offset (info)
       "Posframe's position handler.

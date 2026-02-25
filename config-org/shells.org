@@ -110,8 +110,8 @@ Quickly create an eshell with a name or switch to an open eshell with completing
   	 (end-of-line)
   	 (deactivate-mark))
 
-    (defun maybe-setup-project-shell ()
-      (if (and (project-current) (file-exists-p "shell.nix")) (send-to-project-shell "echo \"Starting nix-shell...\" && nix-shell")))
+    (defun maybe-setup-project-shell () (interactive)
+      (if (and (project-current) (file-exists-p "shell.nix")) (send-to-project-shell "echo \"nix develop\" && nix develop") (clear-shell-buffer)))
     (defvar shell-outline-regexp ".*\\([0-9]+\) test\\)\\([[:space:]]\\|(\\)")
     :hook ((shell-mode . (lambda ()
                            (set-process-query-on-exit-flag (get-buffer-process (current-buffer)) nil)
@@ -148,7 +148,7 @@ Quickly create an eshell with a name or switch to an open eshell with completing
   (defun cape--iex-input-filter (input)
     (if (cape--iex-starts-with-iex input)
       (set-process-filter (current-buffer-process) 'cape--iex-bootstrap-filter)))
-
+  (defvar-local default-capfs nil "Backup of buffer-local completion-at-point-functions for cape-iex.")
   (defun current-buffer-process () (get-buffer-process (current-buffer)))
 
   (defun cape--iex-starts-with-iex (str)
@@ -335,14 +335,22 @@ https://github.com/andyjda/sticky-shell
     :hook (shell-mode . sticky-shell-mode)
     :config
     (defun clear-shell-buffer-to-last-prompt () (interactive)
-	 (end-of-buffer)
-	 (set-mark (point))
-	 (comint-previous-prompt 1)
-	 (end-of-line)
-	 (forward-char)
-	 (delete-active-region))
+  	 (end-of-buffer)
+  	 (set-mark (point))
+  	 (comint-previous-prompt 1)
+  	 (end-of-line)
+  	 (forward-char)
+  	 (delete-active-region))
+    (defun clear-shell-buffer-to-last-prompt-leave-n (n) (interactive)
+  	 (end-of-buffer)
+  	 (set-mark (point))
+  	 (comint-previous-prompt 1)
+           (next-line n)
+  	 (end-of-line)
+  	 (forward-char)
+  	 (delete-active-region))
     :bind (:map shell-mode-map
-		("C-S-l" . clear-shell-buffer-to-last-prompt)))
+  		("C-S-l" . clear-shell-buffer-to-last-prompt)))
 #+end_src
 ** Syntax Overlay Region
 #+begin_src emacs-lisp
@@ -391,6 +399,13 @@ Allows the popper buffer that a shell is in to be made fullscreen
       (delete-window)
       (switch-to-buffer name)))
   (emacs-set-key (kbd "C-x c") 'popper-shell-fullscreen)
+#+end_src
+** Comint
+#+begin_src emacs-lisp
+(use-package comint
+  :ensure nil   ;; built-in
+  :bind
+  (:map comint-mode-map ("<return>" . comint-send-input)))
 #+end_src
 * Vterm
 #+begin_src emacs-lisp

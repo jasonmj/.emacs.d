@@ -17,7 +17,7 @@
 					 "\\*Messages\\*"
 					 "\\*Warnings\\*"))
   :config
-  (key-seq-define-global "bf" 'bufler)
+  (key-chord-define-global "bf" 'bufler-list)
   (defun my/bufler-workspace-focus-buffer (&optional buffer)
     (run-with-idle-timer 0.001 nil (lambda () (interactive) (bufler-workspace-focus-buffer (current-buffer)))))
   (add-to-list 'window-selection-change-functions 'my/bufler-workspace-focus-buffer)
@@ -101,7 +101,7 @@
 														    (let* ((group-buffers (if (eq (type-of buffer-or-buffers) 'buffer) buffer-or-buffers (car (cdr buffer-or-buffers))))
 															   (clean-group-buffers (if (eq (type-of group-buffers) 'buffer)
 																		    group-buffers
-																		  (delq nil (delete-dups group-buffers))))
+																		  (delete-dups group-buffers)))
 															   (buffer-list '()))
 														      (if (eq (type-of clean-group-buffers) 'buffer) clean-group-buffers
 															(mapcar (lambda (item) (if (eq (type-of item) 'buffer) item)) clean-group-buffers)))) (cdr group)))) (bufler-buffers)))))))))))

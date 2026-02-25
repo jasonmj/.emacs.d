@@ -142,7 +142,7 @@
 
 (use-package which-key-posframe
   :ensure t
-  :config (custom-set-faces '(which-key-posframe-border ((t nil))))
+  :config (custom-set-faces '(which-key-posframe-border ((t ()))))
   :custom
   (which-key-posframe-border-width  20)
   (which-key-posframe-poshandler 'posframe-poshandler-window-top-center-offset)

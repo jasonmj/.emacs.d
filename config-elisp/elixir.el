@@ -6,7 +6,14 @@
 	   (path (replace-regexp-in-string root "" path-from-home nil t))
 	   (line-number (number-to-string (line-number-at-pos)))
 	   (cmd (if (string-match "ec2k" (caddr (project-current))) "watch mix espec " "watch mix test ")))
-    (kill-new (concat cmd path ":" line-number))))
+    (progn
+        (kill-new (concat cmd path ":" line-number))
+        (project-shell)
+        (comint-quit-subjob)
+        (clear-shell-buffer)
+        (yank)
+        (comint-send-input))
+    ))
 (global-set-key (kbd "C-c t l") 'copy-test-line)
 
 (defun copy-test-file ()
@@ -16,7 +23,13 @@
 	   (path-from-home (replace-regexp-in-string (s-trim (shell-command-to-string "echo $HOME")) "~" full-path nil t))
 	   (path (replace-regexp-in-string root "" path-from-home nil t))
 	   (cmd (if (string-match "ec2k" (caddr (project-current))) "watch mix espec " "watch mix test ")))
-    (kill-new (concat cmd path))))
+    (progn
+      (kill-new (concat cmd path))
+      (project-shell)
+      (comint-quit-subjob)
+      (clear-shell-buffer)
+      (yank)
+      (comint-send-input))))
 (global-set-key (kbd "C-c t f") 'copy-test-file)
 
 (use-package elixir-mode :ensure t)
@@ -24,28 +37,38 @@
 (use-package elixir-ts-mode
   :ensure t
   :bind (:map elixir-ts-mode-map
-		("C-s" . (lambda () (interactive) (eglot-format) (run-with-idle-timer 0.1 nil (lambda () (save-buffer)))))
-		("M-RET" . (lambda () (interactive) (newline) (insert "|> ") (indent-for-tab-command))))
+	      ("C-s" . (lambda () (interactive) (eglot-format) (run-with-idle-timer 0.1 nil (lambda () (save-buffer)))))
+	      ("M-RET" . (lambda () (interactive) (newline) (insert "|> ") (indent-for-tab-command))))
   :config
+  (defvar spec-outline-regexp "^[[:space:]]*\\(describe\\|context\\|it\\)[[:space:]]+\"[^\"]*\"[[:space:]]+do[[:space:]]*$")
   (defvar elixir-outline-regexp
     (concat "^[[:space:]]*\\("
-	      "@moduledoc\\|@behaviour\\|@callback\\|@type\\|@typedoc\\|@doc\\|@spec\\|@impl"
-	      "\\|def\\(\\|p\\|callback\\|delegate\\|impl\\|overridable\\|exception\\|struct\\|guard\\|guardp\\|record\\|recordp\\|macro\\|macrop\\|macrocallback\\|protocol\\)"
-	      "\\|describe\\|feature\\|test\\|setup\\|let\\|it\\|context\\|before\\|schema\\|scope"
-	      "\\|use\\|alias\\|import\\|require"
-	      "\\)\\([[:space:]]\\|(\\)"))
+	    "@moduledoc\\|@behaviour\\|@callback\\|@type\\|@typedoc\\|@doc\\|@spec\\|@impl"
+	    "\\|def\\(\\|p\\|callback\\|delegate\\|impl\\|overridable\\|exception\\|struct\\|guard\\|guardp\\|record\\|recordp\\|macro\\|macrop\\|macrocallback\\|protocol\\)"
+	    "\\|describe\\|feature\\|test\\|setup\\|let\\|it\\|context\\|before\\|finally\\|schema\\|scope"
+	    "\\|use\\|alias\\|import\\|require"
+	    "\\)\\([[:space:]]\\|(\\)"))
   (defvar html-outline-regexp "^[[:space:]]*<[^/>]+?\\(>\\|\n\\)")
-  :hook ((elixir-ts-mode . (lambda () (setq-local outline-regexp elixir-outline-regexp)))
-	   (elixir-ts-mode . (lambda ()
-			       (unless (eq system-type 'darwin)
-				 (setq indent-tabs-mode nil)
-				 (indent-bars-mode t)
-				 (setq indent-tabs-mode t))))
-	   (heex-ts-mode . (lambda () (setq-local outline-regexp html-outline-regexp)))
-	   (heex-ts-mode . hungry-delete-mode)
-	   (heex-ts-mode . display-line-numbers-mode))
+
+  (defun elixir-outline-setup-regexp ()
+    "Configure outline using a custom regexp and explicit levels."
+    (message "settings up outline-minor-mode")
+    (setq-local outline-heading-alist nil)
+    (setq-local outline-regexp elixir-outline-regexp)
+    (outline-minor-mode 1))
+  :hook ((elixir-mode . elixir-outline-setup-regexp)
+         (elixir-ts-mode . (lambda ()
+			     (setq indent-tabs-mode nil)
+			     (indent-bars-mode t)
+			     (setq indent-tabs-mode t)
+                             (elixir-outline-setup-regexp)))
+	 (heex-ts-mode . (lambda ()
+                           (setq-local outline-regexp html-outline-regexp)
+                           (outline-minor-mode 1)))
+	 (heex-ts-mode . hungry-delete-mode)
+	 (heex-ts-mode . display-line-numbers-mode))
   :mode (("\\.ex\\'" . elixir-ts-mode)
-	   ("\\.exs\\'" . elixir-ts-mode)))
+	 ("\\.exs\\'" . elixir-ts-mode)))
 
 (use-package ex_tra
   :bind (("C-c t t" . ex_tra))
@@ -74,12 +97,13 @@
 
 (defun flymake-mix-test--output-filter (output)
   (let ((clean-output (s-trim (strip-ansi-chars output))))
-    (if (string-match-p "^Excluding tags" clean-output)
-	  (progn
+    (if (string-match-p "^Running ExUnit" clean-output)
+	(progn
+          (open-line 1)
 	    (flymake-mix-test--clear-diags)
 	    (let ((buffer (get-buffer (concat "*" (project-name (project-current)) "-shell*"))))
 	      (when buffer
-		 (with-current-buffer buffer (clear-shell-buffer-to-last-prompt) (deactivate-mark))
+		 (with-current-buffer buffer (clear-shell-buffer-to-last-prompt-leave-n 1) (deactivate-mark))
                 ))))
     (flymake-mix-test--process-output clean-output))
   nil)

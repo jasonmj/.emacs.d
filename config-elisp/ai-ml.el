@@ -74,6 +74,9 @@ FILE:
         (require 'json)
         (json-encode (or (nreverse result) []))))))
 
+(defun llm-working-directory ()
+  "Return the current working directory as a string."
+  default-directory)
 
 (defun llm-project-root ()
   "Return the root directory of the current project."
@@ -196,18 +199,87 @@ Warn if N exceeds 40. Trailing whitespace and newlines are stripped."
     (shell-command-to-string rg-cmd)))
 
 (provide 'llm-utils)
-    ;;; llm-utils.el ends here
+
+(defun llm-treesit--node-to-alist (node depth)
+  "Recursively convert NODE into an alist representing the syntax tree up to DEPTH levels."
+  (let ((node-type (treesit-node-type node))
+        (start (treesit-node-start node))
+        (end (treesit-node-end node))
+        children)
+    (when (> depth 0)
+      (setq children
+            (mapcar (lambda (child) (llm-treesit--node-to-alist child (1- depth)))
+                    (treesit-node-children node))))
+    `((type . ,node-type)
+      (start . ,start)
+      (end . ,end)
+      (children . ,children))))
+
+(defun llm-treesit-info (&optional file-or-buffer depth)
+  (let* ((buf-and-path (cond
+                        ((bufferp file-or-buffer) 
+                         (cons file-or-buffer (buffer-file-name file-or-buffer)))
+                        ((stringp file-or-buffer) 
+                         (let ((full-path (expand-file-name file-or-buffer)))
+                           (cons (find-file-noselect full-path) full-path)))
+                        (t 
+                         (cons (current-buffer) (buffer-file-name (current-buffer))))))
+         (buf (car buf-and-path))
+         (full-path (cdr buf-and-path))
+         (depth (or depth 3)))
+    (with-current-buffer buf
+      (if (fboundp 'treesit-parser-list)
+          (let* ((tree (treesit-buffer-root-node))
+                 (data (llm-treesit--node-to-alist tree depth))
+                 (data-with-path (cons `(file-path . ,full-path) data))
+                 (json-str (json-encode data-with-path)))
+            (when (and (stringp file-or-buffer) (buffer-live-p buf))
+              (kill-buffer buf))
+            json-str)
+        (format "Error: Buffer %s (path: %s) is not using tree-sitter." 
+                (buffer-name buf) (or full-path "unknown"))))))
+
+
+(defun llm-xref-find-references (&optional symbol)
+  "Return a JSON string of xref references for SYMBOL in the current project.
+If SYMBOL is nil, use the symbol at point.
+Each reference is represented as an alist with keys :file, :line, and :summary.
+
+Does not jump to any location, just returns the list of references."
+  (interactive)
+  (let* ((sym-str (or symbol (thing-at-point 'symbol t)))
+         (backend (xref-find-backend))
+         (refs (and sym-str (xref-backend-references backend sym-str)))
+         (refs-data
+          (mapcar
+           (lambda (ref)
+             (let* ((loc (xref-item-location ref))
+                    (file (xref-file-location-file loc))
+                    (line (xref-file-location-line loc))
+                    (summary (xref-item-summary ref)))
+               `((:file . ,file) (:line . ,line) (:summary . ,summary))))
+           refs)))
+    (json-encode refs-data)))
+
+;;; llm-utils.el ends here
 
 (use-package gptel
   :straight (:type git :host github :repo "karthink/gptel")
-  :bind (("C-x g" . gptel-menu))
+  :bind ((("C-x G" . gptel-menu)
+          ("C-x g" . (lambda () (interactive) (gptel-context-remove-all ) (gptel "*GPTel*") (switch-to-buffer "*GPTel*"))))
+         (:map gptel-mode-map ("C-c C-c" . gptel-send)))
+   ;; :hook (direnv-mode . my/setup-gptel)
   :after direnv
   :config
   (require 'llm-utils)
 
   (setq gptel-display-buffer-action
-      '((display-buffer-in-side-window)
-        (side . right)))
+    '((display-buffer-reuse-window
+       display-buffer-in-side-window)
+      (side . right)
+      (slot . 0)
+      (window-width . 0.4)
+      (body-function . select-window)))
   (defun read-file-as-string (file-path)
     (with-temp-buffer (insert-file-contents file-path)
                       (buffer-string)))
@@ -242,7 +314,7 @@ Warn if N exceeds 40. Trailing whitespace and newlines are stripped."
                             (project-shell)
                           (shell "*shell*"))))
       (with-current-buffer shell-buf
-        (gptel-add)
+        (gptel-context--add-region (current-buffer) (point-min) (point-max) t)
         (goto-char (point-max))
         (comint-send-string shell-buf (concat command "\n")))))
 
@@ -287,7 +359,20 @@ Warn if N exceeds 40. Trailing whitespace and newlines are stripped."
   (add-to-list 'gptel-tools gptel-tool-save-buffer-fn)
 
   (defvar gptel-elisp-function-whitelist
-    '(message buffer-name list-buffers gptel-add-elisp-function-to-whitelist current-time-string)
+    '(message
+      buffer-name
+      list-buffers
+      gptel-add-elisp-function-to-whitelist
+      current-time-string
+      llm-xref-find-references
+      llm-treesit-info
+      llm-working-directory
+      llm-project-diff
+      llm-directory-tree
+      llm-file-preview
+      llm-project-root
+      llm-code-outline
+      llm-symbol-search)
     "List of symbols for whitelisted elisp function calls.")
 
      ;;; Utility to add a function to the gptel elisp whitelist
@@ -377,14 +462,22 @@ If an argument is a character, convert it to a string."
                           :models '(lmstudio))
           gptel-model 'lmstudio)
 
+    (setq gptel-backend (gptel-make-openai "LiteLLM"
+                          :protocol "http"
+                          :host "localhost:1234"
+                          :stream t
+                          :key (getenv "LITELLM_MASTER_KEY")
+                          :models '(github/gpt-4.1 github/gpt-5-mini)))
+
     (setq gptel-backend (gptel-make-openai "OpenRouter"
                           :host "openrouter.ai"
                           :endpoint "/api/v1/chat/completions"
                           :stream nil
                           :key (getenv "OPENROUTER_API_KEY")
-                          :models '(deepseek/deepseek-r1-0528:free)))
+                          :models '(deepseek/deepseek-r1-0528:free)
+                          ))
 
-    (setq gptel-backend (gptel-make-openai "GitHub"
+    (setq gptel-backend (gptel-make-openai "GPTel"
                           :host "models.inference.ai.azure.com"
                           :endpoint "/chat/completions"
                           :stream t
@@ -438,3 +531,21 @@ If an argument is a character, convert it to a string."
     (gptel-mcp-use-tool))
   (setq mcp-hub-servers
         '(("tidewave" . (:url "http://localhost:4000/tidewave/mcp?include_fs_tools=true")))))
+
+(straight-use-package
+ '(git-commit
+   :type git
+   :host github
+   :repo "magit/magit"
+   :files ("lisp/git-commit.el" "lisp/git-commit-pkg.el")))
+;; Now install Magit (will reuse the same repo)
+(straight-use-package 'magit)
+(use-package plz-media-type :straight (plz-media-type :type git :host github :repo "emacs-straight/plz-media-type"))
+(use-package opencode
+  :straight (opencode :type git :host codeberg :repo "sczi/opencode.el")
+  :custom (opencode-provider "github-copilot"))
+
+(use-package agent-shell
+  :ensure t
+  :hook ((agent-shell-mode . olivetti-mode))
+  :custom (agent-shell-show-welcome-message nil))

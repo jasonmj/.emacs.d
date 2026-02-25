@@ -3,12 +3,16 @@
   :demand t
   :bind (("C-c j" . avy-goto-word-org-subword-1))
   :config
+  (setq avy-all-windows nil)
+  (setq avy-keys (string-to-list "aoeuidhtns"))
   (key-chord-define-global "jj" 'avy-goto-word-or-subword-1)
   (key-chord-define-global "JJ" 'avy-goto-char-in-line))
 
 (use-package centered-cursor-mode
   :ensure t
-  :bind ("s--" . centered-cursor-mode))
+  :bind ("s--" . centered-cursor-mode)
+   :hook (prog-mode . (lambda ()
+            (run-with-idle-timer 0 nil #'centered-cursor-mode))))
 
 (defun copy-keep-highlight (beg end)
   (interactive "r")
@@ -62,60 +66,40 @@
 
 (use-package related-files
   :ensure t
-  :bind (("C-x j" . related-files-jump)))
+  :bind (("C-x j" . related-files-jump))
+  :config
+  (defun test-from-module (file)
+    (concat (file-name-sans-extension (replace-regexp-in-string "lib/" "test/" file nil t)) "_test.exs"))
+
+  (defun module-from-test (file)
+    (let* ((replaced (replace-regexp-in-string "test/" "lib/" file nil t))
+	   (without-suffix (if (> (length replaced) 0) (substring (file-name-sans-extension replaced) 0 -5))))
+      (if without-suffix
+	  (concat without-suffix ".ex")
+	file)))
+
+  (defun spec-from-module (file)
+    (concat (file-name-sans-extension (replace-regexp-in-string "lib/ec2k/" "spec/" file nil t)) "_spec.exs"))
+
+  (defun module-from-spec (file)
+    (let* ((replaced (replace-regexp-in-string "spec/" "lib/ec2k/" file nil t))
+	   (without-suffix (if (> (length replaced) 0) (substring (file-name-sans-extension replaced) 0 -5))))
+      (if without-suffix
+	  (concat without-suffix ".ex")
+	file)))
+
+  (defun my/related-files-jumper (file)
+    (list
+     (test-from-module file)
+     (module-from-test file)
+     (spec-from-module file)
+     (module-from-spec file)))
+
+  (setq related-files-jumpers (list #'my/related-files-jumper)))
 
 (use-package related-files-recipe
   :demand t
   :after related-files)
-
-(defun remove-directory-from-path (file remove-directory)
-  "Return the paths to files looking like FILE but with REMOVE-DIRECTORY removed.
-
-  The file-system is searched for existing directories but the
-  returned paths don't have to exist."
-  (when-let* ((path-segments (split-string file "/"))
-		(positions (related-files-recipe--seq-positions path-segments remove-directory)))
-    (cl-loop
-     for position in positions
-     for candidate = (string-join (related-files-recipe--seq-remove-at-position path-segments position) "/")
-     collect candidate)))
-
-(defun replace-directory-in-path (file remove-directory add-directory)
-  (let* ((without-removed (remove-directory-from-path file remove-directory))
-	   (with-added (if without-removed
-			   (related-files-recipe--add-directory-to-path (car without-removed) add-directory))))
-    (if with-added
-	  (car with-added)
-	"")))
-
-(defun test-from-module (file)
-  (concat (file-name-sans-extension (replace-directory-in-path file "lib" "test")) "_test.exs"))
-
-(defun module-from-test (file)
-  (let* ((replaced (replace-directory-in-path file "test" "lib"))
-	   (without-suffix (if (> (length replaced) 0) (substring (file-name-sans-extension replaced) 0 -5))))
-    (if without-suffix
-	  (concat without-suffix ".ex")
-	file)))
-
-(defun spec-from-module (file)
-  (concat (file-name-sans-extension (replace-directory-in-path file "lib" "spec")) "_spec.exs"))
-
-(defun module-from-spec (file)
-  (let* ((replaced (replace-directory-in-path file "spec" "lib"))
-	   (without-suffix (if (> (length replaced) 0) (substring (file-name-sans-extension replaced) 0 -5))))
-    (if without-suffix
-	  (concat without-suffix ".ex")
-	file)))
-
-(defun my/related-files-jumper (file)
-  (list
-    (test-from-module file)
-    (module-from-test file)
-    (spec-from-module file)
-    (module-from-spec file)))
-
-(setq related-files-jumpers (list #'my/related-files-jumper))
 
 (emacs-set-key (kbd "C-x x") 'scratch-buffer)
 (key-chord-define-global "xx" 'scratch-buffer)

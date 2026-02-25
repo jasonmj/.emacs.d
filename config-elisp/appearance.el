@@ -35,7 +35,7 @@
 
 (use-package modern-fringes
   :ensure t
-  :hook (after-init . modern-fringes-mode)
+  ;; :hook (after-init . modern-fringes-mode)
   :config (set-fringe-mode '(7 . 0)))
 
 (global-prettify-symbols-mode t)

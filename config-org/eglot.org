@@ -35,7 +35,15 @@ https://joaotavora.github.io/eglot/
   	 (elixir-ts-mode-hook . eglot-ensure)
   	 (eglot--managed-mode . manually-activate-flymake))
     :config
-    (add-to-list 'exec-path "~/git/lexical-lsp/lexical/bin/")
+    ;;(add-to-list 'exec-path "~/git/lexical-lsp/lexical/bin/")
+    (with-eval-after-load 'eglot
+    (setf (alist-get '(elixir-mode elixir-ts-mode heex-ts-mode)
+                     eglot-server-programs
+                     nil nil #'equal)
+          (if (and (fboundp 'w32-shell-dos-semantics)
+                   (w32-shell-dos-semantics))
+              '("expert_windows_amd64")
+            (eglot-alternatives '("expert_linux_amd64" ("/Users/jjohnson/git/elixir-lang/expert/apps/expert/_build/prod/rel/plain/bin/start_expert" "--stdio"))))))
     (add-to-list 'eglot-stay-out-of 'flymake))
 #+end_src
 ** Manually activate flymake

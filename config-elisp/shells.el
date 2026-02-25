@@ -87,8 +87,8 @@
 	 (end-of-line)
 	 (deactivate-mark))
 
-  (defun maybe-setup-project-shell ()
-    (if (and (project-current) (file-exists-p "shell.nix")) (send-to-project-shell "echo \"Starting nix-shell...\" && nix-shell")))
+  (defun maybe-setup-project-shell () (interactive)
+    (if (and (project-current) (file-exists-p "shell.nix")) (send-to-project-shell "echo \"nix develop\" && nix develop") (clear-shell-buffer)))
   (defvar shell-outline-regexp ".*\\([0-9]+\) test\\)\\([[:space:]]\\|(\\)")
   :hook ((shell-mode . (lambda ()
                          (set-process-query-on-exit-flag (get-buffer-process (current-buffer)) nil)
@@ -119,7 +119,7 @@
 (defun cape--iex-input-filter (input)
   (if (cape--iex-starts-with-iex input)
     (set-process-filter (current-buffer-process) 'cape--iex-bootstrap-filter)))
-
+(defvar-local default-capfs nil "Backup of buffer-local completion-at-point-functions for cape-iex.")
 (defun current-buffer-process () (get-buffer-process (current-buffer)))
 
 (defun cape--iex-starts-with-iex (str)
@@ -302,6 +302,14 @@
 	 (end-of-line)
 	 (forward-char)
 	 (delete-active-region))
+  (defun clear-shell-buffer-to-last-prompt-leave-n (n) (interactive)
+	 (end-of-buffer)
+	 (set-mark (point))
+	 (comint-previous-prompt 1)
+         (next-line n)
+	 (end-of-line)
+	 (forward-char)
+	 (delete-active-region))
   :bind (:map shell-mode-map
 		("C-S-l" . clear-shell-buffer-to-last-prompt)))
 
@@ -347,6 +355,11 @@
     (delete-window)
     (switch-to-buffer name)))
 (emacs-set-key (kbd "C-x c") 'popper-shell-fullscreen)
+
+(use-package comint
+  :ensure nil   ;; built-in
+  :bind
+  (:map comint-mode-map ("<return>" . comint-send-input)))
 
 (add-to-list 'load-path (concat "~/.local/vterm/" (string-trim (shell-command-to-string "ls ~/.local/vterm/"))))
 (add-to-list 'load-path (concat "/etc/links/vterm/" (string-trim (shell-command-to-string "ls /etc/links/vterm/"))))

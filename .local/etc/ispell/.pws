@@ -1,6 +1,7 @@
 acurev
 acuvim
 args
+argumenterror
 associations
 async
 asyncapi
@@ -110,12 +111,14 @@ lightingzones
 livecomponent
 liveview
 liveviews
+loranetworkscan
 lorem
 macos
 meterreading
 meterverification
 mobilechannel
 modbus
+modbusmanager
 moduledoc
 morehead
 namespace
@@ -174,6 +177,7 @@ tailwindcss
 telemetrybus
 temperaturesensor
 temperaturesensors
+tooltip
 typeprefixes
 uart
 uncomment

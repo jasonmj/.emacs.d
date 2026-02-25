@@ -37,7 +37,7 @@
 (add-to-list 'savehist-additional-variables 'mark-ring)
 (add-to-list 'savehist-additional-variables 'global-mark-ring)
 
-(setq-default fill-column 80)
+(setq-default fill-column 100)
 
 (setq-default scroll-margin 0)
 (setq-default maximum-scroll-margin 0)
