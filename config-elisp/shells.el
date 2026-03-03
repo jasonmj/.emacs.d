@@ -88,7 +88,7 @@
 	 (deactivate-mark))
 
   (defun maybe-setup-project-shell () (interactive)
-    (if (and (project-current) (file-exists-p "shell.nix")) (send-to-project-shell "echo \"nix develop\" && nix develop") (clear-shell-buffer)))
+    (if (and (project-current) (file-exists-p "shell.nix")) (send-to-project-shell "unset NIX_SKIP_SHELL_HOOK && echo \"nix develop\" && nix develop") (clear-shell-buffer)))
   (defvar shell-outline-regexp ".*\\([0-9]+\) test\\)\\([[:space:]]\\|(\\)")
   :hook ((shell-mode . (lambda ()
                          (set-process-query-on-exit-flag (get-buffer-process (current-buffer)) nil)
@@ -383,7 +383,8 @@
             :append
             :local))
   (setq-local global-hi-lock-mode nil)
-  (setq-local global-hl-line-mode nil))
+  (setq-local global-hl-line-mode nil)
+  (setq-local cursor-type 'hbar))
 (add-hook 'vterm-mode-hook 'vterm-startup)
 
 (use-package vterm-toggle

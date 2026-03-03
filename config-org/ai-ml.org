@@ -568,6 +568,62 @@ An Mcp client inside Emacs
 #+begin_src emacs-lisp
   (use-package agent-shell
     :ensure t
-    :hook ((agent-shell-mode . olivetti-mode))
-    :custom (agent-shell-show-welcome-message nil))
+    :hook ((agent-shell-mode . olivetti-mode)
+           (agent-shell-mode . my/agent-shell-setup))
+    :custom ((agent-shell-session-strategy 'prompt)
+             (agent-shell-highlight-blocks t)
+             (agent-shell-show-welcome-message nil))
+    :config
+    (require 'llm-utils)
+
+    (defun my/agent-shell-setup ()
+      "Hook to wire up Emacs integration for each agent-shell buffer."
+      (let ((shell-buffer (current-buffer)))
+        ;; Auto-revert Emacs buffers when the agent writes to files
+        (agent-shell-subscribe-to
+         :shell-buffer shell-buffer
+         :event 'file-write
+         :on-event (lambda (event)
+                     (when-let* ((path (map-elt (map-elt event :data) :path))
+                                 ((file-exists-p path))
+                                 (buf (find-buffer-visiting path)))
+                       (with-current-buffer buf
+                         (revert-buffer t t t))))))))
+#+end_src
+* More Config
+#+begin_src emacs-lisp
+  (use-package knockknock
+  :straight (:host github :repo "konrad1977/knockknock"))
+(use-package agent-shell-attention
+  :ensure t
+  :straight (:host github :repo "ultronozm/agent-shell-attention.el")
+  :after agent-shell
+  :demand
+  ;; :bind (("C-z a" . agent-shell-attention-jump))
+  :config
+  (require 'knockknock)
+  (setopt agent-shell-attention-notify-function
+          (lambda (_buffer title body)
+            (knockknock-notify
+             :title title
+             :message body
+             :icon "nf-cod-bot"
+             :duration 5)
+            (alert (or body "")
+                   :title (or title "Emacs")
+                   :severity 'high)))
+  (setopt agent-shell-attention-render-function
+          #'agent-shell-attention-render-active)
+  (setopt agent-shell-attention-indicator-location 'global-mode-string)
+  (agent-shell-attention-mode))
+
+(use-package agent-shell-quiet-mode
+  :straight (:host github :repo "ewilderj/agent-shell-quiet-mode")
+  :after agent-shell
+  :config
+  (agent-shell-quiet-mode 1))
+
+(use-package agent-shell-manager
+  :straight (:host github :repo "jethrokuan/agent-shell-manager")
+  :custom (agent-shell-manager-side nil))
 #+end_src

@@ -18,11 +18,9 @@ https://github.com/emacsattic/bury-successful-compilation
   (use-package bury-successful-compilation :ensure t)
 #+end_src
 * Default Browser Settings
-Set the default browser to Firefox and use the default browser function for urls. 
+Use the macOS default browser for opening urls.
 #+begin_src emacs-lisp
   (setq browse-url-browser-function 'browse-url-default-macosx-browser)
-  (setq browse-url-generic-program "firefox"
-	browse-url-browser-function 'browse-url-generic)
 #+end_src
 * Delete by Moving to Trash
 Set file deletion commands to use the function `move-file-to-trash` instead of deleting files outright.

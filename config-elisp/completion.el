@@ -427,14 +427,15 @@ function."
   :init (progn (vertico-posframe-mode 1) (setq vertico-posframe-border-width 12) (custom-set-faces '(vertico-posframe-border ((t ())))))
   :config
   (setq vertico-posframe-hide-minibuffer t
-	  vertico-posframe-min-width 110
-	  vertico-posframe-height nil
-	  vertico-posframe-min-height 10
-	  vertico-posframe-width 130
-	  vertico-posframe-poshandler #'posframe-poshandler-window-top-center-offset
-	  vertico-posframe-parameters '((alpha . 85)
-					(left-fringe . 0)
-					(right-fringe . 0)))
+        posframe-text-scale-factor-function (lambda (_) 0)
+	vertico-posframe-min-width 110
+	vertico-posframe-height nil
+	vertico-posframe-min-height 10
+	vertico-posframe-width 130
+	vertico-posframe-poshandler #'posframe-poshandler-window-top-center-offset
+	vertico-posframe-parameters '((alpha . 85)
+				      (left-fringe . 0)
+				      (right-fringe . 0)))
 
   (defun posframe-poshandler-window-top-center-offset (info)
     "Posframe's position handler.
@@ -444,26 +445,26 @@ function."
 	 `posframe-show'."
     (setq-local tab-line-format nil)
     (let* ((window-left (plist-get info :parent-window-left))
-	     (window-top (plist-get info :parent-window-top))
-	     (window-width (plist-get info :parent-window-width))
-	     (posframe-width (plist-get info :posframe-width)))
-	(cons (+ window-left (/ (- window-width posframe-width) 2))
-	      (+ window-top 128))))
+	   (window-top (plist-get info :parent-window-top))
+	   (window-width (plist-get info :parent-window-width))
+	   (posframe-width (plist-get info :posframe-width)))
+      (cons (+ window-left (/ (- window-width posframe-width) 2))
+	    (+ window-top 128))))
   (defun vertico-posframe--handle-minibuffer-window ()
-	"Handle minibuffer window."
-	(let ((show-minibuffer-p (vertico-posframe--show-minibuffer-p))
-	      (minibuffer-window (active-minibuffer-window)))
-	  (setq-local max-mini-window-height 1)
-	  ;; Let minibuffer-window's height = 1
-	  (when-let* ((win (active-minibuffer-window))
-		      ((not (frame-root-window-p win))))
-	    (window-resize minibuffer-window
-			   (- (window-pixel-height minibuffer-window))
-			   nil nil 'pixelwise))
-	  ;; Hide the context showed in minibuffer-window.
-	  (set-window-vscroll minibuffer-window 100)
-	  (when show-minibuffer-p
-	    (set-window-vscroll minibuffer-window 0)))))
+    "Handle minibuffer window."
+    (let ((show-minibuffer-p (vertico-posframe--show-minibuffer-p))
+	  (minibuffer-window (active-minibuffer-window)))
+      (setq-local max-mini-window-height 1)
+      ;; Let minibuffer-window's height = 1
+      (when-let* ((win (active-minibuffer-window))
+		  ((not (frame-root-window-p win))))
+	(window-resize minibuffer-window
+		       (- (window-pixel-height minibuffer-window))
+		       nil nil 'pixelwise))
+      ;; Hide the context showed in minibuffer-window.
+      (set-window-vscroll minibuffer-window 100)
+      (when show-minibuffer-p
+	(set-window-vscroll minibuffer-window 0)))))
 
 (use-package yasnippet
   :ensure t

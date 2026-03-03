@@ -31,7 +31,7 @@
         (if (and (fboundp 'w32-shell-dos-semantics)
                  (w32-shell-dos-semantics))
             '("expert_windows_amd64")
-          (eglot-alternatives '("expert_linux_amd64" ("/Users/jjohnson/git/elixir-lang/expert/apps/expert/_build/prod/rel/plain/bin/start_expert" "--stdio"))))))
+          (eglot-alternatives '("expert" ("/Users/jjohnson/git/elixir-lang/expert/apps/expert/_build/prod/rel/plain/bin/start_expert" "--stdio"))))))
   (add-to-list 'eglot-stay-out-of 'flymake))
 
 (defun manually-activate-flymake ()
