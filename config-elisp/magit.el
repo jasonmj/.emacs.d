@@ -10,8 +10,8 @@
   :defer t
   :straight t
   :bind (("C-c g" . magit)
-	   :map magit-mode-map
-	   ("<C-tab>" . tab-line-switch-to-next-tab))
+  	 :map magit-mode-map
+  	 ("<C-tab>" . tab-line-switch-to-next-tab))
   :chords ("mg" . magit)
   :custom
   (magit-commit-show-diff nil)
@@ -19,6 +19,9 @@
   (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1)
   (magit-save-repository-buffers nil)
   (magit-revert-buffers 1))
+(use-package magit-gh
+:ensure t
+:after magit)
 
 (use-package magit-pretty-graph
   :defer t
@@ -32,3 +35,7 @@
   (use-package magit-delta
   :ensure t
   :hook (magit-mode . magit-delta-mode)))
+
+(use-package diffview
+  :straight t
+  :hook (magit-diff-mode . diffview-current))

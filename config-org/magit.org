@@ -26,6 +26,9 @@ https://magit.vc
     (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1)
     (magit-save-repository-buffers nil)
     (magit-revert-buffers 1))
+  (use-package magit-gh
+  :ensure t
+  :after magit)
 #+end_src
 * Magit Pretty Graph
 A prettier graph for magit drawn in Emacs.
@@ -49,4 +52,13 @@ https://github.com/dandavison/magit-delta
     (use-package magit-delta
     :ensure t
     :hook (magit-mode . magit-delta-mode)))
+#+end_src
+* Diffview
+Automatically show side-by-side diffs when magit opens a diff buffer.
+
+https://github.com/arthurxavierx/diffview.el
+#+begin_src emacs-lisp
+  (use-package diffview
+    :straight t
+    :hook (magit-diff-mode . diffview-current))
 #+end_src
