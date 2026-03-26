@@ -76,6 +76,11 @@
   (load bootstrap-file nil 'nomessage))
 (setq package-enable-at-startup nil)
 
+;;; Register built-in packages before any straight-use-package calls
+;;; Prevents straight from installing flymake from GNU ELPA mirror,
+;;; which conflicts with the version bundled in Emacs.
+(straight-register-package '(flymake :type built-in))
+
 ;;; Project
 (straight-use-package 'project)
 
@@ -100,7 +105,7 @@
  '(global-so-long-mode t)
  '(keycast-header-line-format "%1s%k%c%r ")
  '(minimap-window-location 'right)
- '(olivetti-body-width 120)
+ '(olivetti-body-width 100)
  '(safe-local-variable-values '((eval add-to-list 'vc-directory-exclusion-list "docs")))
  '(so-long-action 'so-long-minor-mode)
  '(so-long-threshold 1000)
@@ -115,7 +120,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(doom-modeline-bar ((t (:background "DarkGoldenrod1"))))
+ '(doom-modeline-bar ((t (:background "cyan1"))))
  '(eldoc-box-body ((t (:background "#fbf7f0" :foreground "#000000"))))
  '(eldoc-box-border ((t (:background "#000000"))))
  '(font-lock-doc-markup-face ((t (:foreground "unspecified"))))

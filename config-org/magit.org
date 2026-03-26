@@ -58,7 +58,5 @@ Automatically show side-by-side diffs when magit opens a diff buffer.
 
 https://github.com/arthurxavierx/diffview.el
 #+begin_src emacs-lisp
-  (use-package diffview
-    :straight t
-    :hook (magit-diff-mode . diffview-current))
+  (use-package diffview :straight t)
 #+end_src

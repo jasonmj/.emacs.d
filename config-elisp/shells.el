@@ -76,7 +76,11 @@
 		("C-l" . clear-shell-buffer)
 		("C-1" . popper-shell-fullscreen)
 		("C-d" . hungry-delete-forward))
-  :custom (shell-file-name (if (eq system-type 'darwin) "/opt/homebrew/bin/bash" "/run/current-system/sw/bin/bash"))
+  :custom (shell-file-name (if (eq system-type 'darwin)
+                            (or (and (file-executable-p "/opt/homebrew/bin/bash") "/opt/homebrew/bin/bash")
+                                (and (file-executable-p "/bin/bash") "/bin/bash")
+                                "/bin/bash")
+                          "/run/current-system/sw/bin/bash"))
   :config
   (defun clear-shell-buffer () (interactive)
 	 (erase-buffer)
@@ -88,7 +92,7 @@
 	 (deactivate-mark))
 
   (defun maybe-setup-project-shell () (interactive)
-    (if (and (project-current) (file-exists-p "shell.nix")) (send-to-project-shell "unset NIX_SKIP_SHELL_HOOK && echo \"nix develop\" && nix develop") (clear-shell-buffer)))
+    (if (and (project-current) (file-exists-p "shell.nix")) (send-to-project-shell "echo \"nix develop\" && nix develop") (clear-shell-buffer)))
   (defvar shell-outline-regexp ".*\\([0-9]+\) test\\)\\([[:space:]]\\|(\\)")
   :hook ((shell-mode . (lambda ()
                          (set-process-query-on-exit-flag (get-buffer-process (current-buffer)) nil)
@@ -361,8 +365,17 @@
   :bind
   (:map comint-mode-map ("<return>" . comint-send-input)))
 
-(add-to-list 'load-path (concat "~/.local/vterm/" (string-trim (shell-command-to-string "ls ~/.local/vterm/"))))
-(add-to-list 'load-path (concat "/etc/links/vterm/" (string-trim (shell-command-to-string "ls /etc/links/vterm/"))))
+;; vterm path setup - only add if vterm directories exist
+(when (file-directory-p "~/.local/vterm/")
+  (let ((vterm-dir (expand-file-name "~/.local/vterm/")))
+    (when-let ((dir (car (directory-files vterm-dir t "^[^.]"))))
+      (add-to-list 'load-path (concat vterm-dir (file-name-nondirectory dir))))))
+
+(when (file-directory-p "/etc/links/vterm/")
+  (let ((vterm-dir "/etc/links/vterm/"))
+    (when-let ((dir (car (directory-files vterm-dir t "^[^.]"))))
+      (add-to-list 'load-path (concat vterm-dir (file-name-nondirectory dir))))))
+
 (require 'vterm)
 (setq vterm-module-cmake-args "-DUSE_SYSTEM_LIBVTERM=yes")
 (defun vterm-startup ()

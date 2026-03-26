@@ -20,8 +20,8 @@
   (eglot-extend-to-xref t)
   (read-process-output-max (* 1024 1024))
   :hook ((elixir-ts-mode . eglot-ensure)
-	 (elixir-ts-mode-hook . eglot-ensure)
-	 (eglot--managed-mode . manually-activate-flymake))
+       (elixir-ts-mode-hook . eglot-ensure)
+       (eglot--managed-mode . manually-activate-flymake))
   :config
   ;;(add-to-list 'exec-path "~/git/lexical-lsp/lexical/bin/")
   (with-eval-after-load 'eglot

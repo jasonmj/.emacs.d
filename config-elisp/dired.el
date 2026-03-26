@@ -72,7 +72,8 @@
 
 (use-package direnv
   :ensure t
-  :config (direnv-mode))
+  :config (direnv-mode)
+  :custom (direnv-always-show-summary nil))
 
 (use-package dired-single
   :ensure t

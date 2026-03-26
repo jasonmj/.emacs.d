@@ -551,6 +551,7 @@ If an argument is a character, convert it to a string."
          (agent-shell-mode . my/agent-shell-setup))
   :custom ((agent-shell-session-strategy 'prompt)
            (agent-shell-highlight-blocks t)
+           (agent-shell-header-style nil)
            (agent-shell-show-welcome-message nil))
   :config
   (require 'llm-utils)

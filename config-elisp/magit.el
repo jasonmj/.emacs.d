@@ -10,8 +10,8 @@
   :defer t
   :straight t
   :bind (("C-c g" . magit)
-  	 :map magit-mode-map
-  	 ("<C-tab>" . tab-line-switch-to-next-tab))
+	   :map magit-mode-map
+	   ("<C-tab>" . tab-line-switch-to-next-tab))
   :chords ("mg" . magit)
   :custom
   (magit-commit-show-diff nil)
@@ -36,6 +36,4 @@
   :ensure t
   :hook (magit-mode . magit-delta-mode)))
 
-(use-package diffview
-  :straight t
-  :hook (magit-diff-mode . diffview-current))
+(use-package diffview :straight t)
