@@ -378,13 +378,37 @@
 
 (require 'vterm)
 (setq vterm-module-cmake-args "-DUSE_SYSTEM_LIBVTERM=yes")
+(defun vterm-scroll-up (event)
+  "Scroll up in vterm by entering copy-mode and scrolling."
+  (interactive "e")
+  (unless (eq major-mode 'vterm-mode)
+    (user-error "Not in vterm-mode"))
+  (when (not (bound-and-true-p vterm-copy-mode))
+    (vterm-copy-mode 1))
+  (scroll-down 3))
+
+(defun vterm-scroll-down (event)
+  "Scroll down in vterm by entering copy-mode and scrolling."
+  (interactive "e")
+  (unless (eq major-mode 'vterm-mode)
+    (user-error "Not in vterm-mode"))
+  (when (not (bound-and-true-p vterm-copy-mode))
+    (vterm-copy-mode 1))
+  (scroll-up 3))
+
 (defun vterm-startup ()
   (define-key vterm-mode-map (kbd "C-c C-t") 'vterm-copy-mode)
-  (define-key vterm-mode-map (kbd "C-p") 'vterm-copy-mode)
+  (define-key vterm-mode-map (kbd "C-p") #'vterm--self-insert)
+  (define-key vterm-mode-map (kbd "C-c p") (lambda () (interactive) (vterm-copy-mode 1) (previous-line)))
   (define-key vterm-mode-map (kbd "C-c C-\\") 'vterm-send-C-c)
   (define-key vterm-mode-map (kbd "M-p") 'vterm-send-up)
   (define-key vterm-mode-map (kbd "M-n") 'vterm-send-down)
   (define-key vterm-mode-map (kbd "C-z") 'vterm-undo)
+  ;; Mouse scroll wheel support
+  (define-key vterm-mode-map (kbd "<mouse-4>") 'vterm-scroll-up)
+  (define-key vterm-mode-map (kbd "<mouse-5>") 'vterm-scroll-down)
+  (define-key vterm-mode-map (kbd "<wheel-up>") 'vterm-scroll-up)
+  (define-key vterm-mode-map (kbd "<wheel-down>") 'vterm-scroll-down)
   (define-key vterm-copy-mode-map (kbd "M-n") 'vterm-next-prompt)
   (define-key vterm-copy-mode-map (kbd "C-z") 'vterm-undo)
   (define-key vterm-copy-mode-map (kbd "M-p") 'vterm-previous-prompt)
@@ -397,10 +421,26 @@
             :local))
   (setq-local global-hi-lock-mode nil)
   (setq-local global-hl-line-mode nil)
-  (setq-local cursor-type 'hbar))
-(add-hook 'vterm-mode-hook 'vterm-startup)
+   (setq-local cursor-type 'hbar)
+   ;; vterm's C module resets cursor-type to 'box on every terminal redraw via
+   ;; (set 'cursor-type 'box).  A local post-command-hook enforces hbar after
+   ;; each command, and also repairs the global default in case the C module
+   ;; set it before the buffer-local binding was established.
+   (add-hook 'post-command-hook
+             (lambda ()
+               (when (eq major-mode 'vterm-mode)
+                 (setq cursor-type 'hbar)
+                 (setq-default cursor-type 'hbar)))
+             nil :local))
+ (add-hook 'vterm-mode-hook 'vterm-startup)
 
 (use-package vterm-toggle
   :ensure t
   :config
+  ;; vterm-toggle-show-hook fires after the prompt is ready (C module has redrawn),
+  ;; so cursor-type is already 'box by then.  Reset it here for the initial open.
+  (add-hook 'vterm-toggle-show-hook
+            (lambda ()
+              (setq cursor-type 'hbar)
+              (setq-default cursor-type 'hbar)))
   (emacs-set-key (kbd "C-s-t") 'vterm-toggle))
