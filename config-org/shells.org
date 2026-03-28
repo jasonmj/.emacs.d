@@ -92,7 +92,8 @@ Quickly create an eshell with a name or switch to an open eshell with completing
                 (setq xterm-color-preserve-properties t)))
     (setq xterm-color-use-bold-for-bright t)
     :custom
-    (eshell-output-filter-functions (remove 'eshell-handle-ansi-color eshell-output-filter-functions)))
+    (eshell-output-filter-functions (remove 'eshell-handle-ansi-color 
+                                            (remove 'eshell-handle-control-codes eshell-output-filter-functions))))
 #+end_src
 
 * Shell Mode

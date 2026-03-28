@@ -72,7 +72,8 @@
               (setq xterm-color-preserve-properties t)))
   (setq xterm-color-use-bold-for-bright t)
   :custom
-  (eshell-output-filter-functions (remove 'eshell-handle-ansi-color eshell-output-filter-functions)))
+  (eshell-output-filter-functions (remove 'eshell-handle-ansi-color 
+                                          (remove 'eshell-handle-control-codes eshell-output-filter-functions))))
 
 (use-package shell
   :bind (:map shell-mode-map
