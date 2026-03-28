@@ -203,6 +203,11 @@ This package is a transient extension, which use posframe to show transient popu
 
 https://github.com/yanghaoxie/transient-posframe
 #+begin_src emacs-lisp
+  ;; Compatibility shim: transient-posframe references this variable which was
+  ;; removed in newer versions of transient (loaded via straight.el).
+  (defvar transient-minimal-frame-width 83
+    "Minimum frame width for transient popups. Fallback for transient-posframe compatibility.")
+
   (use-package transient-posframe
     :ensure t
     :hook (magit-status-mode . transient-posframe-mode))

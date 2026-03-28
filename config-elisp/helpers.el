@@ -119,6 +119,11 @@
   :config (put 'tramp-remote-path '(tramp-own-remote-path) nil)
 	    (add-to-list 'tramp-remote-path "~/.asdf/shims/"))
 
+;; Compatibility shim: transient-posframe references this variable which was
+;; removed in newer versions of transient (loaded via straight.el).
+(defvar transient-minimal-frame-width 83
+  "Minimum frame width for transient popups. Fallback for transient-posframe compatibility.")
+
 (use-package transient-posframe
   :ensure t
   :hook (magit-status-mode . transient-posframe-mode))
@@ -142,7 +147,7 @@
 
 (use-package which-key-posframe
   :ensure t
-  :config (custom-set-faces '(which-key-posframe-border ((t ()))))
+  :config (custom-set-faces '(which-key-posframe-border ((t nil))))
   :custom
   (which-key-posframe-border-width  20)
   (which-key-posframe-poshandler 'posframe-poshandler-window-top-center-offset)

@@ -100,6 +100,9 @@
         (setq cursor-type 'hbar))
     (unless (bound-and-true-p modalka-mode)
       (toggle-modalka)))
+  ;; Ensure vterm's C module hasn't corrupted the global default cursor-type.
+  (unless (bound-and-true-p modalka-mode)
+    (setq-default cursor-type 'hbar))
   (update-modalka-mode-line))
 (add-hook 'change-major-mode-hook 'maybe-modalka-mode)
 (add-hook 'buffer-list-update-hook 'maybe-modalka-mode)
