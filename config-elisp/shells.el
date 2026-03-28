@@ -64,12 +64,14 @@
 
 (use-package xterm-color
   :ensure t
-  :config
-  (add-to-list 'eshell-preoutput-filter-functions 'xterm-color-filter)
   :custom
   (eshell-output-filter-functions (remove 'eshell-handle-ansi-color eshell-output-filter-functions))
-  :hook ((eshell-mode . (lambda () (setenv "TERM" "xterm-256color")))
-	   (eshell-before-prompt . (lambda () (setq xterm-color-preserve-properties t)))))
+  :hook ((eshell-mode . (lambda () 
+                         (setenv "TERM" "xterm-256color")
+                         (add-to-list 'eshell-preoutput-filter-functions 'xterm-color-filter)
+                         (setq xterm-color-preserve-properties t))))
+  :config
+  (setq xterm-color-use-bold-for-bright t))
 
 (use-package shell
   :bind (:map shell-mode-map
