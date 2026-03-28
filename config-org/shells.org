@@ -85,32 +85,11 @@ Quickly create an eshell with a name or switch to an open eshell with completing
   (use-package xterm-color
     :ensure t
     :config
-    (defun my-eshell-xterm-filter (str)
-      "Process ANSI codes in command output, but preserve prompt styling.
-Only apply xterm-color-filter to substrings without the 'field' property
-(i.e., command output), leaving prompt text untouched."
-      (if (not (text-property-any 0 (length str) 'field 'prompt str))
-          ;; No prompt field in this string, process it normally
-          (xterm-color-filter str)
-        ;; String contains prompt, only process non-prompt parts
-        (let ((result nil)
-              (pos 0))
-          (while (< pos (length str))
-            (let* ((next-pos (or (next-property-change pos str) (length str)))
-                   (substring (substring str pos next-pos))
-                   (field-prop (get-text-property pos 'field str)))
-              (if (eq field-prop 'prompt)
-                  ;; Keep prompt as-is
-                  (push substring result)
-                ;; Process command output
-                (push (xterm-color-filter substring) result))
-              (setq pos next-pos)))
-          (apply 'concat (nreverse result)))))
-    
     (add-hook 'eshell-mode-hook
               (lambda ()
                 (setenv "TERM" "xterm-256color")
-                (add-to-list 'eshell-preoutput-filter-functions 'my-eshell-xterm-filter nil)))
+                (add-to-list 'eshell-preoutput-filter-functions 'xterm-color-filter nil)
+                (setq xterm-color-preserve-properties nil)))
     (setq xterm-color-use-bold-for-bright t)
     :custom
     (eshell-output-filter-functions (remove 'eshell-handle-ansi-color 
