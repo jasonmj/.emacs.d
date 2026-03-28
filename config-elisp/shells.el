@@ -69,7 +69,7 @@
             (lambda ()
               (setenv "TERM" "xterm-256color")
               (add-to-list 'eshell-preoutput-filter-functions 'xterm-color-filter nil)
-              (setq xterm-color-preserve-properties t)))
+              (setq xterm-color-preserve-properties nil)))
   (setq xterm-color-use-bold-for-bright t)
   :custom
   (eshell-output-filter-functions (remove 'eshell-handle-ansi-color 
