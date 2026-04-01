@@ -96,7 +96,7 @@ This command does not push text to `kill-ring'."
      (point))))
 (global-set-key (kbd "M-d") 'delete-word-no-copy)
 
-(use-package markdown-mode :ensure t)
+(use-package markdown-mode :ensure t :hook ((markdown-view-mode . olivetti-mode)))
 
 (defun open-line-below ()
   (interactive)

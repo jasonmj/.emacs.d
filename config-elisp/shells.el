@@ -408,6 +408,7 @@
   (define-key vterm-mode-map (kbd "M-p") 'vterm-send-up)
   (define-key vterm-mode-map (kbd "M-n") 'vterm-send-down)
   (define-key vterm-mode-map (kbd "C-z") 'vterm-undo)
+  (define-key vterm-mode-map (kbd "C-q") 'vterm-send-next-key)
   ;; Mouse scroll wheel support
   (define-key vterm-mode-map (kbd "<mouse-4>") 'vterm-scroll-up)
   (define-key vterm-mode-map (kbd "<mouse-5>") 'vterm-scroll-down)

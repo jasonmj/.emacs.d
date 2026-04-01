@@ -93,10 +93,6 @@ When modifying Elixir-related config, look in `config-org/elixir.org`.
 This config has extensive AI tooling — relevant context when working on AI-related features:
 
 - `agent-shell` — AI agent shell with auto-revert
-- `opencode.el` — OpenCode AI integration
-- `copilot.el` — GitHub Copilot completions (active in `elixir-ts-mode`)
-- `gptel` — general-purpose LLM client (system message in `config-org/gptel-system-message.md`)
-- `aidermacs`, `emigo` — AI pair programming tools
 - `llm-utils.el` (tangled from `config-org/ai-ml.org`) — helpers providing Emacs context
   to LLMs: `llm-project-diff`, `llm-directory-tree`, `llm-file-preview`, `llm-code-outline`,
   `llm-symbol-search`, `llm-treesit-info`, `llm-xref-find-references`
@@ -127,7 +123,7 @@ The completion system ("MVCC stack") uses coordinated packages — treat as a un
 | `config-org/completion.org` | Vertico, Corfu, Orderless, Cape, Consult, Embark |
 | `config-org/elixir.org` | Elixir LSP, tree-sitter, test integration, IEx |
 | `config-org/navigation.org` | Avy, modalka, windmove, zoom, bufler |
-| `config-org/ai-ml.org` | Agent-shell, gptel, copilot, llm-utils |
+| `config-org/ai-ml.org` | Agent-shell, gptel, llm-utils |
 | `config-org/shells.org` | Eshell, shell-mode, vterm, popper |
 | `config-org/magit.org` | Magit, git-gutter, sideline-blame |
 | `config-org/org.org` | Org-mode, org-toggl |

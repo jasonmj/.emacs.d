@@ -99,7 +99,6 @@
  ;; If there is more than one, they won't work right.
  '(aidermacs-editor-model "sonnet")
  '(alert-default-style 'osx-notifier)
- '(copilot-chat-model "gpt-4o")
  '(dimmer-fraction 0.2)
  '(emigo-prompt-symbol "> ")
  '(global-so-long-mode t)

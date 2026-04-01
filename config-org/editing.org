@@ -157,7 +157,7 @@ This command does not push text to `kill-ring'."
 #+end_src
 * Markdown Mode
 #+begin_src emacs-lisp
-  (use-package markdown-mode :ensure t)
+  (use-package markdown-mode :ensure t :hook ((markdown-view-mode . olivetti-mode)))
 #+end_src
 * Open Line Below
 #+begin_src emacs-lisp
