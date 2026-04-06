@@ -105,8 +105,7 @@
                          (local-set-key "C-e" 'move-end-of-line)
 			   (compilation-shell-minor-mode)
 			   (run-with-idle-timer 0.5 nil 'pcomplete-shell-setup)
-			   (run-with-idle-timer 0.5 nil 'bash-completion-setup)
-                           (maybe-setup-project-shell)))))
+			   (run-with-idle-timer 0.5 nil 'bash-completion-setup)))))
 
 (defun clean-compilation-filename (filename)
   (string-trim
