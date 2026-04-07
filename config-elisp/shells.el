@@ -22,11 +22,15 @@
   (eshell-smart-space-goes-to-end t)
   (eshell-history-size 10000)
   :hook ((eshell-mode-hook . (lambda ()
-				 (setq eshell-prefer-lisp-functions t
+			 (setq eshell-prefer-lisp-functions t
 				       password-cache t
 				       password-cache-expiry 900)
-				 (setq-local truncate-lines -1)
-				 (setenv "TERM" "xterm-256color")))))
+			 (setq-local truncate-lines -1)
+			 (setenv "TERM" "xterm-256color")
+			 (setq-local eshell-output-filter-functions
+				     (remove 'eshell-handle-ansi-color
+					     (remove 'eshell-handle-control-codes
+						     eshell-output-filter-functions)))))))
 
 (use-package eshell-prompt-extras :ensure t
   :config
@@ -69,22 +73,14 @@
             (lambda ()
               (setenv "TERM" "xterm-256color")
               (add-to-list 'eshell-preoutput-filter-functions 'xterm-color-filter nil)
-              (setq xterm-color-preserve-properties nil)))
-  (setq xterm-color-use-bold-for-bright t)
-  :custom
-  (eshell-output-filter-functions (remove 'eshell-handle-ansi-color 
-                                          (remove 'eshell-handle-control-codes eshell-output-filter-functions))))
+              (setq xterm-color-preserve-properties t)))
+  (setq xterm-color-use-bold-for-bright t))
 
 (use-package shell
   :bind (:map shell-mode-map
 		("C-l" . clear-shell-buffer)
 		("C-1" . popper-shell-fullscreen)
 		("C-d" . hungry-delete-forward))
-  :custom (shell-file-name (if (eq system-type 'darwin)
-                            (or (and (file-executable-p "/opt/homebrew/bin/bash") "/opt/homebrew/bin/bash")
-                                (and (file-executable-p "/bin/bash") "/bin/bash")
-                                "/bin/bash")
-                          "/run/current-system/sw/bin/bash"))
   :config
   (defun clear-shell-buffer () (interactive)
 	 (erase-buffer)
@@ -104,8 +100,7 @@
                          (local-set-key "<return>" 'comint-send-input)
                          (local-set-key "C-e" 'move-end-of-line)
 			   (compilation-shell-minor-mode)
-			   (run-with-idle-timer 0.5 nil 'pcomplete-shell-setup)
-			   (run-with-idle-timer 0.5 nil 'bash-completion-setup)))))
+			   (run-with-idle-timer 0.5 nil 'pcomplete-shell-setup)))))
 
 (defun clean-compilation-filename (filename)
   (string-trim
@@ -368,75 +363,57 @@
   :bind
   (:map comint-mode-map ("<return>" . comint-send-input)))
 
-;; vterm path setup - only add if vterm directories exist
-(when (file-directory-p "~/.local/vterm/")
-  (let ((vterm-dir (expand-file-name "~/.local/vterm/")))
-    (when-let ((dir (car (directory-files vterm-dir t "^[^.]"))))
-      (add-to-list 'load-path (concat vterm-dir (file-name-nondirectory dir))))))
-
-(when (file-directory-p "/etc/links/vterm/")
-  (let ((vterm-dir "/etc/links/vterm/"))
-    (when-let ((dir (car (directory-files vterm-dir t "^[^.]"))))
-      (add-to-list 'load-path (concat vterm-dir (file-name-nondirectory dir))))))
-
-(require 'vterm)
-(setq vterm-module-cmake-args "-DUSE_SYSTEM_LIBVTERM=yes")
-(defun vterm-scroll-up (event)
-  "Scroll up in vterm by entering copy-mode and scrolling."
-  (interactive "e")
-  (unless (eq major-mode 'vterm-mode)
-    (user-error "Not in vterm-mode"))
-  (when (not (bound-and-true-p vterm-copy-mode))
-    (vterm-copy-mode 1))
-  (scroll-down 3))
-
-(defun vterm-scroll-down (event)
-  "Scroll down in vterm by entering copy-mode and scrolling."
-  (interactive "e")
-  (unless (eq major-mode 'vterm-mode)
-    (user-error "Not in vterm-mode"))
-  (when (not (bound-and-true-p vterm-copy-mode))
-    (vterm-copy-mode 1))
-  (scroll-up 3))
-
-(defun vterm-startup ()
-  (define-key vterm-mode-map (kbd "C-c C-t") 'vterm-copy-mode)
-  (define-key vterm-mode-map (kbd "C-p") #'vterm--self-insert)
-  (define-key vterm-mode-map (kbd "C-c p") (lambda () (interactive) (vterm-copy-mode 1) (previous-line)))
-  (define-key vterm-mode-map (kbd "C-c C-\\") 'vterm-send-C-c)
-  (define-key vterm-mode-map (kbd "M-p") 'vterm-send-up)
-  (define-key vterm-mode-map (kbd "M-n") 'vterm-send-down)
-  (define-key vterm-mode-map (kbd "C-z") 'vterm-undo)
-  (define-key vterm-mode-map (kbd "C-q") 'vterm-send-next-key)
-  ;; Mouse scroll wheel support
-  (define-key vterm-mode-map (kbd "<mouse-4>") 'vterm-scroll-up)
-  (define-key vterm-mode-map (kbd "<mouse-5>") 'vterm-scroll-down)
-  (define-key vterm-mode-map (kbd "<wheel-up>") 'vterm-scroll-up)
-  (define-key vterm-mode-map (kbd "<wheel-down>") 'vterm-scroll-down)
-  (define-key vterm-copy-mode-map (kbd "M-n") 'vterm-next-prompt)
-  (define-key vterm-copy-mode-map (kbd "C-z") 'vterm-undo)
-  (define-key vterm-copy-mode-map (kbd "M-p") 'vterm-previous-prompt)
-  (define-key vterm-copy-mode-map (kbd "C-l") (lambda () (interactive) (vterm-copy-mode -1) (vterm-clear)))
-  (with-eval-after-load 'centered-cursor-mode
-        (add-hook 'after-change-major-mode-hook
-            (lambda ()
-              (centered-cursor-mode 0))
-            :append
-            :local))
-  (setq-local global-hi-lock-mode nil)
-  (setq-local global-hl-line-mode nil)
-   (setq-local cursor-type 'hbar)
-   ;; vterm's C module resets cursor-type to 'box on every terminal redraw via
-   ;; (set 'cursor-type 'box).  A local post-command-hook enforces hbar after
-   ;; each command, and also repairs the global default in case the C module
-   ;; set it before the buffer-local binding was established.
-   (add-hook 'post-command-hook
-             (lambda ()
-               (when (eq major-mode 'vterm-mode)
-                 (setq cursor-type 'hbar)
-                 (setq-default cursor-type 'hbar)))
-             nil :local))
- (add-hook 'vterm-mode-hook 'vterm-startup)
+(use-package vterm
+  :ensure t
+  :init
+  ;; vterm path setup - only add if vterm directories exist
+  (when (file-directory-p "~/.local/vterm/")
+    (let ((vterm-dir (expand-file-name "~/.local/vterm/")))
+      (when-let ((dir (car (directory-files vterm-dir t "^[^.]"))))
+        (add-to-list 'load-path (concat vterm-dir (file-name-nondirectory dir))))))
+  (when (file-directory-p "/etc/links/vterm/")
+    (let ((vterm-dir "/etc/links/vterm/"))
+      (when-let ((dir (car (directory-files vterm-dir t "^[^.]"))))
+        (add-to-list 'load-path (concat vterm-dir (file-name-nondirectory dir))))))
+  :custom
+  (vterm-shell "/Users/jasonmj/.nix-profile/bin/fish")
+  (vterm-module-cmake-args "-DUSE_SYSTEM_LIBVTERM=yes")
+  :hook
+  (vterm-mode . vterm-startup)
+  :config
+  (defun vterm-startup ()
+    (define-key vterm-mode-map (kbd "C-c C-t") 'vterm-copy-mode)
+    (define-key vterm-mode-map (kbd "C-p") #'vterm--self-insert)
+    (define-key vterm-mode-map (kbd "C-c p") (lambda () (interactive) (vterm-copy-mode 1) (previous-line)))
+    (define-key vterm-mode-map (kbd "C-c C-\\") 'vterm-send-C-c)
+    (define-key vterm-mode-map (kbd "M-p") 'vterm-send-up)
+    (define-key vterm-mode-map (kbd "M-n") 'vterm-send-down)
+    (define-key vterm-mode-map (kbd "C-z") 'vterm-undo)
+    (define-key vterm-mode-map (kbd "C-q") 'vterm-send-next-key)
+    ;; Mouse scroll wheel support
+    (define-key vterm-copy-mode-map (kbd "M-n") 'vterm-next-prompt)
+    (define-key vterm-copy-mode-map (kbd "C-z") 'vterm-undo)
+    (define-key vterm-copy-mode-map (kbd "M-p") 'vterm-previous-prompt)
+    (define-key vterm-copy-mode-map (kbd "C-l") (lambda () (interactive) (vterm-copy-mode -1) (vterm-clear)))
+    (with-eval-after-load 'centered-cursor-mode
+      (add-hook 'after-change-major-mode-hook
+                (lambda ()
+                  (centered-cursor-mode 0))
+                :append
+                :local))
+    (setq-local global-hi-lock-mode nil)
+    (setq-local global-hl-line-mode nil)
+    (setq-local cursor-type 'hbar)
+    ;; vterm's C module resets cursor-type to 'box on every terminal redraw via
+    ;; (set 'cursor-type 'box).  A local post-command-hook enforces hbar after
+    ;; each command, and also repairs the global default in case the C module
+    ;; set it before the buffer-local binding was established.
+    (add-hook 'post-command-hook
+              (lambda ()
+                (when (eq major-mode 'vterm-mode)
+                  (setq cursor-type 'hbar)
+                  (setq-default cursor-type 'hbar)))
+              nil :local)))
 
 (use-package vterm-toggle
   :ensure t

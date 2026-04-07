@@ -1,7 +1,6 @@
 (setq global-auto-revert-mode t)
 
-(require 'alert)
-(setq alert-default-style 'osx-notifier)
+(use-package alert :ensure t :config (setq alert-default-style 'osx-notifier))
 
 (use-package bury-successful-compilation :ensure t)
 
@@ -50,10 +49,14 @@
 (add-hook 'find-file-hook 'recentf-save-list)
 (recentf-mode 1)
 
-(setq epg-gpg-program "gpg2")
-(setq epa-pinentry-mode 'loopback)
-(setq auth-sources '((:source "~/.authinfo.gpg")))
-(if (eq system-type 'darwin) (pinentry-start))
+(use-package pinentry
+  :defer nil
+  :straight t
+  :config
+  (setq epg-gpg-program "gpg2")
+  (setq epa-pinentry-mode 'loopback)
+  (setq auth-sources '((:source "~/.authinfo.gpg")))
+  (if (eq system-type 'darwin) (pinentry-start)))
 
 (require 'tramp)
 (setq tramp-default-method "ssh")

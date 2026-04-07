@@ -33,7 +33,8 @@
 		     ,@cape--history-properties)))))
     (add-hook 'shell-mode-hook (lambda ()
 				   (setq-local completion-at-point-functions
-					       (list (cape-capf-buster #'cape-history)
+					       (list #'comint-completion-at-point
+						     (cape-capf-buster #'cape-history)
 						     #'cape-dabbrev
 						     #'cape-file))))
     ;; (add-hook 'eglot-managed-mode-hook (lambda ()
@@ -154,7 +155,7 @@
               (or (thing-at-point 'symbol)
                   "")))))
 
-(require 'request)
+(use-package request :ensure t)
 
 (cl-defun consult-web--handle-error (&rest args &key error-thrown &allow-other-keys)
   "Handle error from `request' with ARGS.

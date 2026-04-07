@@ -41,3 +41,4 @@ cache/
 var/
 savefold/
 url/
+/.agent-shell/

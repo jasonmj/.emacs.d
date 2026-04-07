@@ -315,4 +315,4 @@ Does not jump to any location, just returns the list of references."
   :straight (:host github :repo "jethrokuan/agent-shell-manager")
   :custom (agent-shell-manager-side nil))
 
-(load-file "~/git/jasonmj/switchboard/editors/emacs/switchboard.el")
+(load-file "~/git/gridpoint-com/switchboard/editors/emacs/switchboard.el")

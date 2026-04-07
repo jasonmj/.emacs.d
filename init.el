@@ -7,17 +7,6 @@
 (tool-bar-mode -1)
 (toggle-debug-on-error)
 
-;;; Add Package and Archives
-(require 'package)
-(setq package-enable-at-startup nil)
-(setq package-archives '(("elpa" . "https://elpa.gnu.org/packages/") ("melpa" . "https://melpa.org/packages/")))
-(package-initialize)
-
-;;; Bootstrap use-package
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
-
 ;;; Load Minimal Config
 (load-file "~/.emacs.d/minimal-config.el")
 
@@ -48,11 +37,11 @@
 
   (global-set-key (kbd "C-S-w") 'save-buffers-kill-terminal)
 
-  (emacs-set-key (kbd "s-1") (lambda () (interactive) (call-process-shell-command "osascript -e 'tell Application \"BetterTouchTool\" to trigger_named \"Desktop 1\"'")))
-  (emacs-set-key (kbd "s-2") (lambda () (interactive) (call-process-shell-command "osascript -e 'tell Application \"BetterTouchTool\" to trigger_named \"Desktop 2\"'")))
-  (emacs-set-key (kbd "s-3") (lambda () (interactive) (call-process-shell-command "osascript -e 'tell Application \"BetterTouchTool\" to trigger_named \"Desktop 3\"'")))
-  (emacs-set-key (kbd "s-4") (lambda () (interactive) (call-process-shell-command "osascript -e 'tell Application \"BetterTouchTool\" to trigger_named \"Desktop 4\"'")))
-  (emacs-set-key (kbd "s-5") (lambda () (interactive) (call-process-shell-command "osascript -e 'tell Application \"BetterTouchTool\" to trigger_named \"Desktop 5\"'")))
+  (emacs-set-key (kbd "s-1") (lambda () (interactive) (start-process-shell-command "aerospace" nil "aerospace workspace 1")))
+  (emacs-set-key (kbd "s-2") (lambda () (interactive) (start-process-shell-command "aerospace" nil "aerospace workspace 2")))
+  (emacs-set-key (kbd "s-3") (lambda () (interactive) (start-process-shell-command "aerospace" nil "aerospace workspace 3")))
+  (emacs-set-key (kbd "s-4") (lambda () (interactive) (start-process-shell-command "aerospace" nil "aerospace workspace 4")))
+  (emacs-set-key (kbd "s-5") (lambda () (interactive) (start-process-shell-command "aerospace" nil "aerospace workspace 5")))
 
   (emacs-set-key (kbd "C-c f") 'firefox)
   (key-seq-define-global "sf" 'firefox)
@@ -61,6 +50,7 @@
     (start-process-shell-command "firefox fullscreen" nil "/Applications/Firefox.app/Contents/MacOS/firefox")))
 
 ;;; Straight
+(setq straight-check-for-modifications nil)
 (defvar native-comp-deferred-compilation-deny-list ())
 (defvar bootstrap-version)
 (let ((bootstrap-file
@@ -75,6 +65,16 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 (setq package-enable-at-startup nil)
+
+;;; Add Package and Archives
+(require 'package)
+(setq package-archives '(("elpa" . "https://elpa.gnu.org/packages/") ("melpa" . "https://melpa.org/packages/")))
+(package-initialize)
+
+;;; Bootstrap use-package
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
 
 ;;; Register built-in packages before any straight-use-package calls
 ;;; Prevents straight from installing flymake from GNU ELPA mirror,

@@ -22,11 +22,8 @@ Configure the tab bar to be hidden by default, but still support tabs and tab gr
 Display the tab line in all windows using the configuration specified below. 
 #+begin_src emacs-lisp
   (use-package tab-line
-    :bind (("C-<tab>" . tab-line-switch-to-next-tab)
-  	   ("C-M-<tab>" . tab-line-switch-to-next-tab)
-  	   ("C-M-S-<tab>" . tab-line-switch-to-prev-tab)
-  	   ("C-<iso-lefttab>" . tab-line-switch-to-prev-tab)
-  	   ("C-S-<iso-lefttab>" . tab-line-switch-to-prev-tab))
+    :bind (("s-<tab>" . tab-line-switch-to-next-tab)
+  	   ("s-S-<tab>" . tab-line-switch-to-prev-tab))
     :hook ((after-init . global-tab-line-mode)
   	   (global-tab-line-mode . init-tab-line-function))
     :custom

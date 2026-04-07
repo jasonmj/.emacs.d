@@ -7,8 +7,7 @@ Revert any buffer associated with a file when the file changes on disk.
 #+end_src
 * Alert
 #+begin_src emacs-lisp
-  (require 'alert)
-  (setq alert-default-style 'osx-notifier)
+  (use-package alert :ensure t :config (setq alert-default-style 'osx-notifier))
 #+end_src
 * Bury Compilation Buffers If Successful
 Automatically bury the *compilation* buffer when compilation succeeds.
@@ -113,10 +112,14 @@ Setup recent file mode to include 300 items and exclude irrelevant directories.
 * Secrets with GnuPG and Easy PG
 Configure GPG and Pinentry for managing secrets. Use `~/.authinfo.gpg` for storage.
 #+begin_src emacs-lisp
-  (setq epg-gpg-program "gpg2")
-  (setq epa-pinentry-mode 'loopback)
-  (setq auth-sources '((:source "~/.authinfo.gpg")))
-  (if (eq system-type 'darwin) (pinentry-start))
+  (use-package pinentry
+    :defer nil
+    :straight t
+    :config
+    (setq epg-gpg-program "gpg2")
+    (setq epa-pinentry-mode 'loopback)
+    (setq auth-sources '((:source "~/.authinfo.gpg")))
+    (if (eq system-type 'darwin) (pinentry-start)))
 #+end_src
 * Tramp
 Configure tramp to use smart defaults for remote connections. 

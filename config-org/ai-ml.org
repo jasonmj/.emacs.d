@@ -327,5 +327,5 @@
 #+end_src
 * Switchboard
 #+begin_src emacs-lisp
-  (load-file "~/git/jasonmj/switchboard/editors/emacs/switchboard.el")
+  (load-file "~/git/gridpoint-com/switchboard/editors/emacs/switchboard.el")
 #+end_src

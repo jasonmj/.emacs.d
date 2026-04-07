@@ -134,7 +134,10 @@ This command does not push text to `kill-ring'."
 
 (use-package spell-fu
   :ensure t
-  :config (setq ispell-personal-dictionary "~/.emacs.d/.local/etc/ispell/.pws")
+  :config
+  (setq ispell-personal-dictionary "~/.emacs.d/.local/etc/ispell/.pws"
+        ispell-aspell-dict-dir "~/.nix-profile/lib/aspell"
+        ispell-aspell-data-dir "~/.nix-profile/lib/aspell")
   :hook ((prog-mode . spell-fu-mode)
 	   (org-mode . spell-fu-mode)
 	   (markdown-mode . spell-fu-mode)))

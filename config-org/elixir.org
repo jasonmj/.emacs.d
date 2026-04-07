@@ -43,6 +43,9 @@ Major mode for editing Elixir, powered by tree-sitter.
 
 https://github.com/wkirschbaum/elixir-ts-mode
 #+begin_src emacs-lisp
+  (setq treesit-language-source-alist
+        '((elixir "https://github.com/elixir-lang/tree-sitter-elixir")
+          (heex "https://github.com/phoenixframework/tree-sitter-heex")))
   (use-package elixir-mode :ensure t)
   (use-package heex-ts-mode :ensure t)
   (use-package elixir-ts-mode

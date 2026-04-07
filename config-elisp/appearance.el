@@ -29,7 +29,7 @@
   :config (fira-code-mode-set-font)
   :hook prog-mode)
 
-(set-face-attribute 'default nil :font "Iosevka Term 15")
+(set-face-attribute 'default nil :font "Iosevka 15")
 
 (setq-default truncate-lines -1)
 

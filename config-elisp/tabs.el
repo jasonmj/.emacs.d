@@ -14,11 +14,8 @@
     (concat " " (tab-bar-tab-name-format-default tab i) " ")))
 
 (use-package tab-line
-  :bind (("C-<tab>" . tab-line-switch-to-next-tab)
-	   ("C-M-<tab>" . tab-line-switch-to-next-tab)
-	   ("C-M-S-<tab>" . tab-line-switch-to-prev-tab)
-	   ("C-<iso-lefttab>" . tab-line-switch-to-prev-tab)
-	   ("C-S-<iso-lefttab>" . tab-line-switch-to-prev-tab))
+  :bind (("s-<tab>" . tab-line-switch-to-next-tab)
+	   ("s-S-<tab>" . tab-line-switch-to-prev-tab))
   :hook ((after-init . global-tab-line-mode)
 	   (global-tab-line-mode . init-tab-line-function))
   :custom
