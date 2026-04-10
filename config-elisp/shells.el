@@ -428,9 +428,7 @@
 
 (use-package ghostel
   :ensure t
-  :defer t
+  :commands (ghostel ghostel-project ghostel-other)
   :custom
   (ghostel-shell "/Users/jasonmj/.nix-profile/bin/fish")
-  :config
-  (when (eq system-type 'darwin)
-    (setq ghostel-module-auto-install 'download)))
+  (ghostel-module-auto-install (if (eq system-type 'darwin) 'download 'ask)))
