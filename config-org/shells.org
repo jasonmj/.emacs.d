@@ -476,3 +476,15 @@ Allows the popper buffer that a shell is in to be made fullscreen
               (setq-default cursor-type 'hbar)))
   (emacs-set-key (kbd "C-s-t") 'vterm-toggle))
 #+end_src
+
+* Ghostel
+Terminal emulator powered by libghostty-vt — the same VT engine that drives the Ghostty terminal.
+
+https://github.com/dakra/ghostel
+#+begin_src emacs-lisp
+(use-package ghostel
+  :ensure t
+  :custom
+  (ghostel-module-auto-install 'download)
+  (ghostel-shell "/Users/jasonmj/.nix-profile/bin/fish"))
+#+end_src

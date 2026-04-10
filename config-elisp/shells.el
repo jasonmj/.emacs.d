@@ -425,3 +425,9 @@
               (setq cursor-type 'hbar)
               (setq-default cursor-type 'hbar)))
   (emacs-set-key (kbd "C-s-t") 'vterm-toggle))
+
+(use-package ghostel
+  :ensure t
+  :custom
+  (ghostel-module-auto-install 'download)
+  (ghostel-shell "/Users/jasonmj/.nix-profile/bin/fish"))
