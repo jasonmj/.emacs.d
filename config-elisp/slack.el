@@ -1,3 +1,11 @@
+;; Skip Slack integration if GPG is not available in PATH
+;; This prevents "no usable configuration" errors on macOS when GUI Emacs
+;; can't find GPG in exec-path (even though it exists in ~/.nix-profile/bin)
+(defvar slack-disabled (not (or (executable-find "gpg") (executable-find "gpg2")))
+  "Set to t if GPG is not available, disabling Slack integration.")
+
+(unless slack-disabled
+
 (use-package request
   :ensure t)
 
@@ -132,3 +140,5 @@ Wraps auth-source with error handling to prevent GPG failures during init."
 
 ;; Start on first user interaction, not at startup
 (add-hook 'focus-in-hook #'slack-ensure-polling)
+
+) ;; end of (unless slack-disabled ...)

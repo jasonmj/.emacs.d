@@ -6,6 +6,14 @@
 Polls Slack for unread messages and displays count in the mode line.
 
 #+begin_src emacs-lisp
+  ;; Skip Slack integration if GPG is not available in PATH
+  ;; This prevents "no usable configuration" errors on macOS when GUI Emacs
+  ;; can't find GPG in exec-path (even though it exists in ~/.nix-profile/bin)
+  (defvar slack-disabled (not (or (executable-find "gpg") (executable-find "gpg2")))
+    "Set to t if GPG is not available, disabling Slack integration.")
+
+  (unless slack-disabled
+
   (use-package request
     :ensure t)
 
@@ -18,24 +26,25 @@ Polls Slack for unread messages and displays count in the mode line.
   (defvar slack-app-token nil
     "Slack app token (xoxp-*). Set via auth-source (.authinfo.gpg). Cached after first load.")
 
-  (defun slack-load-token ()
-    "Load Slack token from auth-source (idiomatic Emacs approach) and cache it.
+   (defun slack-load-token ()
+     "Load Slack token from auth-source (idiomatic Emacs approach) and cache it.
+
+   Store your token securely in ~/.authinfo.gpg:
+     machine slack.com login slack password xoxp-YOUR-TOKEN-HERE
    
-  Store your token securely in ~/.authinfo.gpg:
-    machine slack.com login slack password xoxp-YOUR-TOKEN-HERE
-  
-  The token is decrypted once on first use and cached for the session.
-  
-  Wraps auth-source with error handling to prevent GPG failures during init."
-    (or slack-app-token
-        (setq slack-app-token
-              (condition-case err
-                  (when-let* ((auth (auth-source-search :host "slack.com" :user "slack" :max 1))
-                              (secret (plist-get (car auth) :secret)))
-                    (if (functionp secret) (funcall secret) secret))
-                (error
-                 (message "[SLACK] Warning: Could not load token from auth-source: %s" (error-message-string err))
-                 nil)))))
+   The token is decrypted once on first use and cached for the session.
+
+   Wraps auth-source with error handling to prevent GPG failures during init."
+     (or slack-app-token
+         (setq slack-app-token
+               (condition-case err
+                   (when-let* ((auth (auth-source-search :host "slack.com" :user "slack" :max 1))
+                               (secret (plist-get (car auth) :secret)))
+                     (if (functionp secret) (funcall secret) secret))
+                 (error
+                  ;; Silently return nil if GPG/auth-source fails (e.g., GPG not installed)
+                  ;; Token loading will be retried on next Slack poll
+                  nil)))))
 
   (defvar slack-unreads nil
     "List of unread conversations. Each element: (channel-id channel-name message-preview).")
@@ -140,6 +149,8 @@ Polls Slack for unread messages and displays count in the mode line.
   
   ;; Start on first user interaction, not at startup
   (add-hook 'focus-in-hook #'slack-ensure-polling)
+
+  ) ;; end of (unless slack-disabled ...)
 #+end_src
 
 * Mode Line Integration
