@@ -1,0 +1,130 @@
+#+TITLE: Slack Integration
+#+PROPERTY: header-args      :tangle "../config-elisp/slack.el"
+
+* Slack Mode Line Indicator
+
+Polls Slack for unread messages and displays count in the mode line.
+
+#+begin_src emacs-lisp
+  (use-package request
+    :ensure t)
+
+  (defvar slack-unread-count 0
+    "Current Slack unread message count.")
+
+  (defvar slack-polling-timer nil
+    "Timer for Slack polling.")
+
+  (defvar slack-app-token nil
+    "Slack app token (xoxb-*). Set via environment or customize.")
+
+  (defun slack-load-token ()
+    "Load Slack token from environment variable or auth-source."
+    (or slack-app-token
+        (getenv "SLACK_BOT_TOKEN")
+        (when-let* ((auth (auth-source-search :host "slack.com" :max 1))
+                    (token (plist-get (car auth) :secret)))
+          (if (functionp token) (funcall token) token))))
+
+  (defun slack-fetch-unreads ()
+    "Fetch unread message count from Slack."
+    (let ((token (slack-load-token)))
+      (if token
+          (request "https://slack.com/api/conversations.unreads"
+            :type "GET"
+            :headers `(("Authorization" . ,(concat "Bearer " token)))
+            :params '(("limit" . "100"))
+            :parser 'json-read
+            :success (cl-function
+                      (lambda (&key data &allow-other-keys)
+                        (if (plist-get data :ok)
+                            (let ((total 0))
+                              (dolist (channel (plist-get data :unreads))
+                                (cl-incf total (plist-get channel :unreads)))
+                              (setq slack-unread-count total)
+                              (force-mode-line-update))
+                          (message "Slack API error: %s" (plist-get data :error)))))
+            :error (cl-function
+                    (lambda (&key error-thrown &allow-other-keys)
+                      (message "Slack fetch failed: %s" error-thrown))))
+        (message "Slack token not configured"))))
+
+  (defun slack-start-polling (&optional interval)
+    "Start polling Slack for unreads. INTERVAL in seconds (default 30)."
+    (interactive)
+    (let ((interval (or interval 30)))
+      (when slack-polling-timer
+        (cancel-timer slack-polling-timer))
+      (slack-fetch-unreads)  ; Fetch immediately
+      (setq slack-polling-timer
+            (run-at-time nil interval 'slack-fetch-unreads))
+      (message "Slack polling started (interval: %ds)" interval)))
+
+  (defun slack-stop-polling ()
+    "Stop polling Slack."
+    (interactive)
+    (when slack-polling-timer
+      (cancel-timer slack-polling-timer)
+      (setq slack-polling-timer nil)
+      (setq slack-unread-count 0)
+      (force-mode-line-update)
+      (message "Slack polling stopped")))
+
+  ;; Start polling at Emacs startup
+  (add-hook 'after-init-hook (lambda () (slack-start-polling)))
+#+end_src
+
+* Mode Line Integration
+
+Add Slack indicator to doom-modeline segments.
+
+Edit your `config-org/doom-modeline.org` to include `slack-indicator` in the modeline:
+
+#+begin_example
+  ;; In doom-modeline config, add this function:
+  (doom-modeline-def-segment slack-indicator
+    "Slack unread count indicator."
+    (if (> slack-unread-count 0)
+        (propertize (format "📬 %d" slack-unread-count)
+                    'face 'warning)
+      ""))
+
+  ;; Then update your modeline definition to include it:
+  ;; (doom-modeline-def-modeline 'my-simple-line
+  ;;   '(bar matches buffer-info remote-host slack-indicator)
+  ;;   '(misc-info major-mode process vcs))
+#+end_example
+
+* Configuration
+
+To use, you need to set your Slack app token. Options:
+
+1. **Environment variable** (recommended):
+   #+begin_example bash
+   export SLACK_BOT_TOKEN="xoxb-your-token-here"
+   #+end_example
+
+2. **Direct customization**:
+   #+begin_example emacs-lisp
+   (setq slack-app-token "xoxb-your-token-here")
+   #+end_example
+
+3. **auth-source** (`.authinfo.gpg`):
+   #+begin_example
+   machine slack.com login slack secret xoxb-your-token-here
+   #+end_example
+
+* Manual Control
+
+- `M-x slack-start-polling` - Start polling (default 30s interval)
+- `M-x slack-stop-polling` - Stop polling
+- `C-u M-x slack-start-polling` - Specify custom interval
+
+* Keybinding (Optional)
+
+Add to your bindings config if desired:
+
+#+begin_example emacs-lisp
+  (global-set-key (kbd "C-c s") 'slack-start-polling)
+  (global-set-key (kbd "C-c C-s") 'slack-stop-polling)
+#+end_example
