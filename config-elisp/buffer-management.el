@@ -24,7 +24,7 @@
   (advice-add 'bufler-workspace-mode-lighter :override (lambda () ""))
   (bufler-workspace-mode t)
   (load "bufler-workspace-tabs.el")
-  (bufler-workspace-workspaces-as-tabs-mode t)
+  (bufler-workspace-tabs-mode t)
   :hook ((kill-buffer .my/bufler-workspace-focus-buffer)))
 
 (key-seq-define-global "xb" 'list-buffers)

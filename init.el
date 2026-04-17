@@ -7,6 +7,34 @@
 (tool-bar-mode -1)
 (toggle-debug-on-error)
 
+;;; Straight
+(setq straight-check-for-modifications nil)
+(add-to-list 'warning-suppress-types '(straight package))
+(add-to-list 'warning-suppress-types '(straight))
+(setq straight-package--warning-displayed t)
+(setq package-enable-at-startup nil)
+(defvar native-comp-deferred-compilation-deny-list ())
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 5))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
+
+;;; Bootstrap use-package via straight
+(straight-use-package 'use-package)
+
+;;; Add Package and Archives (for :ensure t packages)
+(require 'package)
+(setq package-archives '(("elpa" . "https://elpa.gnu.org/packages/") ("melpa" . "https://melpa.org/packages/")))
+(package-initialize)
+
 ;;; Load Minimal Config
 (load-file "~/.emacs.d/minimal-config.el")
 
@@ -48,33 +76,6 @@
   (defun firefox ()
     (interactive)
     (start-process-shell-command "firefox fullscreen" nil "/Applications/Firefox.app/Contents/MacOS/firefox")))
-
-;;; Straight
-(setq straight-check-for-modifications nil)
-(defvar native-comp-deferred-compilation-deny-list ())
-(defvar bootstrap-version)
-(let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-      (bootstrap-version 5))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
-(setq package-enable-at-startup nil)
-
-;;; Add Package and Archives
-(require 'package)
-(setq package-archives '(("elpa" . "https://elpa.gnu.org/packages/") ("melpa" . "https://melpa.org/packages/")))
-(package-initialize)
-
-;;; Bootstrap use-package
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
 
 ;;; Register built-in packages before any straight-use-package calls
 ;;; Prevents straight from installing flymake from GNU ELPA mirror,

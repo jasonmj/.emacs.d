@@ -12,7 +12,7 @@
 
 ;; Garbage Collection Magic Hack
 (use-package gcmh
-  :ensure t
+  :straight t
   :diminish
   :hook (emacs-startup . gcmh-mode)
   :init
@@ -21,14 +21,14 @@
         gcmh-verbose nil
         gc-cons-percentage 0.2))
 
-(use-package loopy :ensure t :config (require 'loopy-iter))
-(use-package key-chord :ensure t)
+(use-package loopy :straight t :config (require 'loopy-iter))
+(use-package key-chord :straight t)
 (use-package use-package-chords
-  :ensure t
+  :straight t
   :demand t
   :custom (key-chord-safety-interval-forward 0.1)
   :config (key-chord-mode t))
-(use-package key-seq :ensure t)
+(use-package key-seq :straight t)
 
 ;; Prevent initial flash of display on startup
 (when (display-graphic-p)

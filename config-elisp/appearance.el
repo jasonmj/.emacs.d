@@ -1,5 +1,5 @@
 (defun setup-frame-appearance (frame) (interactive)
-	 (set-face-attribute 'default nil :font "Iosevka 13")
+	 (set-face-attribute 'default nil :font "IosevkaTerm Nerd Font 13")
 	 (use-package fira-code-mode
 	   :ensure t
 	   :config (fira-code-mode-set-font)
@@ -29,7 +29,7 @@
   :config (fira-code-mode-set-font)
   :hook prog-mode)
 
-(set-face-attribute 'default nil :font "Iosevka 15")
+(set-face-attribute 'default nil :font "IosevkaTerm Nerd Font 15")
 
 (setq-default truncate-lines -1)
 

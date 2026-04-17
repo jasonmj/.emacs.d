@@ -105,6 +105,7 @@ Quickly create an eshell with a name or switch to an open eshell with completing
   		("C-1" . popper-shell-fullscreen)
   		("C-d" . hungry-delete-forward))
     :config
+    (setq explicit-shell-file-name "~/.nix-profile/bin/zsh")
     (defun clear-shell-buffer () (interactive)
   	 (erase-buffer)
   	 (comint-send-input)
@@ -474,7 +475,7 @@ Allows the popper buffer that a shell is in to be made fullscreen
             (lambda ()
               (setq cursor-type 'hbar)
               (setq-default cursor-type 'hbar)))
-  (emacs-set-key (kbd "C-s-t") 'vterm-toggle))
+  (emacs-set-key (kbd "M-s-t") 'vterm-toggle))
 #+end_src
 
 * Ghostel
@@ -482,10 +483,33 @@ Terminal emulator powered by libghostty-vt — the same VT engine that drives th
 
 https://github.com/dakra/ghostel
 #+begin_src emacs-lisp
-(use-package ghostel
-  :ensure t
-  :commands (ghostel ghostel-project ghostel-other)
-  :custom
-  (ghostel-shell "/Users/jasonmj/.nix-profile/bin/fish")
-  (ghostel-module-auto-install (if (eq system-type 'darwin) 'download 'ask)))
+  (defun ghostel-toggle-or-create ()
+    "Toggle ghostel visibility or create a new instance if none exists.
+  Check for any buffer starting with \"*ghostel:\" and whether it's currently displayed."
+    (interactive)
+    (let* ((ghostel-buf (seq-find (lambda (buf) (string-prefix-p "*ghostel:" (buffer-name buf)))
+                                   (buffer-list)))
+           (ghostel-window (when ghostel-buf (get-buffer-window ghostel-buf))))
+      (if (and ghostel-buf ghostel-window)
+          ;; Ghostel buffer exists and is visible in a window - hide it
+          (if (> (length (window-list)) 1)
+              ;; Multiple windows - delete the ghostel window
+              (delete-window ghostel-window)
+            ;; Sole window - bury the buffer to switch to another one
+            (with-current-buffer ghostel-buf
+              (bury-buffer)))
+        ;; Either no ghostel buffer exists, or it exists but is not visible - show/create it
+        (if ghostel-buf
+            (pop-to-buffer ghostel-buf)
+          (ghostel)))))
+  (use-package ghostel
+    :ensure t
+    :bind (
+           ("C-s-t" . ghostel-toggle-or-create)
+           :map ghostel-mode-map
+           ("C-w" . my-kill-this-window))
+    :commands (ghostel ghostel-project ghostel-other)
+    :custom
+    (ghostel-shell "/Users/jasonmj/.nix-profile/bin/fish")
+    (ghostel-module-auto-install (if (eq system-type 'darwin) 'download 'ask)))
 #+end_src
