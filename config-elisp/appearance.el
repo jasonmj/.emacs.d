@@ -38,6 +38,14 @@
   :hook (after-init . modern-fringes-mode)
   :config (set-fringe-mode '(7 . 0)))
 
+(defun my/olivetti-reset-window-no-fringe (window)
+  "Suppress fringes in WINDOW when it displays an olivetti buffer."
+  (when (buffer-local-value 'olivetti-mode (window-buffer window))
+    (set-window-fringes window 0 0)))
+
+(with-eval-after-load 'olivetti
+  (advice-add 'olivetti-reset-window :after #'my/olivetti-reset-window-no-fringe))
+
 (global-prettify-symbols-mode t)
 
 (setq display-time-default-load-average nil

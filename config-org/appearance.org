@@ -71,6 +71,18 @@ https://github.com/SpecialBomb/emacs-modern-fringes
     :hook (after-init . modern-fringes-mode)
     :config (set-fringe-mode '(7 . 0)))
 #+end_src
+* Olivetti Fringe Suppression
+In olivetti buffers (markdown-view-mode, agent-shell, etc.), suppress the left fringe that
+olivetti-reset-window would otherwise restore from the global fringe-mode setting.
+#+begin_src emacs-lisp
+  (defun my/olivetti-reset-window-no-fringe (window)
+    "Suppress fringes in WINDOW when it displays an olivetti buffer."
+    (when (buffer-local-value 'olivetti-mode (window-buffer window))
+      (set-window-fringes window 0 0)))
+
+  (with-eval-after-load 'olivetti
+    (advice-add 'olivetti-reset-window :after #'my/olivetti-reset-window-no-fringe))
+#+end_src
 * Prettify Symbols
 When Prettify Symbols mode and font-locking are enabled, symbols are prettified (displayed as composed characters) according to the rules in `prettify-symbols-alist' (which see), which are locally defined by major modes supporting prettifying.
 #+begin_src emacs-lisp
