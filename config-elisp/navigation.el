@@ -8,11 +8,39 @@
   (key-chord-define-global "jj" 'avy-goto-word-or-subword-1)
   (key-chord-define-global "JJ" 'avy-goto-char-in-line))
 
+(pixel-scroll-precision-mode 1)
+
 (use-package centered-cursor-mode
   :ensure t
   :bind ("s--" . centered-cursor-mode)
-   :hook (prog-mode . (lambda ()
-            (run-with-idle-timer 0 nil #'centered-cursor-mode))))
+  :hook (prog-mode . (lambda ()
+           (run-with-idle-timer 0 nil #'centered-cursor-mode)))
+  :config
+  ;; Remove ccm's mouse wheel bindings so pixel-scroll-precision-mode
+  ;; handles trackpad/wheel scrolling. ccm will still recenter after
+  ;; cursor-moving commands via post-command-hook.
+  (dolist (key (list (vector mouse-wheel-up-event)
+                     (vector mouse-wheel-down-event)
+                     (vector (list 'control mouse-wheel-up-event))
+                     (vector (list 'control mouse-wheel-down-event))
+                     (vector (list 'shift mouse-wheel-up-event))
+                     (vector (list 'shift mouse-wheel-down-event))))
+    (define-key ccm-map key nil))
+  (when (and (boundp 'mouse-wheel-up-alternate-event)
+             (boundp 'mouse-wheel-down-alternate-event))
+    (dolist (key (list (vector mouse-wheel-up-alternate-event)
+                       (vector mouse-wheel-down-alternate-event)
+                       (vector (list 'control mouse-wheel-up-alternate-event))
+                       (vector (list 'control mouse-wheel-down-alternate-event))
+                       (vector (list 'shift mouse-wheel-up-alternate-event))
+                       (vector (list 'shift mouse-wheel-down-alternate-event))))
+      (define-key ccm-map key nil)))
+  ;; Prevent ccm from recentering after any scroll command (wheel/trackpad).
+  ;; Uses the scroll-command property that mwheel-scroll, pixel-scroll-precision, etc. set.
+  (defun ccm-scroll-command-p ()
+    "Return t if this-command is a scroll command (has scroll-command property)."
+    (get this-command 'scroll-command))
+  (add-to-list 'ccm-inhibit-centering-when 'ccm-scroll-command-p))
 
 (defun copy-keep-highlight (beg end)
   (interactive "r")
