@@ -25,6 +25,13 @@
   (bufler-workspace-mode t)
   (load "bufler-workspace-tabs.el")
   (bufler-workspace-tabs-mode t)
+  ;; Fix: magit-section-mode now enables font-lock, which calls
+  ;; font-lock-default-unfontify-region and removes the `face' text
+  ;; property that bufler uses for group heading colors.  Prevent
+  ;; font-lock from unfontifying bufler buffers.
+  (add-hook 'bufler-list-mode-hook
+	    (lambda ()
+	      (setq-local font-lock-unfontify-region-function #'ignore)))
   :hook ((kill-buffer .my/bufler-workspace-focus-buffer)))
 
 (key-seq-define-global "xb" 'list-buffers)

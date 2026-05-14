@@ -50,7 +50,10 @@
 ;;; MacOS Customizations
 (when (eq system-type 'darwin)
   (use-package exec-path-from-shell :ensure t)
+  (setq exec-path-from-shell-shell-name "/run/current-system/sw/bin/fish")
   (exec-path-from-shell-initialize)
+  (setenv "SHELL" "/run/current-system/sw/bin/fish")
+  (setq shell-file-name "/run/current-system/sw/bin/fish")
 
   (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
   (add-to-list 'default-frame-alist '(ns-appearance . dark))

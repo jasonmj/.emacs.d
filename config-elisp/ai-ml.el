@@ -316,3 +316,4 @@ Does not jump to any location, just returns the list of references."
   :custom (agent-shell-manager-side nil))
 
 (load-file "~/git/gridpoint-com/switchboard/editors/emacs/switchboard.el")
+(key-chord-define-global "sb" 'switchboard-list)

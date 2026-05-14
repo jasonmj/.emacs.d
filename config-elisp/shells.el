@@ -82,7 +82,7 @@
 		("C-1" . popper-shell-fullscreen)
 		("C-d" . hungry-delete-forward))
   :config
-  (setq explicit-shell-file-name "~/.nix-profile/bin/zsh")
+  (setq explicit-shell-file-name "/run/current-system/sw/bin/zsh")
   (defun clear-shell-buffer () (interactive)
 	 (erase-buffer)
 	 (comint-send-input)
@@ -377,7 +377,7 @@
       (when-let ((dir (car (directory-files vterm-dir t "^[^.]"))))
         (add-to-list 'load-path (concat vterm-dir (file-name-nondirectory dir))))))
   :custom
-  (vterm-shell "/Users/jasonmj/.nix-profile/bin/fish")
+  (vterm-shell "/run/current-system/sw/bin/fish")
   (vterm-module-cmake-args "-DUSE_SYSTEM_LIBVTERM=yes")
   :hook
   (vterm-mode . vterm-startup)
@@ -454,5 +454,5 @@ Check for any buffer starting with \"*ghostel:\" and whether it's currently disp
          ("C-w" . my-kill-this-window))
   :commands (ghostel ghostel-project ghostel-other)
   :custom
-  (ghostel-shell "/Users/jasonmj/.nix-profile/bin/fish")
+  (ghostel-shell "/run/current-system/sw/bin/fish")
   (ghostel-module-auto-install (if (eq system-type 'darwin) 'download 'ask)))

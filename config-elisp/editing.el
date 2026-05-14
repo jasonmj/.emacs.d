@@ -136,8 +136,8 @@ This command does not push text to `kill-ring'."
   :ensure t
   :config
   (setq ispell-personal-dictionary "~/.emacs.d/.local/etc/ispell/.pws"
-        ispell-aspell-dict-dir "~/.nix-profile/lib/aspell"
-        ispell-aspell-data-dir "~/.nix-profile/lib/aspell")
+        ispell-aspell-dict-dir "/etc/profiles/per-user/jasonmj/lib/aspell"
+        ispell-aspell-data-dir "/etc/profiles/per-user/jasonmj/lib/aspell")
   :hook ((prog-mode . spell-fu-mode)
 	   (org-mode . spell-fu-mode)
 	   (markdown-mode . spell-fu-mode)))

@@ -34,8 +34,3 @@
 (defun manually-activate-flymake ()
   (add-hook 'flymake-diagnostic-functions #'eglot-flymake-backend nil t)
   (flymake-mode 1))
-
-(use-package eglot-booster
-  :after eglot
-  :straight (eglot-booster :type git :host github :repo "jdtsmith/eglot-booster")
-  :config (eglot-booster-mode))
