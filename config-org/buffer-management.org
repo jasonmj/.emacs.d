@@ -68,6 +68,25 @@ Efficiently kill buffers and windows.
 #+end_src
 * Project
 #+begin_src emacs-lisp
+  (defun project-magit-status ()
+    "Open magit-status for the current project root."
+    (interactive)
+    (magit-status (project-root (project-current t))))
+
+  (defun project-ghostel ()
+    "Open a new ghostel session at the current project root."
+    (interactive)
+    (ghostel-project (project-root (project-current t))))
+
+  (setq project-switch-commands
+        '((project-find-file "Find file" ?f)
+          (project-switch-to-buffer "Switch buffer" ?b)
+          (project-find-dir "Find directory" ?d)
+          (project-find-regexp "Find regexp" ?g)
+          (project-magit-status "Magit status" ?m)
+          (project-ghostel "Ghostel shell" ?s)
+          (project-eshell "Eshell" ?e)))
+
   (emacs-set-key (kbd "M-S-SPC") 'project-switch-project)
 #+end_src
 * Revert Buffer

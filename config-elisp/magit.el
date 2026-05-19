@@ -11,7 +11,8 @@
   :straight t
   :bind (("C-c g" . magit)
 	   :map magit-mode-map
-	   ("<C-tab>" . tab-line-switch-to-next-tab))
+	   ("<C-tab>" . tab-line-switch-to-next-tab)
+	   ("C-w" . my-kill-this-buffer))
   :chords ("mg" . magit)
   :custom
   (magit-commit-show-diff nil)

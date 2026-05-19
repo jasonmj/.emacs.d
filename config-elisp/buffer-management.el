@@ -30,8 +30,8 @@
   ;; property that bufler uses for group heading colors.  Prevent
   ;; font-lock from unfontifying bufler buffers.
   (add-hook 'bufler-list-mode-hook
-	    (lambda ()
-	      (setq-local font-lock-unfontify-region-function #'ignore)))
+	      (lambda ()
+		(setq-local font-lock-unfontify-region-function #'ignore)))
   :hook ((kill-buffer .my/bufler-workspace-focus-buffer)))
 
 (key-seq-define-global "xb" 'list-buffers)
@@ -51,6 +51,25 @@
 (key-seq-define-global "gw" 'my-kill-this-buffer)
 (key-seq-define-global "fw" 'my-kill-this-window)
 (key-chord-define-global "fw" 'my-kill-this-window)
+
+(defun project-magit-status ()
+  "Open magit-status for the current project root."
+  (interactive)
+  (magit-status (project-root (project-current t))))
+
+(defun project-ghostel ()
+  "Open a new ghostel session at the current project root."
+  (interactive)
+  (ghostel-project (project-root (project-current t))))
+
+(setq project-switch-commands
+      '((project-find-file "Find file" ?f)
+        (project-switch-to-buffer "Switch buffer" ?b)
+        (project-find-dir "Find directory" ?d)
+        (project-find-regexp "Find regexp" ?g)
+        (project-magit-status "Magit status" ?m)
+        (project-ghostel "Ghostel shell" ?s)
+        (project-eshell "Eshell" ?e)))
 
 (emacs-set-key (kbd "M-S-SPC") 'project-switch-project)
 
