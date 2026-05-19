@@ -90,13 +90,76 @@ Extra Dired functionality.
     (setq dired-omit-files (concat dired-omit-files "^\\.?#\\|^\\.$\\|^\\.\\.$")))
 #+end_src
 * Direnv
-Direnv integration for Emacs.
+Direnv integration for Emacs with async evaluation to avoid blocking on slow .envrc files
+(e.g. nix develop, custom setup scripts).
 
 https://github.com/wbolster/emacs-direnv
+
 #+begin_src emacs-lisp
   (use-package direnv
     :ensure t
-    :config (direnv-mode)
+    :config
+    (direnv-mode)
+
+    ;; Per-directory in-flight guard: maps directory string -> live process or nil.
+    (defvar my/direnv-in-flight (make-hash-table :test 'equal)
+      "Hash table mapping directory strings to their live async direnv process.")
+
+    (defun my/direnv-async-update (directory)
+      "Run `direnv export json' asynchronously for DIRECTORY.
+  Applies the resulting environment and notifies via the echo area when done.
+  Skips launch if a process for DIRECTORY is already in flight."
+      (when (and directory
+                 (not (process-live-p (gethash directory my/direnv-in-flight))))
+        (let ((output "")
+              (exec (or direnv--executable (direnv--detect))))
+          (puthash directory
+                   (make-process
+                    :name (format "direnv-async[%s]" directory)
+                    :command (list exec "export" "json")
+                    :connection-type 'pipe
+                    :noquery t
+                    :filter (lambda (_proc chunk)
+                              (setq output (concat output chunk)))
+                    :sentinel (lambda (_proc event)
+                                (remhash directory my/direnv-in-flight)
+                                (cond
+                                 ((string= event "finished\n")
+                                  (condition-case err
+                                      (let ((trimmed (string-trim output)))
+                                        (when (> (length trimmed) 0)
+                                          (let ((env (json-parse-string
+                                                      trimmed
+                                                      :object-type 'alist
+                                                      :key-type 'string)))
+                                            (when (> (length env) 0)
+                                              (dolist (pair env)
+                                                (let ((name (car pair))
+                                                      (value (cdr pair)))
+                                                  (setenv name value)
+                                                  (when (string= name "PATH")
+                                                    (setq exec-path
+                                                          (append (parse-colon-path value)
+                                                                  (list exec-directory))))))
+                                              (message "direnv: environment loaded (%s)"
+                                                       (abbreviate-file-name directory))))))
+                                    (error
+                                     (message "direnv async error in %s: %s"
+                                              (abbreviate-file-name directory)
+                                              (error-message-string err)))))
+                                 ((string-prefix-p "exited abnormally" event)
+                                  (message "direnv: .envrc evaluation failed in %s"
+                                           (abbreviate-file-name directory))))))
+                   my/direnv-in-flight))))
+
+    (defun my/direnv-maybe-update-async ()
+      "Async replacement for `direnv--maybe-update-environment'."
+      (when-let ((dir (and buffer-file-name
+                           (locate-dominating-file buffer-file-name ".envrc"))))
+        (my/direnv-async-update (file-truename dir))))
+
+    (advice-add 'direnv--maybe-update-environment :override #'my/direnv-maybe-update-async)
+
     :custom (direnv-always-show-summary nil))
 #+end_src
 * Dired Single
