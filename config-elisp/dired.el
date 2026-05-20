@@ -82,49 +82,52 @@
   (defun my/direnv-async-update (directory)
     "Run `direnv export json' asynchronously for DIRECTORY.
 Applies the resulting environment and notifies via the echo area when done.
-Skips launch if a process for DIRECTORY is already in flight."
+Skips launch if a process for DIRECTORY is already in flight.
+Output is stored on the process object via `process-put' to avoid
+dynamic-binding closure issues."
     (when (and directory
                (not (process-live-p (gethash directory my/direnv-in-flight))))
-      (let ((output "")
-            (exec (or direnv--executable (direnv--detect))))
-        (puthash directory
-                 (make-process
-                  :name (format "direnv-async[%s]" directory)
-                  :command (list exec "export" "json")
-                  :connection-type 'pipe
-                  :noquery t
-                  :filter (lambda (_proc chunk)
-                            (setq output (concat output chunk)))
-                  :sentinel (lambda (_proc event)
-                              (remhash directory my/direnv-in-flight)
-                              (cond
-                               ((string= event "finished\n")
-                                (condition-case err
-                                    (let ((trimmed (string-trim output)))
-                                      (when (> (length trimmed) 0)
-                                        (let ((env (json-parse-string
-                                                    trimmed
-                                                    :object-type 'alist
-                                                    :key-type 'string)))
-                                          (when (> (length env) 0)
-                                            (dolist (pair env)
-                                              (let ((name (car pair))
-                                                    (value (cdr pair)))
-                                                (setenv name value)
-                                                (when (string= name "PATH")
-                                                  (setq exec-path
-                                                        (append (parse-colon-path value)
-                                                                (list exec-directory))))))
-                                            (message "direnv: environment loaded (%s)"
-                                                     (abbreviate-file-name directory))))))
-                                  (error
-                                   (message "direnv async error in %s: %s"
-                                            (abbreviate-file-name directory)
-                                            (error-message-string err)))))
-                               ((string-prefix-p "exited abnormally" event)
-                                (message "direnv: .envrc evaluation failed in %s"
-                                         (abbreviate-file-name directory))))))
-                 my/direnv-in-flight))))
+      (let* ((exec (or direnv--executable (direnv--detect)))
+             (proc (make-process
+                    :name (format "direnv-async[%s]" directory)
+                    :command (list exec "export" "json")
+                    :connection-type 'pipe
+                    :noquery t
+                    :filter (lambda (proc chunk)
+                              (process-put proc 'output
+                                           (concat (or (process-get proc 'output) "")
+                                                   chunk)))
+                    :sentinel (lambda (proc event)
+                                (remhash directory my/direnv-in-flight)
+                                (cond
+                                 ((string= event "finished\n")
+                                  (condition-case err
+                                      (let ((trimmed (string-trim
+                                                      (or (process-get proc 'output) ""))))
+                                        (when (> (length trimmed) 0)
+                                          (let ((env (json-parse-string
+                                                      trimmed
+                                                      :object-type 'alist
+                                                      :key-type 'string)))
+                                            (when (> (length env) 0)
+                                              (dolist (pair env)
+                                                (let ((name (car pair))
+                                                      (value (cdr pair)))
+                                                  (setenv name value)
+                                                  (when (string= name "PATH")
+                                                    (setq exec-path
+                                                          (append (parse-colon-path value)
+                                                                  (list exec-directory))))))
+                                              (message "direnv: environment loaded (%s)"
+                                                       (abbreviate-file-name directory))))))
+                                    (error
+                                     (message "direnv async error in %s: %s"
+                                              (abbreviate-file-name directory)
+                                              (error-message-string err)))))
+                                 ((string-prefix-p "exited abnormally" event)
+                                  (message "direnv: .envrc evaluation failed in %s"
+                                           (abbreviate-file-name directory))))))))
+        (puthash directory proc my/direnv-in-flight))))
 
   (defun my/direnv-maybe-update-async ()
     "Async replacement for `direnv--maybe-update-environment'."
