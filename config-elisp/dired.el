@@ -108,8 +108,7 @@ dynamic-binding closure issues."
                                           (when (> (length trimmed) 0)
                                             (let ((env (json-parse-string
                                                         trimmed
-                                                        :object-type 'alist
-                                                        :key-type 'string)))
+                                                        :object-type 'alist)))
                                               (when (> (length env) 0)
                                                 (dolist (pair env)
                                                   (let ((name (car pair))
