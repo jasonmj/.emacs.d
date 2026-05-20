@@ -112,7 +112,7 @@ dynamic-binding closure issues."
                                                         :object-type 'alist)))
                                               (when (> (length env) 0)
                                                 (dolist (pair env)
-                                                  (let ((name (car pair))
+                                                  (let ((name (symbol-name (car pair)))
                                                         (value (cdr pair)))
                                                     (setenv name value)
                                                     (when (string= name "PATH")
