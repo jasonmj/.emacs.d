@@ -115,10 +115,11 @@ https://github.com/wbolster/emacs-direnv
                  (not (process-live-p (gethash directory my/direnv-in-flight))))
         (let* ((exec (or direnv--executable (direnv--detect)))
                (proc (make-process
-                      :name (format "direnv-async[%s]" directory)
-                      :command (list exec "export" "json")
-                      :connection-type 'pipe
-                      :noquery t
+                       :name (format "direnv-async[%s]" directory)
+                       :command (list exec "export" "json")
+                       :connection-type 'pipe
+                       :noquery t
+                       :stderr (get-buffer-create " *direnv-stderr*")
                       :filter (lambda (proc chunk)
                                 (process-put proc 'output
                                              (concat (or (process-get proc 'output) "")
