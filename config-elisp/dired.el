@@ -98,35 +98,37 @@ dynamic-binding closure issues."
                                            (concat (or (process-get proc 'output) "")
                                                    chunk)))
                     :sentinel (lambda (proc event)
-                                (remhash directory my/direnv-in-flight)
-                                (cond
-                                 ((string= event "finished\n")
-                                  (condition-case err
-                                      (let ((trimmed (string-trim
-                                                      (or (process-get proc 'output) ""))))
-                                        (when (> (length trimmed) 0)
-                                          (let ((env (json-parse-string
-                                                      trimmed
-                                                      :object-type 'alist
-                                                      :key-type 'string)))
-                                            (when (> (length env) 0)
-                                              (dolist (pair env)
-                                                (let ((name (car pair))
-                                                      (value (cdr pair)))
-                                                  (setenv name value)
-                                                  (when (string= name "PATH")
-                                                    (setq exec-path
-                                                          (append (parse-colon-path value)
-                                                                  (list exec-directory))))))
-                                              (message "direnv: environment loaded (%s)"
-                                                       (abbreviate-file-name directory))))))
-                                    (error
-                                     (message "direnv async error in %s: %s"
-                                              (abbreviate-file-name directory)
-                                              (error-message-string err)))))
-                                 ((string-prefix-p "exited abnormally" event)
-                                  (message "direnv: .envrc evaluation failed in %s"
-                                           (abbreviate-file-name directory))))))))
+                                (let ((dir (process-get proc 'directory)))
+                                  (remhash dir my/direnv-in-flight)
+                                  (cond
+                                   ((string= event "finished\n")
+                                    (condition-case err
+                                        (let ((trimmed (string-trim
+                                                        (or (process-get proc 'output) ""))))
+                                          (when (> (length trimmed) 0)
+                                            (let ((env (json-parse-string
+                                                        trimmed
+                                                        :object-type 'alist
+                                                        :key-type 'string)))
+                                              (when (> (length env) 0)
+                                                (dolist (pair env)
+                                                  (let ((name (car pair))
+                                                        (value (cdr pair)))
+                                                    (setenv name value)
+                                                    (when (string= name "PATH")
+                                                      (setq exec-path
+                                                            (append (parse-colon-path value)
+                                                                    (list exec-directory))))))
+                                                (message "direnv: environment loaded (%s)"
+                                                         (abbreviate-file-name dir))))))
+                                      (error
+                                       (message "direnv async error in %s: %s"
+                                                (abbreviate-file-name dir)
+                                                (error-message-string err)))))
+                                   ((string-prefix-p "exited abnormally" event)
+                                    (message "direnv: .envrc evaluation failed in %s"
+                                             (abbreviate-file-name dir)))))))))
+        (process-put proc 'directory directory)
         (puthash directory proc my/direnv-in-flight))))
 
   (defun my/direnv-maybe-update-async ()
