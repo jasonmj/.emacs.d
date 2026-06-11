@@ -1,5 +1,4 @@
 (use-package bufler
-  :ensure t
   :straight (:type git :host github :repo "alphapapa/bufler.el")
   :custom
   (bufler-filter-buffer-name-regexps '("\\*Compile-Log\\*"

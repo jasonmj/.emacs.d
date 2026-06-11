@@ -1,5 +1,5 @@
 (use-package cape
-    :ensure t
+    :straight t
     :bind (("C-c q" . completion-at-point))
     :hook (shell-mode . (lambda () (define-key shell-mode-map (kbd "C-r") 'cape-history)))
     :config
@@ -52,7 +52,7 @@
 )
 
 (use-package consult
-  :ensure t
+  :straight t
   :bind (("C-c h" . consult-history)
 	   ("C-c l" . consult-theme)
 	   ("C-;" . consult-recent-file)
@@ -215,7 +215,7 @@ function."
   (counsel-web-search (selection-or-thing-at-point)))
 
 (use-package corfu
-  :ensure t
+  :straight t
   :bind (:map corfu-map
               ("C-e" . corfu-complete)
               ("<return>" . nil)
@@ -294,7 +294,7 @@ function."
   :custom (dabbrev-ignored-buffer-regexps '("\\.\\(?:pdf\\|jpe?g\\|png\\)\\'")))
 
 (use-package embark
-  :ensure t
+  :straight t
   :bind
   (("C-." . embark-act)
    :map embark-general-map
@@ -312,7 +312,7 @@ function."
   (setq prefix-help-command #'embark-prefix-help-command))
 
 (use-package embark-consult
-  :ensure t
+  :straight t
   :hook (embark-collect-mode . consult-preview-at-point-mode))
 
 (use-package kind-icon
@@ -328,12 +328,12 @@ function."
   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
 (use-package marginalia
-  :ensure t
+  :straight t
   :custom (marginalia-field-width 60)
   :config (marginalia-mode))
 
 (use-package orderless
-  :ensure t
+  :straight t
   :custom
   (completion-styles '(orderless basic))
   (completion-category-defaults nil)
@@ -347,18 +347,18 @@ function."
   :config (prescient-persist-mode))
 
 (use-package vertico-prescient
-  :ensure t
+  :straight t
   :after prescient vertico
   :custom (vertico-prescient-completion-styles '(orderless prescient partial-completion))
   :config (vertico-prescient-mode))
 
 (use-package corfu-prescient
-  :ensure t
+  :straight t
   :after prescient corfu
   :config (corfu-prescient-mode))
 
 (use-package vertico
-  :ensure t
+  :straight t
   :config
   (vertico-mode)
   (vertico-indexed-mode 1)
@@ -424,9 +424,11 @@ function."
   (setq enable-recursive-minibuffers t))
 
 (use-package vertico-posframe
-  :ensure t
-  :init (progn (vertico-posframe-mode 1) (setq vertico-posframe-border-width 12) (custom-set-faces '(vertico-posframe-border ((t ())))))
+  :straight (vertico-posframe :type git :host github :repo "tumashu/vertico-posframe")
   :config
+  (vertico-posframe-mode 1)
+  (setq vertico-posframe-border-width 12)
+  (custom-set-faces '(vertico-posframe-border ((t ()))))
   (setq vertico-posframe-hide-minibuffer t
         posframe-text-scale-factor-function (lambda (_) 0)
 	vertico-posframe-min-width 110

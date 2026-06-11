@@ -28,7 +28,7 @@ https://magit.vc
     (magit-save-repository-buffers nil)
     (magit-revert-buffers 1))
   (use-package magit-gh
-  :ensure t
+  :straight (magit-gh :type git :host github :repo "jonathanchu/magit-gh")
   :after magit)
 #+end_src
 * Magit Pretty Graph

@@ -6,7 +6,7 @@ Cape provides Completion At Point Extensions which can be used in combination wi
 https://github.com/minad/cape
 #+begin_src emacs-lisp
     (use-package cape
-      :ensure t
+      :straight t
       :bind (("C-c q" . completion-at-point))
       :hook (shell-mode . (lambda () (define-key shell-mode-map (kbd "C-r") 'cape-history)))
       :config
@@ -64,7 +64,7 @@ Consult provides search and navigation commands based on the Emacs completion fu
 https://github.com/minad/consult
 #+begin_src emacs-lisp
   (use-package consult
-    :ensure t
+    :straight t
     :bind (("C-c h" . consult-history)
   	   ("C-c l" . consult-theme)
   	   ("C-;" . consult-recent-file)
@@ -239,7 +239,7 @@ Corfu enhances completion at point with a small completion popup.
 https://github.com/minad/corfu
 #+begin_src emacs-lisp
   (use-package corfu
-    :ensure t
+    :straight t
     :bind (:map corfu-map
                 ("C-e" . corfu-complete)
                 ("<return>" . nil)
@@ -323,7 +323,7 @@ Dynamic abbreviations let you write just a few characters of words you've writte
 * Embark
 #+begin_src emacs-lisp
   (use-package embark
-    :ensure t
+    :straight t
     :bind
     (("C-." . embark-act)
      :map embark-general-map
@@ -343,7 +343,7 @@ Dynamic abbreviations let you write just a few characters of words you've writte
 ** Embark Consult
 #+begin_src emacs-lisp
   (use-package embark-consult
-    :ensure t
+    :straight t
     :hook (embark-collect-mode . consult-preview-at-point-mode))
 #+end_src
 * Kind Icon
@@ -370,7 +370,7 @@ Adds marginalia to minibuffer completions.
 https://github.com/minad/marginalia
 #+begin_src emacs-lisp
 (use-package marginalia
-  :ensure t
+  :straight t
   :custom (marginalia-field-width 60)
   :config (marginalia-mode))
 #+end_src
@@ -380,7 +380,7 @@ Emacs completion style that matches multiple regexps in any order.
 https://github.com/oantolin/orderless
 #+begin_src emacs-lisp
   (use-package orderless
-    :ensure t
+    :straight t
     :custom
     (completion-styles '(orderless basic))
     (completion-category-defaults nil)
@@ -404,7 +404,7 @@ Provides an interface for using Prescient to sort and filter candidates in Verti
 https://github.com/radian-software/prescient.el
 #+begin_src emacs-lisp
   (use-package vertico-prescient
-    :ensure t
+    :straight t
     :after prescient vertico
     :custom (vertico-prescient-completion-styles '(orderless prescient partial-completion))
     :config (vertico-prescient-mode))
@@ -415,14 +415,14 @@ Provides an interface for using Prescient to sort and filter candidates in Corfu
 https://github.com/radian-software/prescient.el
 #+begin_src emacs-lisp
   (use-package corfu-prescient
-    :ensure t
+    :straight t
     :after prescient corfu
     :config (corfu-prescient-mode))
 #+end_src
 * Vertico
 #+begin_src emacs-lisp
   (use-package vertico
-    :ensure t
+    :straight t
     :config
     (vertico-mode)
     (vertico-indexed-mode 1)
@@ -492,9 +492,11 @@ https://github.com/radian-software/prescient.el
 ** Vertico Posframe
 #+begin_src emacs-lisp
   (use-package vertico-posframe
-    :ensure t
-    :init (progn (vertico-posframe-mode 1) (setq vertico-posframe-border-width 12) (custom-set-faces '(vertico-posframe-border ((t ())))))
+    :straight (vertico-posframe :type git :host github :repo "tumashu/vertico-posframe")
     :config
+    (vertico-posframe-mode 1)
+    (setq vertico-posframe-border-width 12)
+    (custom-set-faces '(vertico-posframe-border ((t ()))))
     (setq vertico-posframe-hide-minibuffer t
           posframe-text-scale-factor-function (lambda (_) 0)
   	vertico-posframe-min-width 110

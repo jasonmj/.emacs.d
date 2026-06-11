@@ -4,6 +4,6 @@
 A major mode for editing .nix files. 
 #+begin_src emacs-lisp
   (use-package nix-mode
-    :ensure t
+    :straight (nix-mode :type git :host github :repo "NixOS/nix-mode")
     :mode "\\.nix\\'")
 #+end_src

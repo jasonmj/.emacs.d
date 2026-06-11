@@ -1,3 +1,3 @@
 (use-package nix-mode
-  :ensure t
+  :straight (nix-mode :type git :host github :repo "NixOS/nix-mode")
   :mode "\\.nix\\'")

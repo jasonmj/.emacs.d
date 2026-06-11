@@ -7,7 +7,6 @@ A butler for your buffers. Group buffers into workspaces with programmable rules
 https://github.com/alphapapa/bufler.el
 #+begin_src emacs-lisp
   (use-package bufler
-    :ensure t
     :straight (:type git :host github :repo "alphapapa/bufler.el")
     :custom
     (bufler-filter-buffer-name-regexps '("\\*Compile-Log\\*"

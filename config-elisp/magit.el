@@ -21,7 +21,7 @@
   (magit-save-repository-buffers nil)
   (magit-revert-buffers 1))
 (use-package magit-gh
-:ensure t
+:straight (magit-gh :type git :host github :repo "jonathanchu/magit-gh")
 :after magit)
 
 (use-package magit-pretty-graph
